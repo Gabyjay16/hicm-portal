@@ -21,7 +21,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ user, onLogout, onUpda
   if (!user || user.role !== 'staff') return null;
 
   return (
-    <div className="min-h-screen bg-navy-900 text-offwhite flex flex-col antialiased">
+    <div className="min-h-screen bg-ambient-glass text-slate-100 flex flex-col antialiased">
       <Header
         user={user}
         onLogout={onLogout}

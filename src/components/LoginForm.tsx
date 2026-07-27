@@ -265,11 +265,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
   };
 
   return (
-    <div className="max-w-xl w-full mx-auto my-6 bg-navy-800 border border-slate-700/60 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6 font-sans text-slate-100">
+    <div className="max-w-xl w-full mx-auto my-8 glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 font-sans text-white border border-white/20 backdrop-blur-2xl animate-float-subtle">
       {/* Header Banner */}
       <div className="text-center space-y-2">
-        <div className="inline-flex p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 mb-1">
-          <BookOpen className="w-8 h-8" />
+        <div className="inline-flex p-3.5 rounded-2xl bg-blue-600/25 border border-blue-400/40 text-blue-400 mb-1 shadow-lg shadow-blue-600/20 backdrop-blur-md">
+          <BookOpen className="w-8 h-8 text-yellow-400" />
         </div>
         <h2 className="text-2xl font-bold text-offwhite tracking-tight">
           {mode === 'landing' && 'HICM Public Portal'}
@@ -303,7 +303,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
       {/* ── 1. PUBLIC LANDING PAGE (MODE = 'landing') ────────────────────────── */}
       {mode === 'landing' && (
         <div className="space-y-6">
-          {/* SINGLE NORMAL TOP LOGIN BUTTON */}
+          {/* TOP LOGIN BUTTON */}
           <div>
             <button
               type="button"
@@ -312,9 +312,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                 setErrorMessage('');
                 setSuccessMessage('');
               }}
-              className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-navy-900 font-extrabold text-sm rounded-xl transition-all shadow-lg flex items-center justify-center space-x-2 cursor-pointer"
+              className="w-full py-3.5 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 hover:from-blue-500 hover:to-blue-600 text-white font-extrabold text-sm rounded-2xl transition-all shadow-xl shadow-blue-600/30 hover:scale-[1.01] active:scale-[0.99] border border-blue-400/30 flex items-center justify-center space-x-2 cursor-pointer"
             >
-              <LogIn className="w-5 h-5" />
+              <LogIn className="w-5 h-5 text-yellow-400" />
               <span>Log In to Portal</span>
             </button>
           </div>
@@ -393,15 +393,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                 setErrorMessage('');
                 setSuccessMessage('');
               }}
-              className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/40 font-bold text-sm rounded-xl transition-all shadow-lg flex items-center justify-center space-x-2 cursor-pointer"
+              className="w-full py-3.5 bg-black/80 hover:bg-black/90 text-yellow-400 border border-yellow-500/50 font-extrabold text-sm rounded-2xl transition-all shadow-xl hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center space-x-2 cursor-pointer backdrop-blur-xl"
             >
-              <LogIn className="w-4 h-4" />
+              <LogIn className="w-4 h-4 text-blue-400" />
               <span>Log In to Portal</span>
             </button>
           </div>
 
           {/* NOT A STUDENT? TEXT LINK TO REGISTRATION PAGE */}
-          <div className="text-center pt-3 border-t border-slate-700/50 space-y-1">
+          <div className="text-center pt-3 border-t border-white/10 space-y-1">
             <p className="text-xs text-slate-400 font-medium">Not a student?</p>
             <button
               type="button"
@@ -410,7 +410,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                 setErrorMessage('');
                 setSuccessMessage('');
               }}
-              className="text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:underline transition-colors cursor-pointer"
+              className="text-xs font-extrabold text-blue-400 hover:text-yellow-400 hover:underline transition-colors cursor-pointer"
             >
               Click here to go to the Registration Page →
             </button>
