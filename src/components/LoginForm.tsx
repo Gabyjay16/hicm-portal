@@ -18,7 +18,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel }) => {
   const [password, setPassword] = useState<string>('');
   const [matricNo, setMatricNo] = useState<string>('');
   const [staffCodeInput, setStaffCodeInput] = useState<string>('');
-  const [department, setDepartment] = useState<string>('Business Administration');
+  const [department, setDepartment] = useState<string>('Money and Banking');
   const [level, setLevel] = useState<string>('Level 300');
   const [staffRole, setStaffRole] = useState<string>('Lecturer');
 
@@ -270,9 +270,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel }) => {
                     onChange={(e) => setDepartment(e.target.value)}
                     className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-1.5 text-offwhite focus:outline-none focus:border-emerald-500"
                   >
-                    <option value="Business Administration">Business Administration</option>
-                    <option value="Accounting & Finance">Accounting & Finance</option>
-                    <option value="Management Information Systems">Management Information Systems</option>
+                    <option value="Money and Banking">Money and Banking</option>
+                    <option value="Accounting and Finance">Accounting and Finance</option>
+                    <option value="Organisational Sciences">Organisational Sciences</option>
+                    <option value="Management">Management</option>
+                    <option value="Insurance and Security">Insurance and Security</option>
                     <option value="Marketing">Marketing</option>
                   </select>
                 </div>
@@ -313,10 +315,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel }) => {
                       onChange={(e) => setDepartment(e.target.value)}
                       className="w-full bg-navy-900 border border-slate-700 rounded-xl px-2.5 py-2 text-offwhite text-xs focus:outline-none focus:border-emerald-500"
                     >
-                      <option value="Business Administration">Business Admin</option>
-                      <option value="Accounting & Finance">Accounting</option>
-                      <option value="Management Systems">MIS</option>
-                      <option value="Marketing">Marketing</option>
+                    <option value="Money and Banking">Money &amp; Banking</option>
+                    <option value="Accounting and Finance">Accounting &amp; Finance</option>
+                    <option value="Organisational Sciences">Org. Sciences</option>
+                    <option value="Management">Management</option>
+                    <option value="Insurance and Security">Insurance &amp; Security</option>
+                    <option value="Marketing">Marketing</option>
                     </select>
                   </div>
 

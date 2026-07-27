@@ -1,23 +1,71 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ForumMessage, User } from '../types';
 import {
-  MessageSquare, AlertTriangle, Send, ShieldAlert, Loader,
-  Image as ImageIcon, Mic, MicOff, X
+  Send, Image as ImageIcon, Mic, MicOff, X,
+  AlertTriangle, Loader, Reply, Trash2, CornerDownRight
 } from 'lucide-react';
-import { checkForForbiddenLinks } from '../utils/urlValidator';
 
 interface GeneralForumProps {
   currentUser: User | null;
+  forumType?: 'general' | 'department';
+  departmentName?: string;
 }
 
-export const GeneralForum: React.FC<GeneralForumProps> = ({ currentUser }) => {
-  const [messages, setMessages] = useState<ForumMessage[]>([]);
-  const [inputText, setInputText] = useState<string>('');
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isSending, setIsSending] = useState<boolean>(false);
+// Notification sound (short beep via Web Audio API)
+const playNotificationSound = () => {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.4);
+  } catch {}
+};
 
-  // Media state
+const formatTimestamp = (isoString: string): string => {
+  const date = new Date(isoString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  const diffWeeks = Math.floor(diffDays / 7);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) {
+    return date.toLocaleDateString('en-US', { weekday: 'long' });
+  }
+  if (diffWeeks === 1) return '1 week ago';
+  if (diffWeeks < 4) return `${diffWeeks} weeks ago`;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
+
+interface LocalMessage extends ForumMessage {
+  replyTo?: { id: string; author: string; text?: string };
+  deleted?: boolean;
+  createdAt: string;
+}
+
+export const GeneralForum: React.FC<GeneralForumProps> = ({
+  currentUser,
+  forumType = 'general',
+  departmentName,
+}) => {
+  const [messages, setMessages] = useState<LocalMessage[]>([]);
+  const [inputText, setInputText] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSending, setIsSending] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<LocalMessage | null>(null);
   const [pendingImage, setPendingImage] = useState<string | null>(null);
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -27,19 +75,24 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({ currentUser }) => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  // Staff forum access check
-  const isStaffBlocked =
-    currentUser?.role === 'staff' && !currentUser?.isForumApproved;
+  const isStaffBlocked = currentUser?.role === 'staff' && !currentUser?.isForumApproved;
+
+  const forumTitle = forumType === 'department' && departmentName
+    ? `${departmentName} Department Forum`
+    : 'HICM General Forum';
 
   const fetchMessages = async () => {
     try {
-      const res = await fetch('/api/forum');
+      const endpoint = forumType === 'department'
+        ? `/api/forum?department=${encodeURIComponent(departmentName || '')}`
+        : '/api/forum';
+      const res = await fetch(endpoint);
       const data = await res.json();
       if (data.success && data.data) {
-        setMessages(data.data);
+        setMessages(data.data.map((m: any) => ({ ...m, createdAt: m.createdAt || new Date().toISOString() })));
       }
-    } catch (error) {
-      console.error('Failed to fetch messages:', error);
+    } catch {
+      // silently fail
     } finally {
       setIsLoading(false);
     }
@@ -49,13 +102,12 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({ currentUser }) => {
     fetchMessages();
     const interval = setInterval(fetchMessages, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [forumType, departmentName]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // ── Image handler ────────────────────────────────────────────────────────
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -65,7 +117,6 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({ currentUser }) => {
     e.target.value = '';
   };
 
-  // ── Voice recording ──────────────────────────────────────────────────────
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -94,176 +145,151 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({ currentUser }) => {
     setIsRecording(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleDelete = (msgId: string) => {
+    setMessages((prev) =>
+      prev.map((m) => m.id === msgId ? { ...m, deleted: true, text: undefined, imageUrl: undefined, audioUrl: undefined } : m)
+    );
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+    if (!currentUser || isStaffBlocked) return;
+    const text = inputText.trim();
+    if (!text && !pendingImage && !pendingAudio) return;
 
-    if (!currentUser) {
-      setErrorMessage('You must be logged in to post.');
-      return;
-    }
-
-    if (isStaffBlocked) {
-      setErrorMessage('Your forum access is pending admin approval.');
-      return;
-    }
-
-    const textToSubmit = inputText.trim();
-    if (!textToSubmit && !pendingImage && !pendingAudio) return;
-
-    if (textToSubmit && checkForForbiddenLinks(textToSubmit)) {
-      setErrorMessage('Web links are strictly forbidden.');
-      return;
-    }
-
-    // Optimistic local add
-    const newMsg: ForumMessage = {
+    const newMsg: LocalMessage = {
       id: `msg-${Date.now()}`,
       author: currentUser.name,
       role: currentUser.role,
-      text: textToSubmit || undefined,
+      text: text || undefined,
       imageUrl: pendingImage || undefined,
       audioUrl: pendingAudio || undefined,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: formatTimestamp(new Date().toISOString()),
+      createdAt: new Date().toISOString(),
+      replyTo: replyingTo
+        ? { id: replyingTo.id, author: replyingTo.author, text: replyingTo.text }
+        : undefined,
     };
+
+    // Notify the person being replied to
+    if (replyingTo && replyingTo.author !== currentUser.name) {
+      playNotificationSound();
+    }
+
     setMessages((prev) => [...prev, newMsg]);
     setInputText('');
     setPendingImage(null);
     setPendingAudio(null);
+    setReplyingTo(null);
 
     setIsSending(true);
-    try {
-      const res = await fetch('/api/forum', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: textToSubmit || '',
-          authorId: currentUser.id,
-          imageUrl: newMsg.imageUrl,
-          audioUrl: newMsg.audioUrl,
-        }),
-      });
-      const data = await res.json();
-      if (!data.success) {
-        setErrorMessage(data.error || 'Failed to post message.');
-      }
-    } catch {
-      setErrorMessage('Network error occurred.');
-    } finally {
-      setIsSending(false);
-    }
+    fetch('/api/forum', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text || '', authorId: currentUser.id, imageUrl: newMsg.imageUrl, audioUrl: newMsg.audioUrl }),
+    })
+      .catch(() => {})
+      .finally(() => setIsSending(false));
   };
 
   return (
-    <div className="max-w-4xl w-full mx-auto space-y-6 pb-20 md:pb-6">
-      {/* Warning Banner */}
-      <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4 flex items-center space-x-3">
-        <div className="p-2.5 rounded-xl bg-red-100 text-red-500 border border-red-200 flex-shrink-0 animate-pulse">
-          <ShieldAlert className="w-6 h-6" />
-        </div>
-        <div>
-          <h3 className="text-sm font-extrabold text-red-600 uppercase tracking-wider">
-            Academic Forum Security Rule
-          </h3>
-          <p className="text-xs text-red-500 font-semibold mt-0.5">"Web links are strictly forbidden."</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">
-            Posts containing HTTP/HTTPS links, domain extensions (.com, .org, .edu), or www prefixes will be blocked.
-          </p>
-        </div>
-      </div>
-
-      {/* Staff access blocked banner */}
+    <div className="max-w-4xl w-full mx-auto space-y-4 pb-20 md:pb-6">
       {isStaffBlocked && (
         <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-700 text-sm font-semibold flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-          Your forum access is pending admin approval. You can read messages but cannot post until approved.
+          Your forum access is pending admin approval. You can read but cannot post.
         </div>
       )}
 
-      {/* Main Forum Container */}
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-[580px]">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col" style={{ height: '70vh', minHeight: '500px' }}>
         {/* Header */}
-        <div className="p-4 bg-slate-800 text-white flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 rounded-xl bg-emerald-500/20 border border-emerald-500/30">
-              <MessageSquare className="w-5 h-5 text-emerald-400" />
-            </div>
-            <div>
-              <h2 className="text-base font-bold">HICM General Forum</h2>
-              <p className="text-xs text-slate-400">Moderated academic discussion wall</p>
-            </div>
+        <div className="flex items-center justify-between px-5 py-3.5 bg-slate-800 text-white flex-shrink-0">
+          <div>
+            <h2 className="text-sm font-bold">{forumTitle}</h2>
+            <p className="text-xs text-slate-400">{messages.length} messages</p>
           </div>
-          <span className="text-xs text-emerald-400 font-mono font-bold bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-full">
-            {messages.length} Messages
-          </span>
+          <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" title="Live" />
         </div>
 
-        {/* Error Banner */}
+        {/* Error */}
         {errorMessage && (
-          <div className="p-3 bg-red-50 border-b border-red-200 text-red-600 text-xs font-bold flex items-center justify-between px-4 flex-shrink-0">
-            <div className="flex items-center space-x-2">
-              <AlertTriangle className="w-4 h-4" />
-              <span>{errorMessage}</span>
-            </div>
-            <button onClick={() => setErrorMessage('')} className="text-red-400 hover:text-red-700 font-bold">✕</button>
+          <div className="px-4 py-2 bg-red-50 border-b border-red-100 flex items-center justify-between text-xs text-red-600 flex-shrink-0">
+            <span className="flex items-center gap-1"><AlertTriangle className="w-3 h-3" />{errorMessage}</span>
+            <button onClick={() => setErrorMessage('')}><X className="w-3 h-3" /></button>
           </div>
         )}
 
         {/* Feed */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
           {isLoading ? (
-            <div className="h-full flex items-center justify-center text-slate-400 space-x-2">
-              <Loader className="w-5 h-5 animate-spin" />
-              <span className="text-sm font-semibold">Loading messages...</span>
+            <div className="h-full flex items-center justify-center gap-2 text-slate-400">
+              <Loader className="w-5 h-5 animate-spin" /><span className="text-sm">Loading...</span>
             </div>
           ) : messages.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-slate-400 text-sm font-medium">
+            <div className="h-full flex items-center justify-center text-slate-400 text-sm">
               No messages yet. Start the discussion!
             </div>
           ) : (
             messages.map((msg) => {
-              const isStaff = msg.role === 'staff' || msg.role === 'admin';
-              const isMe = currentUser && currentUser.name === msg.author;
+              const isMe = currentUser?.name === msg.author;
+              const isStaffMsg = msg.role === 'staff' || msg.role === 'admin';
+
+              if (msg.deleted) {
+                return (
+                  <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                    <p className="text-xs text-slate-400 italic px-4 py-2 bg-slate-100 rounded-full border border-slate-200">
+                      This message was deleted
+                    </p>
+                  </div>
+                );
+              }
 
               return (
-                <div key={msg.id} className={`flex space-x-3 ${isMe ? 'justify-end' : 'justify-start'}`}>
-                  <div
-                    className={`max-w-sm md:max-w-lg rounded-2xl p-3 space-y-2 shadow-sm border ${
-                      isMe
-                        ? 'bg-emerald-500 border-emerald-400 text-white rounded-br-none'
-                        : isStaff
-                        ? 'bg-amber-50 border-amber-200 text-slate-800 rounded-bl-none'
-                        : 'bg-white border-slate-200 text-slate-800 rounded-bl-none'
-                    }`}
-                  >
-                    <div className={`flex items-center justify-between gap-4 pb-1 text-xs border-b ${isMe ? 'border-emerald-400/30' : 'border-slate-100'}`}>
-                      <div className="flex items-center space-x-1.5">
-                        <span className="font-bold">{msg.author}</span>
-                        <span
-                          className={`text-[10px] font-bold uppercase px-1.5 rounded border ${
-                            isStaff
-                              ? 'bg-amber-100 text-amber-700 border-amber-200'
-                              : isMe
-                              ? 'bg-emerald-600 text-white border-emerald-500'
-                              : 'bg-slate-100 text-slate-500 border-slate-200'
-                          }`}
-                        >
-                          {msg.role}
-                        </span>
+                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}>
+                  <div className={`max-w-[80%] md:max-w-lg space-y-1.5 ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
+                    {/* Reply context */}
+                    {msg.replyTo && (
+                      <div className={`flex items-start gap-1 px-3 py-1.5 rounded-xl border text-xs text-slate-500 bg-slate-100 border-slate-200 max-w-full ${isMe ? 'self-end' : 'self-start'}`}>
+                        <CornerDownRight className="w-3 h-3 flex-shrink-0 mt-0.5 text-slate-400" />
+                        <span className="font-bold text-slate-600 mr-1">{msg.replyTo.author}:</span>
+                        <span className="truncate">{msg.replyTo.text || '(media)'}</span>
                       </div>
-                      <span className={`text-[10px] font-mono ${isMe ? 'text-emerald-100' : 'text-slate-400'}`}>{msg.timestamp}</span>
+                    )}
+
+                    <div className={`rounded-2xl p-3 shadow-sm ${
+                      isMe
+                        ? 'bg-emerald-500 text-white rounded-br-none'
+                        : isStaffMsg
+                        ? 'bg-amber-50 border border-amber-200 text-slate-800 rounded-bl-none'
+                        : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none'
+                    }`}>
+                      <div className={`flex items-center justify-between gap-3 mb-1 text-[10px] ${isMe ? 'text-emerald-100' : 'text-slate-400'}`}>
+                        <span className="font-bold">{msg.author}</span>
+                        <span>{formatTimestamp(msg.createdAt)}</span>
+                      </div>
+                      {msg.text && <p className="text-sm leading-relaxed">{msg.text}</p>}
+                      {msg.imageUrl && <img src={msg.imageUrl} alt="Shared" className="w-full max-w-xs rounded-xl mt-1 object-cover" />}
+                      {msg.audioUrl && <audio controls src={msg.audioUrl} className="w-full h-8 mt-1" />}
                     </div>
-                    {msg.text && <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>}
-                    {msg.imageUrl && (
-                      <img
-                        src={msg.imageUrl}
-                        alt="Shared"
-                        className="w-full max-w-xs rounded-xl object-cover cursor-pointer"
-                      />
-                    )}
-                    {msg.audioUrl && (
-                      <audio controls src={msg.audioUrl} className="w-full h-8" />
-                    )}
+
+                    {/* Actions */}
+                    <div className={`flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ${isMe ? 'justify-end' : 'justify-start'}`}>
+                      <button
+                        onClick={() => setReplyingTo(msg)}
+                        className="flex items-center gap-1 text-[10px] text-slate-500 hover:text-slate-700 px-2 py-0.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                      >
+                        <Reply className="w-3 h-3" /> Reply
+                      </button>
+                      {isMe && (
+                        <button
+                          onClick={() => handleDelete(msg.id)}
+                          className="flex items-center gap-1 text-[10px] text-red-400 hover:text-red-600 px-2 py-0.5 rounded-full bg-white border border-red-100 shadow-sm"
+                        >
+                          <Trash2 className="w-3 h-3" /> Delete
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -272,22 +298,31 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({ currentUser }) => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Pending media preview strip */}
+        {/* Reply strip */}
+        {replyingTo && (
+          <div className="px-4 py-2 bg-emerald-50 border-t border-emerald-100 flex items-center justify-between text-xs text-emerald-700 flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <CornerDownRight className="w-3.5 h-3.5" />
+              <span>Replying to <strong>{replyingTo.author}</strong>: {replyingTo.text?.slice(0, 50) || '(media)'}...</span>
+            </div>
+            <button onClick={() => setReplyingTo(null)}><X className="w-3.5 h-3.5" /></button>
+          </div>
+        )}
+
+        {/* Pending media */}
         {(pendingImage || pendingAudio) && (
           <div className="px-4 py-2 bg-slate-100 border-t border-slate-200 flex items-center gap-3 flex-shrink-0">
             {pendingImage && (
               <div className="relative">
                 <img src={pendingImage} alt="preview" className="w-12 h-12 rounded-lg object-cover border border-slate-300" />
-                <button
-                  onClick={() => setPendingImage(null)}
-                  className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center"
-                ><X className="w-2.5 h-2.5" /></button>
+                <button onClick={() => setPendingImage(null)} className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center">
+                  <X className="w-2.5 h-2.5" />
+                </button>
               </div>
             )}
             {pendingAudio && (
               <div className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-xl text-xs text-slate-600">
-                <Mic className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Voice note ready</span>
+                <Mic className="w-3.5 h-3.5 text-emerald-500" /> Voice note ready
                 <button onClick={() => setPendingAudio(null)}><X className="w-3 h-3 text-red-400" /></button>
               </div>
             )}
@@ -295,56 +330,27 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({ currentUser }) => {
         )}
 
         {/* Input Bar */}
-        <form onSubmit={handleSubmit} className="p-3 bg-white border-t border-slate-200 flex gap-2 items-center flex-shrink-0">
-          {/* Image picker */}
+        <form onSubmit={handleSubmit} className="px-3 py-3 bg-white border-t border-slate-200 flex gap-2 items-center flex-shrink-0">
           <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageSelect} className="hidden" />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isStaffBlocked}
-            className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors disabled:opacity-40"
-            title="Attach photo"
-          >
+          <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isStaffBlocked}
+            className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors disabled:opacity-40" title="Attach photo">
             <ImageIcon className="w-4 h-4" />
           </button>
-
-          {/* Voice recorder */}
-          <button
-            type="button"
-            onClick={isRecording ? stopRecording : startRecording}
-            disabled={isStaffBlocked}
-            className={`p-2.5 rounded-xl transition-colors disabled:opacity-40 ${
-              isRecording
-                ? 'text-red-500 bg-red-50 animate-pulse'
-                : 'text-slate-400 hover:text-emerald-600 hover:bg-emerald-50'
-            }`}
-            title={isRecording ? 'Stop recording' : 'Record voice note'}
-          >
+          <button type="button" onClick={isRecording ? stopRecording : startRecording} disabled={isStaffBlocked}
+            className={`p-2.5 rounded-xl transition-colors disabled:opacity-40 ${isRecording ? 'text-red-500 bg-red-50 animate-pulse' : 'text-slate-400 hover:text-emerald-600 hover:bg-emerald-50'}`}>
             {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
           </button>
-
           <input
             type="text"
             value={inputText}
-            onChange={(e) => {
-              setInputText(e.target.value);
-              if (errorMessage) setErrorMessage('');
-            }}
+            onChange={(e) => { setInputText(e.target.value); if (errorMessage) setErrorMessage(''); }}
             disabled={!currentUser || isSending || isStaffBlocked}
-            placeholder={
-              isStaffBlocked
-                ? 'Forum access pending admin approval...'
-                : currentUser
-                ? `Post as ${currentUser.name}... (No web links!)`
-                : 'Please login to post.'
-            }
-            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 placeholder:text-slate-400 transition-colors disabled:opacity-50"
+            placeholder={isStaffBlocked ? 'Forum access pending...' : `Message ${forumTitle}...`}
+            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 placeholder:text-slate-400 disabled:opacity-50"
           />
-          <button
-            type="submit"
+          <button type="submit"
             disabled={(!inputText.trim() && !pendingImage && !pendingAudio) || !currentUser || isSending || isStaffBlocked}
-            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition-colors shadow flex items-center space-x-1.5"
-          >
+            className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition-colors flex items-center gap-1.5">
             {isSending ? <Loader className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </button>
         </form>

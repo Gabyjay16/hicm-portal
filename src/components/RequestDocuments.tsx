@@ -161,7 +161,7 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
                 Request official academic documents such as attestation, attendance letters, and admission letters.
               </p>
               <div className="mt-4 flex items-center gap-1 text-xs font-bold text-emerald-600 group-hover:gap-2 transition-all">
-                <span>Request Now</span>
+                <span>Request</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </div>
             </button>

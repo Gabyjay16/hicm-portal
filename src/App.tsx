@@ -14,7 +14,7 @@ import { StaffDashboard } from './components/StaffDashboard';
 import { AdminDashboard } from './components/AdminDashboard';
 import { TimedEvaluation } from './components/TimedEvaluation';
 import { PlagiarismTest } from './components/PlagiarismTest';
-import { GeneralForum } from './components/GeneralForum';
+import { ForumPage } from './components/ForumPage';
 import { AlertsView } from './components/AlertsView';
 import { NotesView } from './components/NotesView';
 import { ComplaintsDesk } from './components/ComplaintsDesk';
@@ -23,6 +23,7 @@ import { ElectionsView } from './components/ElectionsView';
 import { TokenRequestsAdmin } from './components/TokenRequestsAdmin';
 import { RequestDocuments } from './components/RequestDocuments';
 import { UserManagement } from './components/UserManagement';
+import { PlagiarismCodeLookup } from './components/PlagiarismCodeLookup';
 
 export default function App() {
   const [user, setUser] = useState<User | null>({
@@ -86,7 +87,7 @@ export default function App() {
           <Route path="plagiarism" element={
             <PlagiarismTest user={user} />
           } />
-          <Route path="forum" element={<GeneralForum currentUser={user} />} />
+          <Route path="forum" element={<ForumPage currentUser={user} />} />
           <Route path="alerts" element={<AlertsView />} />
           <Route path="notes" element={<NotesView user={user} />} />
           <Route path="complaints" element={<ComplaintsDesk user={user} />} />
@@ -98,6 +99,7 @@ export default function App() {
         {/* Staff Routes */}
         <Route path="/staff" element={<StaffLayout user={user} onLogout={handleLogout} />}>
           <Route path="dashboard" element={<StaffDashboard />} />
+          <Route path="plagiarism-lookup" element={<PlagiarismCodeLookup />} />
         </Route>
 
         {/* Admin Routes */}
