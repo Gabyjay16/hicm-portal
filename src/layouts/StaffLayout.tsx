@@ -6,9 +6,10 @@ import { User, NavTab, SubView } from '../types';
 interface StaffLayoutProps {
   user: User | null;
   onLogout: () => void;
+  onUpdateUser?: (updated: Partial<User>) => void;
 }
 
-export const StaffLayout: React.FC<StaffLayoutProps> = ({ user, onLogout }) => {
+export const StaffLayout: React.FC<StaffLayoutProps> = ({ user, onLogout, onUpdateUser }) => {
   const navigate = useNavigate();
   React.useEffect(() => {
     if (!user || user.role !== 'staff') {
@@ -23,6 +24,7 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ user, onLogout }) => {
       <Header
         user={user}
         onLogout={onLogout}
+        onUpdateUser={onUpdateUser}
         unreadAlertCount={0}
       />
       <div className="flex-1 flex w-full">

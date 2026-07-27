@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Home, MessageSquare, Bell, User as UserIcon, LogOut, ChevronDown, Camera, Settings, X } from 'lucide-react';
 import { User } from '../types';
 import { Link, useLocation } from 'react-router-dom';
@@ -7,27 +7,64 @@ interface HeaderProps {
   user: User | null;
   unreadAlertCount?: number;
   onLogout?: () => void;
+  onUpdateUser?: (updated: Partial<User>) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   user,
   unreadAlertCount = 2,
   onLogout,
+  onUpdateUser,
 }) => {
   const location = useLocation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [avatarPreview, setAvatarPreview] = useState<string | undefined>(user?.avatarUrl);
+  const [phoneInput, setPhoneInput] = useState<string>(user?.phone || '');
+  const [customUsernameInput, setCustomUsernameInput] = useState<string>(user?.customUsername || user?.name || '');
+  const [showAvatarInForum, setShowAvatarInForum] = useState<boolean>(user?.showAvatarInForum !== false);
+
+  useEffect(() => {
+    if (user) {
+      setAvatarPreview(user.avatarUrl);
+      setPhoneInput(user.phone || '');
+      setCustomUsernameInput(user.customUsername || user.name);
+      setShowAvatarInForum(user.showAvatarInForum !== false);
+    }
+  }, [user]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setAvatarPreview(base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveChanges = () => {
+    if (onUpdateUser) {
+      onUpdateUser({
+        avatarUrl: avatarPreview,
+        phone: phoneInput,
+        customUsername: customUsernameInput,
+        showAvatarInForum: showAvatarInForum,
+      });
+    }
+    setIsProfileModalOpen(false);
+  };
 
   const getHomePath = () => {
     if (!user) return '/login';
     if (user.role === 'staff') return '/staff/dashboard';
     if (user.role === 'admin') return '/admin/dashboard';
     return '/student/dashboard';
-  };
-
-  const getAlertsPath = () => {
-    if (!user) return '/login';
-    return `/${user.role}/alerts`;
   };
 
   return (
@@ -37,8 +74,6 @@ export const Header: React.FC<HeaderProps> = ({
         <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">HICM Hub</h1>
         <p className="text-[13px] text-slate-500 font-medium">Student Academic & Services Portal</p>
       </div>
-
-
 
       {/* Navigation Links & Profile */}
       <div className="flex items-center space-x-6 text-sm font-semibold text-slate-600">
@@ -57,8 +92,6 @@ export const Header: React.FC<HeaderProps> = ({
           <MessageSquare className="w-4 h-4" />
           <span>Forum</span>
         </Link>
-
-
 
         <div className="relative">
           <div 
@@ -103,6 +136,15 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
+      {/* Hidden File Input for Avatar Selection */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        accept="image/*" 
+        className="hidden" 
+        onChange={handleFileSelect} 
+      />
+
       {/* Profile Modal */}
       {isProfileModalOpen && (
         <div className="fixed inset-0 bg-slate-900/50 z-[100] flex items-center justify-center p-4">
@@ -114,10 +156,14 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </div>
             <div className="p-6 space-y-5 text-slate-800">
+              {/* Picture Upload */}
               <div className="flex flex-col items-center gap-3">
-                <div className="w-20 h-20 rounded-full bg-slate-100 overflow-hidden border-2 border-slate-200 flex items-center justify-center relative group cursor-pointer">
-                  {user?.avatarUrl ? (
-                    <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-20 h-20 rounded-full bg-slate-100 overflow-hidden border-2 border-slate-200 flex items-center justify-center relative group cursor-pointer"
+                >
+                  {avatarPreview ? (
+                    <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
                     <UserIcon className="w-10 h-10 text-slate-400" />
                   )}
@@ -125,28 +171,57 @@ export const Header: React.FC<HeaderProps> = ({
                     <Camera className="w-6 h-6 text-white" />
                   </div>
                 </div>
-                <p className="text-xs font-semibold text-emerald-600 cursor-pointer">Change Picture</p>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-xs font-semibold text-emerald-600 hover:underline cursor-pointer"
+                >
+                  Change Picture (Select from Gallery)
+                </button>
               </div>
+
+              {/* Forum Username */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-700">Forum Username / Display Name</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. Anonymous Student or Jane Doe" 
+                  value={customUsernameInput}
+                  onChange={(e) => setCustomUsernameInput(e.target.value)}
+                  className="w-full bg-slate-800 border border-slate-700 text-white placeholder-slate-400 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors" 
+                />
+                <p className="text-[10px] text-slate-500">Name shown when posting in chat forums (defaults to your real name)</p>
+              </div>
+
+              {/* Phone Number */}
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-slate-700">Phone Number</label>
                 <input 
                   type="text" 
                   placeholder="e.g. 671234567" 
-                  defaultValue={user?.phone} 
+                  value={phoneInput} 
+                  onChange={(e) => setPhoneInput(e.target.value)}
                   className="w-full bg-slate-800 border border-slate-700 text-white placeholder-slate-400 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors" 
                 />
               </div>
+
+              {/* Visibility Switch */}
               <div className="space-y-1.5 flex items-center justify-between">
                 <div>
                   <label className="text-xs font-semibold text-slate-700">Picture Visibility</label>
                   <p className="text-[10px] text-slate-500">Show picture to others in chat forums</p>
                 </div>
-                <div className="w-10 h-6 bg-emerald-500 rounded-full flex items-center p-1 cursor-pointer">
-                  <div className="w-4 h-4 bg-white rounded-full translate-x-4 shadow-sm" />
+                <div 
+                  onClick={() => setShowAvatarInForum(!showAvatarInForum)}
+                  className={`w-10 h-6 rounded-full flex items-center p-1 cursor-pointer transition-colors ${showAvatarInForum ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                >
+                  <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${showAvatarInForum ? 'translate-x-4' : 'translate-x-0'}`} />
                 </div>
               </div>
+
+              {/* Submit */}
               <button
-                onClick={() => setIsProfileModalOpen(false)}
+                onClick={handleSaveChanges}
                 className="w-full py-3 bg-slate-900 text-white font-bold rounded-xl text-sm hover:bg-slate-800 transition-colors mt-4"
               >
                 Save Changes

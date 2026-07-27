@@ -6,9 +6,10 @@ import { User, NavTab, SubView } from '../types';
 interface AdminLayoutProps {
   user: User | null;
   onLogout: () => void;
+  onUpdateUser?: (updated: Partial<User>) => void;
 }
 
-export const AdminLayout: React.FC<AdminLayoutProps> = ({ user, onLogout }) => {
+export const AdminLayout: React.FC<AdminLayoutProps> = ({ user, onLogout, onUpdateUser }) => {
   const navigate = useNavigate();
   React.useEffect(() => {
     // Role check logic for Admin (could use a specific role or check if isStaff and isAdmin)
@@ -24,6 +25,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ user, onLogout }) => {
       <Header
         user={user}
         onLogout={onLogout}
+        onUpdateUser={onUpdateUser}
         unreadAlertCount={0}
       />
       <div className="flex-1 flex w-full">

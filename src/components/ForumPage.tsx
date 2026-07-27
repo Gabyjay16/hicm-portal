@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GeneralForum } from './GeneralForum';
 import { User } from '../types';
 import { Users, GraduationCap, Edit2, Save } from 'lucide-react';
@@ -9,8 +9,14 @@ interface ForumPageProps {
 
 export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
   const [activeTab, setActiveTab] = useState<'general' | 'department'>('general');
-  const [customUsername, setCustomUsername] = useState(currentUser?.name || '');
+  const [customUsername, setCustomUsername] = useState(currentUser?.customUsername || currentUser?.name || '');
   const [isEditingUsername, setIsEditingUsername] = useState(false);
+
+  useEffect(() => {
+    if (currentUser) {
+      setCustomUsername(currentUser.customUsername || currentUser.name);
+    }
+  }, [currentUser]);
 
   const dept = currentUser?.department || 'General';
 

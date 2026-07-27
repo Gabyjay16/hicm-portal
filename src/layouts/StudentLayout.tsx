@@ -8,9 +8,10 @@ import { User } from '../types';
 interface StudentLayoutProps {
   user: User | null;
   onLogout: () => void;
+  onUpdateUser?: (updated: Partial<User>) => void;
 }
 
-export const StudentLayout: React.FC<StudentLayoutProps> = ({ user, onLogout }) => {
+export const StudentLayout: React.FC<StudentLayoutProps> = ({ user, onLogout, onUpdateUser }) => {
   const navigate = useNavigate();
   React.useEffect(() => {
     if (!user || user.role !== 'student') {
@@ -30,6 +31,7 @@ export const StudentLayout: React.FC<StudentLayoutProps> = ({ user, onLogout }) 
         <Header
           user={user}
           onLogout={onLogout}
+          onUpdateUser={onUpdateUser}
           unreadAlertCount={2} // Mock
         />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl mx-auto w-full">

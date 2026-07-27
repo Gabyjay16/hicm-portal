@@ -84,6 +84,10 @@ export default function App() {
     setUser(null);
   };
 
+  const handleUpdateUser = (updated: Partial<User>) => {
+    setUser((prev) => (prev ? { ...prev, ...updated } : null));
+  };
+
   return (
     <BrowserRouter>
       <Routes>
@@ -102,7 +106,7 @@ export default function App() {
         />
 
         {/* Student Routes */}
-        <Route path="/student" element={<StudentLayout user={user} onLogout={handleLogout} />}>
+        <Route path="/student" element={<StudentLayout user={user} onLogout={handleLogout} onUpdateUser={handleUpdateUser} />}>
           <Route path="dashboard" element={
             <StudentDashboard user={user} plagiarismTokens={plagiarismTokens} />
           } />
@@ -120,13 +124,13 @@ export default function App() {
         </Route>
 
         {/* Staff Routes */}
-        <Route path="/staff" element={<StaffLayout user={user} onLogout={handleLogout} />}>
+        <Route path="/staff" element={<StaffLayout user={user} onLogout={handleLogout} onUpdateUser={handleUpdateUser} />}>
           <Route path="dashboard" element={<StaffDashboard />} />
           <Route path="plagiarism-lookup" element={<PlagiarismCodeLookup />} />
         </Route>
 
         {/* Admin Routes */}
-        <Route path="/admin" element={<AdminLayout user={user} onLogout={handleLogout} />}>
+        <Route path="/admin" element={<AdminLayout user={user} onLogout={handleLogout} onUpdateUser={handleUpdateUser} />}>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="tokens" element={<TokenRequestsAdmin />} />
           <Route path="users" element={<UserManagement adminSettings={adminSettings} />} />

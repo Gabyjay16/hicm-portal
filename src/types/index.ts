@@ -17,6 +17,7 @@ export interface User {
   canUpdateAnnouncements?: boolean;
   canViewAllForums?: boolean;
   customUsername?: string;
+  showAvatarInForum?: boolean;
 }
 
 export interface AdminSettingsConfig {
