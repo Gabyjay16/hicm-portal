@@ -167,7 +167,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
     switch (status) {
       case 'resolved': return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">Resolved</span>;
       case 'in_progress': return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">In Progress</span>;
-      case 'closed': return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">Closed</span>;
+      case 'closed': return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-black">Closed</span>;
       default: return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-600">Pending</span>;
     }
   };
@@ -178,9 +178,9 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
     return (
       <div className="max-w-3xl mx-auto space-y-6 pb-10">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-slate-900">Complaint Form Editor</h2>
+          <h2 className="text-xl font-bold text-black">Complaint Form Editor</h2>
           {editingType && (
-            <button onClick={() => setEditingType(null)} className="text-xs text-slate-500 flex items-center gap-1 hover:text-slate-800">
+            <button onClick={() => setEditingType(null)} className="text-xs text-black flex items-center gap-1 hover:text-black">
               <ArrowLeft className="w-4 h-4" /> Back to types
             </button>
           )}
@@ -197,26 +197,26 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
                   className="flex items-center justify-between p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-slate-400 transition-all group text-left"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="p-2.5 bg-slate-100 rounded-xl"><Icon className="w-5 h-5 text-slate-600" /></div>
+                    <div className="p-2.5 bg-slate-100 rounded-xl"><Icon className="w-5 h-5 text-black" /></div>
                     <div>
-                      <p className="font-bold text-slate-800">{config.title}</p>
-                      <p className="text-xs text-slate-500">{config.fields.length} fields configured</p>
+                      <p className="font-bold text-black">{config.title}</p>
+                      <p className="text-xs text-black">{config.fields.length} fields configured</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-slate-700" />
+                  <ChevronRight className="w-5 h-5 text-black group-hover:text-black" />
                 </button>
               );
             })}
           </div>
         ) : editingConfig ? (
           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-4">
-            <h3 className="font-bold text-slate-800 text-lg">{editingConfig.title} — Fields</h3>
+            <h3 className="font-bold text-black text-lg">{editingConfig.title} — Fields</h3>
             <div className="space-y-2">
               {editingConfig.fields.map((field, idx) => (
                 <div key={field.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                   <div>
-                    <p className="text-sm font-semibold text-slate-800">{field.label}</p>
-                    <p className="text-xs text-slate-500">Type: {field.type}{field.autoFill ? ` · Auto-fill: ${field.autoFill}` : ''}</p>
+                    <p className="text-sm font-semibold text-black">{field.label}</p>
+                    <p className="text-xs text-black">Type: {field.type}{field.autoFill ? ` · Auto-fill: ${field.autoFill}` : ''}</p>
                   </div>
                   {!field.autoFill && (
                     <button
@@ -240,7 +240,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
 
             {/* Add new field */}
             <div className="border-t border-slate-100 pt-4 space-y-3">
-              <p className="text-sm font-bold text-slate-700">Add New Field</p>
+              <p className="text-sm font-bold text-black">Add New Field</p>
               <div className="flex gap-2">
                 <input
                   value={newFieldLabel}
@@ -293,7 +293,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
       {/* Back */}
       <button
         onClick={() => selectedType ? setSelectedType(null) : navigate(-1)}
-        className="flex items-center space-x-2 text-slate-600 hover:text-slate-900 text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl transition-colors shadow-sm"
+        className="flex items-center space-x-2 text-black hover:text-black text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl transition-colors shadow-sm"
       >
         <ArrowLeft className="w-4 h-4 text-emerald-500" />
         <span>{selectedType ? 'Back to complaint types' : 'Back'}</span>
@@ -311,8 +311,8 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
         <>
           {/* Type picker */}
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-slate-900">Complaints Desk</h2>
-            <p className="text-sm text-slate-500">Select the type of complaint you want to submit.</p>
+            <h2 className="text-2xl font-bold text-black">Complaints Desk</h2>
+            <p className="text-sm text-black">Select the type of complaint you want to submit.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -327,8 +327,8 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
                   <div className="p-2.5 rounded-xl bg-white border border-current mb-3 shadow-sm">
                     <Icon className="w-5 h-5" />
                   </div>
-                  <p className="font-bold text-slate-800 text-sm">{config.title}</p>
-                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">{config.description}</p>
+                  <p className="font-bold text-black text-sm">{config.title}</p>
+                  <p className="text-xs text-black mt-1 leading-relaxed">{config.description}</p>
                   <div className="mt-4 flex items-center gap-1 text-xs font-bold">
                     <span>File Complaint</span>
                     <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -340,17 +340,17 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
 
           {/* History */}
           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-4">
-            <h3 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Your Complaint History</h3>
+            <h3 className="font-bold text-black text-sm border-b border-slate-100 pb-3">Your Complaint History</h3>
             {isLoading ? (
-              <p className="text-xs text-slate-400 text-center py-4">Loading history...</p>
+              <p className="text-xs text-black text-center py-4">Loading history...</p>
             ) : complaints.length === 0 ? (
-              <p className="text-xs text-slate-400 text-center py-6">No complaints found.</p>
+              <p className="text-xs text-black text-center py-6">No complaints found.</p>
             ) : (
               <div className="space-y-3">
                 {complaints.map((comp) => (
                   <div key={comp.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
                     <div className="flex items-start justify-between">
-                      <p className="text-sm font-bold text-slate-800">{comp.subject}</p>
+                      <p className="text-sm font-bold text-black">{comp.subject}</p>
                       {getStatusBadge(comp.status)}
                     </div>
                     {comp.adminResponse && (
@@ -359,7 +359,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
                         <p className="text-xs text-emerald-800">{comp.adminResponse}</p>
                       </div>
                     )}
-                    <p className="text-[10px] text-slate-400">{new Date(comp.createdAt).toLocaleString()}</p>
+                    <p className="text-[10px] text-black">{new Date(comp.createdAt).toLocaleString()}</p>
                   </div>
                 ))}
               </div>
@@ -370,10 +370,10 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
         /* ── Structured Complaint Form ── */
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-6">
           <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-            {React.createElement(typeIcons[selectedType], { className: 'w-5 h-5 text-slate-600' })}
+            {React.createElement(typeIcons[selectedType], { className: 'w-5 h-5 text-black' })}
             <div>
-              <h2 className="text-lg font-bold text-slate-900">{activeConfig.title}</h2>
-              <p className="text-xs text-slate-500">{activeConfig.description}</p>
+              <h2 className="text-lg font-bold text-black">{activeConfig.title}</h2>
+              <p className="text-xs text-black">{activeConfig.description}</p>
             </div>
           </div>
 
@@ -386,9 +386,9 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
                 return (
                   <div key={field.id} className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-semibold text-slate-700">{field.label}</label>
+                      <label className="text-xs font-semibold text-black">{field.label}</label>
                       <label className="flex items-center gap-2 cursor-pointer select-none">
-                        <span className="text-xs text-slate-500">{field.toggleLabel}</span>
+                        <span className="text-xs text-black">{field.toggleLabel}</span>
                         <div
                           onClick={() => setCaMarkIsNone((p) => !p)}
                           className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${caMarkIsNone ? 'bg-red-500' : 'bg-slate-200'}`}
@@ -412,7 +412,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
               if (field.type === 'select') {
                 return (
                   <div key={field.id} className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-700">{field.label}</label>
+                    <label className="text-xs font-semibold text-black">{field.label}</label>
                     <select
                       value={value}
                       onChange={(e) => handleFieldChange(field.id, e.target.value)}
@@ -430,7 +430,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
               if (field.type === 'textarea') {
                 return (
                   <div key={field.id} className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-700">{field.label}</label>
+                    <label className="text-xs font-semibold text-black">{field.label}</label>
                     <textarea
                       value={value}
                       onChange={(e) => handleFieldChange(field.id, e.target.value)}
@@ -444,7 +444,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
 
               return (
                 <div key={field.id} className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-700">
+                  <label className="text-xs font-semibold text-black">
                     {field.label} {isAutoFill && <span className="text-emerald-500 font-normal">(auto-filled)</span>}
                   </label>
                   <input
@@ -454,7 +454,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
                     placeholder={field.placeholder}
                     readOnly={isAutoFill}
                     className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors ${
-                      isAutoFill ? 'bg-emerald-50 border-emerald-200 text-slate-600' : 'border-slate-200'
+                      isAutoFill ? 'bg-emerald-50 border-emerald-200 text-black' : 'border-slate-200'
                     }`}
                   />
                 </div>
@@ -464,7 +464,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-slate-900 text-white font-bold rounded-xl text-sm hover:bg-slate-800 disabled:opacity-50 transition-colors"
+              className="w-full py-3 bg-slate-50 text-black font-bold rounded-xl text-sm hover:bg-white disabled:opacity-50 transition-colors"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Complaint'}
             </button>

@@ -68,17 +68,17 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl px-6 sm:px-8 py-4 flex items-center justify-between border-b border-slate-200 shadow-md text-slate-900">
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl px-6 sm:px-8 py-4 flex items-center justify-between border-b border-slate-200 shadow-md text-black">
       {/* Title Area */}
       <div className="hidden sm:block">
-        <h1 className="text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2">
+        <h1 className="text-2xl font-black tracking-tight text-black flex items-center gap-2">
           HICM Hub
         </h1>
-        <p className="text-[12px] text-slate-500 font-medium">Student Academic &amp; Services Portal</p>
+        <p className="text-[12px] text-black font-medium">Student Academic &amp; Services Portal</p>
       </div>
 
       {/* Navigation Links & Profile */}
-      <div className="flex items-center space-x-6 text-sm font-bold text-slate-700">
+      <div className="flex items-center space-x-6 text-sm font-bold text-black">
         <Link 
           to={getHomePath()} 
           className="hidden md:flex items-center space-x-1.5 hover:text-blue-600 transition-colors border-b-2 border-blue-600 text-blue-600 pb-0.5"
@@ -89,7 +89,7 @@ export const Header: React.FC<HeaderProps> = ({
         
         <Link 
           to="/student/forum" 
-          className="hidden md:flex items-center space-x-1.5 hover:text-blue-600 transition-colors text-slate-700"
+          className="hidden md:flex items-center space-x-1.5 hover:text-blue-600 transition-colors text-black"
         >
           <MessageSquare className="w-4 h-4 text-blue-600" />
           <span>Forum</span>
@@ -107,8 +107,8 @@ export const Header: React.FC<HeaderProps> = ({
                   <UserIcon className="w-5 h-5 text-blue-600" />
                 )}
             </div>
-            <span className="hidden lg:block font-bold text-slate-900 group-hover:text-blue-600">Profile</span>
-            <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+            <span className="hidden lg:block font-bold text-black group-hover:text-blue-600">Profile</span>
+            <ChevronDown className="w-4 h-4 text-black group-hover:text-blue-600 transition-colors" />
           </div>
 
           {isDropdownOpen && (
@@ -118,7 +118,7 @@ export const Header: React.FC<HeaderProps> = ({
                   setIsDropdownOpen(false);
                   setIsProfileModalOpen(true);
                 }}
-                className="w-full flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-all font-semibold"
+                className="w-full flex items-center px-4 py-2.5 text-sm text-black hover:bg-blue-50 hover:text-blue-600 transition-all font-semibold"
               >
                 <Settings className="w-4 h-4 mr-2.5 text-blue-600" />
                 Update Profile
@@ -150,10 +150,10 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Profile Modal */}
       {isProfileModalOpen && (
         <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-md">
-          <div className="glass-panel rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-white/20 backdrop-blur-2xl text-white">
+          <div className="glass-panel rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-200 backdrop-blur-2xl text-white">
             <div className="flex justify-between items-center p-4 border-b border-white/10 bg-black/40">
               <h2 className="font-extrabold text-white text-base">Update Profile</h2>
-              <button onClick={() => setIsProfileModalOpen(false)} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors">
+              <button onClick={() => setIsProfileModalOpen(false)} className="text-black hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -184,38 +184,38 @@ export const Header: React.FC<HeaderProps> = ({
 
               {/* Forum Username */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-200">Forum Username / Display Name</label>
+                <label className="text-xs font-semibold text-black">Forum Username / Display Name</label>
                 <input 
                   type="text" 
                   placeholder="e.g. Anonymous Student or Jane Doe" 
                   value={customUsernameInput}
                   onChange={(e) => setCustomUsernameInput(e.target.value)}
-                  className="w-full bg-black/60 border border-white/20 text-white placeholder-slate-400 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all" 
+                  className="w-full bg-black/60 border border-slate-200 text-white placeholder-slate-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all" 
                 />
-                <p className="text-[10px] text-slate-400">Name shown when posting in chat forums (defaults to your real name)</p>
+                <p className="text-[10px] text-black">Name shown when posting in chat forums (defaults to your real name)</p>
               </div>
 
               {/* Phone Number */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-200">Phone Number</label>
+                <label className="text-xs font-semibold text-black">Phone Number</label>
                 <input 
                   type="text" 
                   placeholder="e.g. 671234567" 
                   value={phoneInput} 
                   onChange={(e) => setPhoneInput(e.target.value)}
-                  className="w-full bg-black/60 border border-white/20 text-white placeholder-slate-400 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all" 
+                  className="w-full bg-black/60 border border-slate-200 text-white placeholder-slate-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all" 
                 />
               </div>
 
               {/* Visibility Switch */}
               <div className="space-y-1.5 flex items-center justify-between p-3 bg-black/40 rounded-xl border border-white/10">
                 <div>
-                  <label className="text-xs font-semibold text-slate-200">Picture Visibility</label>
-                  <p className="text-[10px] text-slate-400">Show picture to others in chat forums</p>
+                  <label className="text-xs font-semibold text-black">Picture Visibility</label>
+                  <p className="text-[10px] text-black">Show picture to others in chat forums</p>
                 </div>
                 <div 
                   onClick={() => setShowAvatarInForum(!showAvatarInForum)}
-                  className={`w-11 h-6 rounded-full flex items-center p-1 cursor-pointer transition-colors ${showAvatarInForum ? 'bg-blue-600' : 'bg-slate-700'}`}
+                  className={`w-11 h-6 rounded-full flex items-center p-1 cursor-pointer transition-colors ${showAvatarInForum ? 'bg-blue-600' : 'bg-slate-100'}`}
                 >
                   <div className={`w-4 h-4 bg-yellow-400 rounded-full shadow-md transition-transform ${showAvatarInForum ? 'translate-x-5' : 'translate-x-0'}`} />
                 </div>

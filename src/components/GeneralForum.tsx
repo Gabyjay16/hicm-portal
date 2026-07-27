@@ -206,10 +206,10 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
 
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col" style={{ height: '70vh', minHeight: '500px' }}>
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 bg-slate-800 text-white flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 bg-white text-white flex-shrink-0">
           <div>
             <h2 className="text-sm font-bold">{forumTitle}</h2>
-            <p className="text-xs text-slate-400">{messages.length} messages</p>
+            <p className="text-xs text-black">{messages.length} messages</p>
           </div>
           <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" title="Live" />
         </div>
@@ -225,11 +225,11 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
         {/* Feed */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
           {isLoading ? (
-            <div className="h-full flex items-center justify-center gap-2 text-slate-400">
+            <div className="h-full flex items-center justify-center gap-2 text-black">
               <Loader className="w-5 h-5 animate-spin" /><span className="text-sm">Loading...</span>
             </div>
           ) : messages.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-slate-400 text-sm">
+            <div className="h-full flex items-center justify-center text-black text-sm">
               No messages yet. Start the discussion!
             </div>
           ) : (
@@ -241,7 +241,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
               if (msg.deleted) {
                 return (
                   <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                    <p className="text-xs text-slate-400 italic px-4 py-2 bg-slate-100 rounded-full border border-slate-200">
+                    <p className="text-xs text-black italic px-4 py-2 bg-slate-100 rounded-full border border-slate-200">
                       This message was deleted
                     </p>
                   </div>
@@ -253,9 +253,9 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
                   <div className={`max-w-[80%] md:max-w-lg space-y-1.5 ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
                     {/* Reply context */}
                     {msg.replyTo && (
-                      <div className={`flex items-start gap-1 px-3 py-1.5 rounded-xl border text-xs text-slate-500 bg-slate-100 border-slate-200 max-w-full ${isMe ? 'self-end' : 'self-start'}`}>
-                        <CornerDownRight className="w-3 h-3 flex-shrink-0 mt-0.5 text-slate-400" />
-                        <span className="font-bold text-slate-600 mr-1">{msg.replyTo.author}:</span>
+                      <div className={`flex items-start gap-1 px-3 py-1.5 rounded-xl border text-xs text-black bg-slate-100 border-slate-200 max-w-full ${isMe ? 'self-end' : 'self-start'}`}>
+                        <CornerDownRight className="w-3 h-3 flex-shrink-0 mt-0.5 text-black" />
+                        <span className="font-bold text-black mr-1">{msg.replyTo.author}:</span>
                         <span className="truncate">{msg.replyTo.text || '(media)'}</span>
                       </div>
                     )}
@@ -264,10 +264,10 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
                       isMe
                         ? 'bg-emerald-500 text-white rounded-br-none'
                         : isStaffMsg
-                        ? 'bg-amber-50 border border-amber-200 text-slate-800 rounded-bl-none'
-                        : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none'
+                        ? 'bg-amber-50 border border-amber-200 text-black rounded-bl-none'
+                        : 'bg-white border border-slate-200 text-black rounded-bl-none'
                     }`}>
-                      <div className={`flex items-center justify-between gap-3 mb-1 text-[10px] ${isMe ? 'text-emerald-100' : 'text-slate-400'}`}>
+                      <div className={`flex items-center justify-between gap-3 mb-1 text-[10px] ${isMe ? 'text-emerald-100' : 'text-black'}`}>
                         <span className="font-bold">{msg.author}</span>
                         <span>{formatTimestamp(msg.createdAt)}</span>
                       </div>
@@ -280,7 +280,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
                     <div className={`flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ${isMe ? 'justify-end' : 'justify-start'}`}>
                       <button
                         onClick={() => setReplyingTo(msg)}
-                        className="flex items-center gap-1 text-[10px] text-slate-500 hover:text-slate-700 px-2 py-0.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                        className="flex items-center gap-1 text-[10px] text-black hover:text-black px-2 py-0.5 rounded-full bg-white border border-slate-200 shadow-sm"
                       >
                         <Reply className="w-3 h-3" /> Reply
                       </button>
@@ -324,7 +324,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
               </div>
             )}
             {pendingAudio && (
-              <div className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-xl text-xs text-slate-600">
+              <div className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-xl text-xs text-black">
                 <Mic className="w-3.5 h-3.5 text-emerald-500" /> Voice note ready
                 <button onClick={() => setPendingAudio(null)}><X className="w-3 h-3 text-red-400" /></button>
               </div>
@@ -336,11 +336,11 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
         <form onSubmit={handleSubmit} className="px-3 py-3 bg-white border-t border-slate-200 flex gap-2 items-center flex-shrink-0">
           <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageSelect} className="hidden" />
           <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isStaffBlocked}
-            className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors disabled:opacity-40" title="Attach photo">
+            className="p-2.5 text-black hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors disabled:opacity-40" title="Attach photo">
             <ImageIcon className="w-4 h-4" />
           </button>
           <button type="button" onClick={isRecording ? stopRecording : startRecording} disabled={isStaffBlocked}
-            className={`p-2.5 rounded-xl transition-colors disabled:opacity-40 ${isRecording ? 'text-red-500 bg-red-50 animate-pulse' : 'text-slate-400 hover:text-emerald-600 hover:bg-emerald-50'}`}>
+            className={`p-2.5 rounded-xl transition-colors disabled:opacity-40 ${isRecording ? 'text-red-500 bg-red-50 animate-pulse' : 'text-black hover:text-emerald-600 hover:bg-emerald-50'}`}>
             {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
           </button>
           <input
@@ -349,11 +349,11 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
             onChange={(e) => { setInputText(e.target.value); if (errorMessage) setErrorMessage(''); }}
             disabled={!currentUser || isSending || isStaffBlocked}
             placeholder={isStaffBlocked ? 'Forum access pending...' : `Message ${forumTitle}...`}
-            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 placeholder:text-slate-400 disabled:opacity-50"
+            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 placeholder:text-black disabled:opacity-50"
           />
           <button type="submit"
             disabled={(!inputText.trim() && !pendingImage && !pendingAudio) || !currentUser || isSending || isStaffBlocked}
-            className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition-colors flex items-center gap-1.5">
+            className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-black font-bold rounded-xl text-sm transition-colors flex items-center gap-1.5">
             {isSending ? <Loader className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </button>
         </form>

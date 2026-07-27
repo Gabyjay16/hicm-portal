@@ -34,7 +34,7 @@ interface AnalysisResult {
 const PlagiarismGauge: React.FC<{ label: string; pct: number; color: string }> = ({ label, pct, color }) => (
   <div className="space-y-1.5">
     <div className="flex justify-between items-center text-xs">
-      <span className="font-semibold text-slate-700">{label}</span>
+      <span className="font-semibold text-black">{label}</span>
       <span className={`font-bold font-mono ${pct > 30 ? 'text-red-600' : 'text-emerald-600'}`}>{pct}%</span>
     </div>
     <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
@@ -240,7 +240,7 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
       {/* Back */}
       <button
         onClick={() => navigate('/student/dashboard')}
-        className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-800 font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-sm"
+        className="flex items-center gap-2 text-xs text-black hover:text-black font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-sm"
       >
         <ArrowLeft className="w-4 h-4 text-emerald-500" /> Back to Dashboard
       </button>
@@ -249,13 +249,13 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
       {stage === 'payment_gate' && (
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
           {/* Header */}
-          <div className="p-5 bg-slate-800 text-white flex items-center gap-3">
+          <div className="p-5 bg-white text-white flex items-center gap-3">
             <div className="p-2.5 bg-amber-400/20 rounded-xl border border-amber-400/30">
               <Lock className="w-5 h-5 text-amber-400" />
             </div>
             <div>
               <h2 className="text-base font-bold">Plagiarism & Originality Test</h2>
-              <p className="text-xs text-slate-400">Payment required to access this service</p>
+              <p className="text-xs text-black">Payment required to access this service</p>
             </div>
           </div>
 
@@ -268,18 +268,18 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                 <div className="bg-white border border-amber-200 rounded-xl p-3 text-center">
-                  <p className="text-xs text-slate-500 font-medium mb-1">Amount</p>
-                  <p className="text-2xl font-extrabold text-slate-900">{adminSettings.plagiarismPayment.amount || '3,500'}</p>
+                  <p className="text-xs text-black font-medium mb-1">Amount</p>
+                  <p className="text-2xl font-extrabold text-black">{adminSettings.plagiarismPayment.amount || '3,500'}</p>
                   <p className="text-xs font-bold text-amber-700">FCFA</p>
                 </div>
                 <div className="bg-white border border-amber-200 rounded-xl p-3 text-center">
-                  <p className="text-xs text-slate-500 font-medium mb-1">MTN MoMo Number</p>
-                  <p className="text-xl font-extrabold text-slate-900 font-mono tracking-wider">{adminSettings.plagiarismPayment.primaryNumber}</p>
+                  <p className="text-xs text-black font-medium mb-1">MTN MoMo Number</p>
+                  <p className="text-xl font-extrabold text-black font-mono tracking-wider">{adminSettings.plagiarismPayment.primaryNumber}</p>
                   <p className="text-xs font-bold text-amber-700">MTN Mobile Money</p>
                 </div>
                 <div className="bg-white border border-amber-200 rounded-xl p-3 text-center">
-                  <p className="text-xs text-slate-500 font-medium mb-1">Account Name</p>
-                  <p className="text-lg font-extrabold text-slate-900 truncate px-1">{adminSettings.plagiarismPayment.primaryName}</p>
+                  <p className="text-xs text-black font-medium mb-1">Account Name</p>
+                  <p className="text-lg font-extrabold text-black truncate px-1">{adminSettings.plagiarismPayment.primaryName}</p>
                   <p className="text-xs font-bold text-amber-700">MoMo Registered Name</p>
                 </div>
               </div>
@@ -287,13 +287,13 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
               {adminSettings.plagiarismPayment.secondaryNumber && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mt-3 pt-3 border-t border-amber-200/50">
                   <div className="bg-white border border-amber-200 rounded-xl p-3 text-center">
-                    <p className="text-xs text-slate-500 font-medium mb-1">Orange Money Number</p>
-                    <p className="text-xl font-extrabold text-slate-900 font-mono tracking-wider">{adminSettings.plagiarismPayment.secondaryNumber}</p>
+                    <p className="text-xs text-black font-medium mb-1">Orange Money Number</p>
+                    <p className="text-xl font-extrabold text-black font-mono tracking-wider">{adminSettings.plagiarismPayment.secondaryNumber}</p>
                     <p className="text-xs font-bold text-amber-700">Orange Money</p>
                   </div>
                   <div className="bg-white border border-amber-200 rounded-xl p-3 text-center">
-                    <p className="text-xs text-slate-500 font-medium mb-1">Account Name</p>
-                    <p className="text-lg font-extrabold text-slate-900 truncate px-1">{adminSettings.plagiarismPayment.secondaryName}</p>
+                    <p className="text-xs text-black font-medium mb-1">Account Name</p>
+                    <p className="text-lg font-extrabold text-black truncate px-1">{adminSettings.plagiarismPayment.secondaryName}</p>
                     <p className="text-xs font-bold text-amber-700">Orange Registered Name</p>
                   </div>
                 </div>
@@ -325,7 +325,7 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
             ) : (
               <form onSubmit={handlePaymentSubmit} className="space-y-4">
                 <div>
-                  <p className="text-xs font-bold text-slate-700 mb-2">Upload Payment Screenshot *</p>
+                  <p className="text-xs font-bold text-black mb-2">Upload Payment Screenshot *</p>
                   <input type="file" accept="image/*" ref={screenshotRef} onChange={handleScreenshotSelect} className="hidden" />
                   <button
                     type="button"
@@ -336,22 +336,22 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
                       <div className="space-y-2">
                         <img src={screenshotPreview} alt="Payment proof" className="max-h-40 mx-auto rounded-xl object-contain shadow" />
                         <p className="text-xs text-emerald-700 font-semibold">{screenshotFile?.name}</p>
-                        <p className="text-[10px] text-slate-400">Click to change</p>
+                        <p className="text-[10px] text-black">Click to change</p>
                       </div>
                     ) : (
                       <div className="space-y-2">
                         <div className="mx-auto w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                          <Camera className="w-5 h-5 text-slate-400" />
+                          <Camera className="w-5 h-5 text-black" />
                         </div>
-                        <p className="text-sm font-semibold text-slate-700">Tap to upload screenshot</p>
-                        <p className="text-xs text-slate-400">JPG, PNG — max 10MB</p>
+                        <p className="text-sm font-semibold text-black">Tap to upload screenshot</p>
+                        <p className="text-xs text-black">JPG, PNG — max 10MB</p>
                       </div>
                     )}
                   </button>
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-sm transition-colors shadow flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl text-sm transition-colors shadow flex items-center justify-center gap-2"
                 >
                   <CheckCircle2 className="w-4 h-4" /> Submit Payment Proof
                 </button>
@@ -364,13 +364,13 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
       {/* ── UPLOAD STAGE ─────────────────────────────────────────────────── */}
       {stage === 'upload' && (
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-          <div className="p-5 bg-slate-800 text-white flex items-center gap-3">
+          <div className="p-5 bg-white text-white flex items-center gap-3">
             <div className="p-2.5 bg-emerald-500/20 rounded-xl border border-emerald-500/30">
               <FileCheck className="w-5 h-5 text-emerald-400" />
             </div>
             <div>
               <h2 className="text-base font-bold">Plagiarism & Originality Test</h2>
-              <p className="text-xs text-slate-400">Upload your PDF for AI-powered analysis</p>
+              <p className="text-xs text-black">Upload your PDF for AI-powered analysis</p>
             </div>
             <div className="ml-auto flex items-center gap-1.5 text-xs text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-full">
               <CheckCircle2 className="w-3.5 h-3.5" /> Payment Verified
@@ -400,17 +400,17 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
                   <input type="file" id="pdf-upload" accept=".pdf" ref={fileRef} onChange={(e) => e.target.files?.[0] && validateAndSetFile(e.target.files[0])} className="hidden" />
                   <label htmlFor="pdf-upload" className="cursor-pointer block space-y-3">
                     <div className="mx-auto w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
-                      <UploadCloud className={`w-7 h-7 ${selectedFile ? 'text-emerald-500' : 'text-slate-400'}`} />
+                      <UploadCloud className={`w-7 h-7 ${selectedFile ? 'text-emerald-500' : 'text-black'}`} />
                     </div>
                     {selectedFile ? (
                       <div>
                         <p className="text-sm font-bold text-emerald-700">📄 {selectedFile.name}</p>
-                        <p className="text-xs text-slate-500 mt-1">{(selectedFile.size / 1024).toFixed(1)} KB · Click to change</p>
+                        <p className="text-xs text-black mt-1">{(selectedFile.size / 1024).toFixed(1)} KB · Click to change</p>
                       </div>
                     ) : (
                       <div>
-                        <p className="text-sm font-bold text-slate-700">Drag & Drop your PDF or <span className="text-emerald-600 underline">Browse</span></p>
-                        <p className="text-xs text-slate-400 mt-1">PDF only · Max 15MB</p>
+                        <p className="text-sm font-bold text-black">Drag & Drop your PDF or <span className="text-emerald-600 underline">Browse</span></p>
+                        <p className="text-xs text-black mt-1">PDF only · Max 15MB</p>
                       </div>
                     )}
                   </label>
@@ -419,7 +419,7 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
                 <button
                   onClick={startAnalysis}
                   disabled={!selectedFile}
-                  className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition-all shadow flex items-center justify-center gap-2"
+                  className="w-full py-3.5 bg-slate-50 hover:bg-white disabled:opacity-40 text-black font-bold rounded-xl text-sm transition-all shadow flex items-center justify-center gap-2"
                 >
                   <FileCheck className="w-4 h-4" /> Run Plagiarism & AI Detection
                 </button>
@@ -433,8 +433,8 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
                   <Loader2 className="w-7 h-7 animate-spin" />
                 </div>
                 <div>
-                  <h4 className="text-base font-bold text-slate-800">Analysing Document...</h4>
-                  <p className="text-xs text-slate-500 font-mono mt-1">{currentStageLabel}</p>
+                  <h4 className="text-base font-bold text-black">Analysing Document...</h4>
+                  <p className="text-xs text-black font-mono mt-1">{currentStageLabel}</p>
                 </div>
                 <div className="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
                   <div
@@ -452,13 +452,13 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
                 {/* Check Code */}
                 <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Unique Check Code</p>
-                    <p className="text-xl font-extrabold font-mono text-slate-800 tracking-widest mt-0.5">{result.checkCode}</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Share this code with your lecturer to verify results</p>
+                    <p className="text-[10px] font-bold text-black uppercase tracking-wider">Unique Check Code</p>
+                    <p className="text-xl font-extrabold font-mono text-black tracking-widest mt-0.5">{result.checkCode}</p>
+                    <p className="text-[10px] text-black mt-0.5">Share this code with your lecturer to verify results</p>
                   </div>
                   <button
                     onClick={copyCode}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all ${copiedCode ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-400'}`}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all ${copiedCode ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-white border-slate-200 text-black hover:border-slate-400'}`}
                   >
                     <Copy className="w-3.5 h-3.5" />
                     {copiedCode ? 'Copied!' : 'Copy Code'}
@@ -484,7 +484,7 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
 
                 {/* Gauges */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
-                  <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-100 pb-2">Detailed Breakdown</h4>
+                  <h4 className="text-xs font-bold text-black uppercase tracking-wider border-b border-slate-100 pb-2">Detailed Breakdown</h4>
                   <PlagiarismGauge label="Plagiarism Detected" pct={result.plagiarismPct} color={result.plagiarismPct > 30 ? 'bg-red-500' : 'bg-amber-400'} />
                   <PlagiarismGauge label="AI-Written Content" pct={result.aiWritingPct} color={result.aiWritingPct > 30 ? 'bg-red-500' : 'bg-blue-400'} />
                   <PlagiarismGauge label="Combined Score" pct={result.combinedPct} color={result.combinedPct > 30 ? 'bg-red-500' : 'bg-emerald-500'} />
@@ -493,13 +493,13 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
                 {/* AI Findings */}
                 {result.details.length > 0 && (
                   <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-3">
-                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                    <h4 className="text-xs font-bold text-black uppercase tracking-wider flex items-center gap-2">
                       <ShieldAlert className="w-3.5 h-3.5 text-emerald-500" /> AI Findings
                     </h4>
                     <ul className="space-y-2">
                       {result.details.map((d, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs text-slate-600">
-                          <ExternalLink className="w-3 h-3 mt-0.5 text-slate-400 flex-shrink-0" />
+                        <li key={i} className="flex items-start gap-2 text-xs text-black">
+                          <ExternalLink className="w-3 h-3 mt-0.5 text-black flex-shrink-0" />
                           {d}
                         </li>
                       ))}
@@ -507,13 +507,13 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
                   </div>
                 )}
 
-                <div className="text-xs text-slate-400 text-center">
+                <div className="text-xs text-black text-center">
                   Analysed: {result.fileName} · {result.analyzedAt}
                 </div>
 
                 <button
                   onClick={() => { setResult(null); setSelectedFile(null); setProgress(0); }}
-                  className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm border border-slate-200 transition-colors"
+                  className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-black font-semibold rounded-xl text-sm border border-slate-200 transition-colors"
                 >
                   Test Another File
                 </button>

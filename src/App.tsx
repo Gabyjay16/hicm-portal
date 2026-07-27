@@ -27,18 +27,7 @@ import { PlagiarismCodeLookup } from './components/PlagiarismCodeLookup';
 import { AdminSettings } from './components/AdminSettings';
 
 export default function App() {
-  const [user, setUser] = useState<User | null>({
-    id: 'std-2026-089',
-    name: 'Jane Doe',
-    email: 'j.doe@student.hicm.edu',
-    role: 'student',
-    matricNo: 'HICM-2024-089',
-    matricule: 'HICM-2024-089',
-    department: 'Business Administration',
-    level: 'Level 300',
-    status: 'Active Student - Verified',
-    phone: '+237 670 000 089',
-  });
+  const [user, setUser] = useState<User | null>(null);
 
   const [plagiarismTokens, setPlagiarismTokens] = useState<number>(5);
   
@@ -55,8 +44,6 @@ export default function App() {
   });
 
   const handleEnforceMatricules = () => {
-    // In a real app this would call an API. 
-    // Here we can log out the current user if they are a student and invalid
     if (user?.role === 'student' && adminSettings.matriculeVerificationEnabled) {
       if (user.matricNo && !adminSettings.validMatricules.includes(user.matricNo)) {
         alert("Your account has been suspended due to an invalid matricule.");
@@ -93,7 +80,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
-        <Route path="/login" element={<LoginForm onLogin={handleLogin} adminSettings={adminSettings} />} />
+        <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginForm onLogin={handleLogin} adminSettings={adminSettings} />} />
 
         {/* Root Redirect based on Role */}
         <Route

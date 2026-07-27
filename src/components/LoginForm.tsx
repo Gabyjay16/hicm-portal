@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, AdminSettingsConfig } from '../types';
 import { ShieldCheck, UserCheck, User as UserIcon, BookOpen, AlertCircle, Lock, Phone, UserCheck2, Bell, ChevronUp, ChevronDown, ArrowLeft, LogIn, UserPlus, Sparkles } from 'lucide-react';
 
@@ -47,6 +48,7 @@ const DEFAULT_ANNOUNCEMENTS: PublicAnnouncement[] = [
 ];
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSettings }) => {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<AuthMode>('landing');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -151,23 +153,20 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
       isStaff = true;
     }
 
-    setTimeout(() => {
-      const authenticatedUser: User = {
-        id: `${role}-${Date.now()}`,
-        name: loginName.trim(),
-        role: role,
-        isStaff: isStaff,
-        phone: phone || '+237 670 000 089',
-        matricNo: role === 'student' ? cleanSecret.toUpperCase() : undefined,
-        matricule: role === 'student' ? cleanSecret.toUpperCase() : undefined,
-        department: department,
-        level: level,
-        status: 'Active & Verified',
-      };
+    const authenticatedUser: User = {
+      id: `${role}-${Date.now()}`,
+      name: loginName.trim(),
+      role: role,
+      isStaff: isStaff,
+      phone: phone || '+237 670 000 089',
+      matricNo: role === 'student' ? cleanSecret.toUpperCase() : undefined,
+      matricule: role === 'student' ? cleanSecret.toUpperCase() : undefined,
+      department: department,
+      level: level,
+      status: 'Active & Verified',
+    };
 
-      setIsLoading(false);
-      onLogin(authenticatedUser);
-    }, 600);
+    onLogin(authenticatedUser);
   };
 
   const handleStudentRegisterSubmit = (e: React.FormEvent) => {
@@ -203,23 +202,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
       }
     }
 
-    setIsLoading(true);
-
-    setTimeout(() => {
-      const newStudent: User = {
-        id: `std-${Date.now()}`,
-        name: name.trim(),
-        role: 'student',
-        phone: phone.trim(),
-        matricNo: matricNo.trim().toUpperCase(),
-        matricule: matricNo.trim().toUpperCase(),
-        department: department,
-        level: level,
-        status: 'Active Student - Verified',
-      };
-      setIsLoading(false);
-      onLogin(newStudent);
-    }, 600);
+    const newStudent: User = {
+      id: `std-${Date.now()}`,
+      name: name.trim(),
+      role: 'student',
+      phone: phone.trim(),
+      matricNo: matricNo.trim().toUpperCase(),
+      matricule: matricNo.trim().toUpperCase(),
+      department: department,
+      level: level,
+      status: 'Active Student - Verified',
+    };
+    onLogin(newStudent);
   };
 
   const handleStaffRegisterSubmit = (e: React.FormEvent) => {
@@ -244,41 +238,36 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
       return;
     }
 
-    setIsLoading(true);
-
     const isSystemAdmin = position === 'System Administrator';
     const staffRole = isSystemAdmin ? 'admin' : 'staff';
 
-    setTimeout(() => {
-      const newStaff: User = {
-        id: `stf-${Date.now()}`,
-        name: name.trim(),
-        role: staffRole,
-        isStaff: true,
-        phone: phone.trim(),
-        department: department,
-        status: `${position} - Verified`,
-      };
-      setIsLoading(false);
-      onLogin(newStaff);
-    }, 600);
+    const newStaff: User = {
+      id: `stf-${Date.now()}`,
+      name: name.trim(),
+      role: staffRole,
+      isStaff: true,
+      phone: phone.trim(),
+      department: department,
+      status: `${position} - Verified`,
+    };
+    onLogin(newStaff);
   };
 
   return (
-    <div className="max-w-xl w-full mx-auto my-8 glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 font-sans text-slate-900 border border-slate-200/90 backdrop-blur-2xl animate-float-subtle">
+    <div className="max-w-xl w-full mx-auto my-8 glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 font-sans text-black border border-slate-200/90 backdrop-blur-2xl">
       {/* Header Banner */}
       <div className="text-center space-y-2">
         <div className="inline-flex p-3.5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-600 mb-1 shadow-md shadow-blue-500/10">
           <BookOpen className="w-8 h-8 text-blue-600" />
         </div>
-        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center justify-center gap-2">
+        <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight flex items-center justify-center gap-2">
           {mode === 'landing' && 'HICM Public Portal'}
           {mode === 'login_form' && 'Portal Sign In'}
           {mode === 'student_register' && 'Student Account Registration'}
           {mode === 'staff_register' && 'Staff Account Registration'}
           <Sparkles className="w-5 h-5 text-yellow-500 animate-pulse" />
         </h2>
-        <p className="text-xs font-semibold text-slate-600">
+        <p className="text-xs font-semibold text-black">
           {mode === 'landing' && 'Higher Institute of Human Resource Management - Campus Announcements'}
           {mode === 'login_form' && 'Sign in with your Name and Matricule Number.'}
           {mode === 'student_register' && 'Register your student account with your details below.'}
@@ -323,9 +312,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
           {/* PUBLIC ADMIN ANNOUNCEMENTS FEED */}
           <div className="bg-white/90 border border-slate-200/90 rounded-2xl p-5 space-y-4 shadow-xl backdrop-blur-xl">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <div className="flex items-center gap-2 text-slate-900 font-extrabold text-sm">
+              <div className="flex items-center gap-2 text-black font-extrabold text-sm">
                 <Bell className="w-5 h-5 text-yellow-600 animate-bounce" />
-                <span className="text-slate-900">
+                <span className="text-black">
                   Campus Announcements &amp; Official Notices
                 </span>
               </div>
@@ -371,7 +360,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                     }`}
                   >
                     <div className="flex justify-between items-start gap-2">
-                      <h3 className="text-sm font-extrabold text-slate-900 leading-tight">{ann.title}</h3>
+                      <h3 className="text-sm font-extrabold text-black leading-tight">{ann.title}</h3>
                       <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full flex-shrink-0 uppercase border shadow-sm ${
                         isRed
                           ? 'bg-red-100 border-red-300 text-red-700'
@@ -383,7 +372,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-700 leading-relaxed mt-2 font-medium">{ann.content}</p>
+                    <p className="text-xs text-black leading-relaxed mt-2 font-medium">{ann.content}</p>
 
                     {/* Photos */}
                     {ann.imageUrl && (
@@ -399,7 +388,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                       </div>
                     )}
 
-                    <p className="text-[10px] text-slate-500 pt-2 font-semibold">Posted: {ann.date}</p>
+                    <p className="text-[10px] text-black pt-2 font-semibold">Posted: {ann.date}</p>
                   </div>
                 );
               })}
@@ -424,7 +413,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
 
           {/* NOT A STUDENT? TEXT LINK TO REGISTRATION PAGE */}
           <div className="text-center pt-3 border-t border-white/10 space-y-1">
-            <p className="text-xs text-slate-400 font-medium">Not a student?</p>
+            <p className="text-xs text-black font-medium">Not a student?</p>
             <button
               type="button"
               onClick={() => {
@@ -456,30 +445,36 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
           </button>
 
           <div className="space-y-1">
-            <label className="block text-slate-800 font-bold">Full Name</label>
+            <label className="block text-black font-bold">Full Name</label>
             <div className="relative">
               <UserIcon className="w-4 h-4 text-blue-600 absolute left-3 top-3.5" />
               <input
                 type="text"
+                id="loginName"
+                name="username"
+                autoComplete="username"
                 value={loginName}
                 onChange={(e) => setLoginName(e.target.value)}
                 placeholder="Enter Full Name"
-                className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-3 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all font-semibold"
+                className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-3 py-3 text-black placeholder-slate-600 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all font-semibold"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="block text-slate-800 font-bold">Matricule Number</label>
+            <label className="block text-black font-bold">Matricule Number</label>
             <div className="relative">
               <Lock className="w-4 h-4 text-blue-600 absolute left-3 top-3.5" />
               <input
                 type="password"
+                id="loginSecret"
+                name="password"
+                autoComplete="current-password"
                 value={loginSecret}
                 onChange={(e) => setLoginSecret(e.target.value)}
                 placeholder="UBa26C0001"
-                className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-3 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all font-mono tracking-wider"
+                className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-3 py-3 text-black placeholder-slate-600 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all font-mono tracking-wider"
               />
             </div>
           </div>
@@ -493,8 +488,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
             <span>{isLoading ? 'Authenticating...' : 'Sign In to Portal'}</span>
           </button>
 
-          <div className="text-center pt-3 border-t border-slate-700/50 space-y-1">
-            <p className="text-xs text-slate-400 font-medium">Not a student?</p>
+          <div className="text-center pt-3 border-t border-slate-200 space-y-1">
+            <p className="text-xs text-black font-medium">Not a student?</p>
             <button
               type="button"
               onClick={() => {
@@ -520,60 +515,60 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
               setErrorMessage('');
               setSuccessMessage('');
             }}
-            className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white font-medium mb-2"
+            className="flex items-center gap-1.5 text-xs text-black hover:text-white font-medium mb-2"
           >
             <ArrowLeft className="w-4 h-4 text-emerald-400" /> Back to Public Home
           </button>
 
           <div className="space-y-1">
-            <label className="block text-slate-300 font-medium">Full Name</label>
+            <label className="block text-black font-medium">Full Name</label>
             <div className="relative">
-              <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <UserIcon className="w-4 h-4 text-black absolute left-3 top-3" />
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Jane Doe"
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-black focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="block text-slate-300 font-medium">Phone Number</label>
+            <label className="block text-black font-medium">Phone Number</label>
             <div className="relative">
-              <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Phone className="w-4 h-4 text-black absolute left-3 top-3" />
               <input
                 type="text"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="e.g. 671234567"
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-black focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="block text-slate-300 font-medium">Matriculation Number</label>
+            <label className="block text-black font-medium">Matriculation Number</label>
             <input
               type="text"
               value={matricNo}
               onChange={(e) => setMatricNo(e.target.value)}
               placeholder="UBa26C0001"
-              className="w-full bg-navy-900 border border-slate-700 rounded-xl px-3 py-2.5 text-offwhite font-mono uppercase focus:outline-none focus:border-emerald-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-black font-mono uppercase focus:outline-none focus:border-emerald-500"
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <label className="block text-slate-300 font-medium">Department</label>
+              <label className="block text-black font-medium">Department</label>
               <select
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl px-2.5 py-2.5 text-offwhite text-xs focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2.5 text-black text-xs focus:outline-none focus:border-emerald-500"
               >
                 <option value="Money and Banking">Money &amp; Banking</option>
                 <option value="Accounting and Finance">Accounting &amp; Finance</option>
@@ -585,11 +580,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
             </div>
 
             <div className="space-y-1">
-              <label className="block text-slate-300 font-medium">Level</label>
+              <label className="block text-black font-medium">Level</label>
               <select
                 value={level}
                 onChange={(e) => setLevel(e.target.value)}
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl px-2.5 py-2.5 text-offwhite text-xs focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2.5 text-black text-xs focus:outline-none focus:border-emerald-500"
               >
                 <option value="Level 100">Level 100</option>
                 <option value="Level 200">Level 200</option>
@@ -603,24 +598,24 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
 
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <label className="block text-slate-300 font-medium">Password</label>
+              <label className="block text-black font-medium">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl px-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-black focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-slate-300 font-medium">Confirm Password</label>
+              <label className="block text-black font-medium">Confirm Password</label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl px-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-black focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>
@@ -635,7 +630,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
             <span>{isLoading ? 'Registering...' : 'Register Student Account'}</span>
           </button>
 
-          <div className="text-center pt-3 border-t border-slate-700/50">
+          <div className="text-center pt-3 border-t border-slate-200">
             <button
               type="button"
               onClick={() => {
@@ -660,30 +655,30 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
           </div>
 
           <div className="space-y-1">
-            <label className="block text-slate-300 font-medium">Full Name</label>
+            <label className="block text-black font-medium">Full Name</label>
             <div className="relative">
-              <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <UserIcon className="w-4 h-4 text-black absolute left-3 top-3" />
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Dr. Robert Vance"
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-black focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="block text-slate-300 font-medium">Phone Number</label>
+            <label className="block text-black font-medium">Phone Number</label>
             <div className="relative">
-              <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Phone className="w-4 h-4 text-black absolute left-3 top-3" />
               <input
                 type="text"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="e.g. 671234567"
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-black focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>
@@ -691,11 +686,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
 
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <label className="block text-slate-300 font-medium">Position</label>
+              <label className="block text-black font-medium">Position</label>
               <select
                 value={position}
                 onChange={(e) => setPosition(e.target.value)}
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl px-2.5 py-2.5 text-offwhite text-xs focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2.5 text-black text-xs focus:outline-none focus:border-emerald-500"
               >
                 <option value="Lecturer">Lecturer</option>
                 <option value="Senior Academic Staff">Senior Academic Staff</option>
@@ -705,11 +700,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
             </div>
 
             <div className="space-y-1">
-              <label className="block text-slate-300 font-medium">Gender</label>
+              <label className="block text-black font-medium">Gender</label>
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl px-2.5 py-2.5 text-offwhite text-xs focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2.5 text-black text-xs focus:outline-none focus:border-emerald-500"
               >
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -720,24 +715,24 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
 
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <label className="block text-slate-300 font-medium">Password</label>
+              <label className="block text-black font-medium">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl px-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-black focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-slate-300 font-medium">Confirm Password</label>
+              <label className="block text-black font-medium">Confirm Password</label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl px-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-black focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>

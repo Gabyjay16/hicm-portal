@@ -93,18 +93,18 @@ export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
             {/* Category Header */}
             <button
               onClick={() => toggleCategory(category.id)}
-              className="w-full flex items-center justify-between p-4 text-left font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
+              className="w-full flex items-center justify-between p-4 text-left font-semibold text-black hover:bg-slate-50 transition-colors"
             >
               <div className="flex items-center space-x-3">
-                <div className={`p-2 rounded-xl transition-colors ${isOpen ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
+                <div className={`p-2 rounded-xl transition-colors ${isOpen ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-black'}`}>
                   <CategoryIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[15px] font-bold text-slate-800">{category.title}</span>
-                  <p className="text-xs text-slate-500 font-medium">{category.items.length} Sub-menus</p>
+                  <span className="text-[15px] font-bold text-black">{category.title}</span>
+                  <p className="text-xs text-black font-medium">{category.items.length} Sub-menus</p>
                 </div>
               </div>
-              <div className={`transition-transform duration-200 ${isOpen ? 'text-emerald-500' : 'text-slate-400'}`}>
+              <div className={`transition-transform duration-200 ${isOpen ? 'text-emerald-500' : 'text-black'}`}>
                 {isOpen ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
               </div>
             </button>
@@ -118,7 +118,7 @@ export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
                     <button
                       key={item.id}
                       onClick={() => handleItemClick(category.title, item)}
-                      className="flex items-center space-x-3 p-3 rounded-xl bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 text-left transition-all text-slate-700 hover:text-emerald-700 group shadow-sm"
+                      className="flex items-center space-x-3 p-3 rounded-xl bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 text-left transition-all text-black hover:text-emerald-700 group shadow-sm"
                     >
                       <ItemIcon className="w-5 h-5 text-emerald-500 group-hover:scale-110 transition-transform flex-shrink-0" />
                       <span className="text-sm font-semibold truncate">{item.label}</span>

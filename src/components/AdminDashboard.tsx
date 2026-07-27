@@ -60,8 +60,8 @@ export const AdminDashboard: React.FC = () => {
     <div className="space-y-6 pb-16 md:pb-6 font-sans">
       {/* Header Banner */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-        <h1 className="text-2xl font-bold text-slate-900">Administrator Control Panel</h1>
-        <p className="text-sm text-slate-500 mt-1">System-wide overview, user management, and administrative actions.</p>
+        <h1 className="text-2xl font-bold text-black">Administrator Control Panel</h1>
+        <p className="text-sm text-black mt-1">System-wide overview, user management, and administrative actions.</p>
       </div>
 
       {/* Metric Cards */}
@@ -70,32 +70,32 @@ export const AdminDashboard: React.FC = () => {
           <div className="p-2.5 bg-blue-50 rounded-full text-blue-500 mb-2">
             <Users className="w-5 h-5" />
           </div>
-          <h3 className="text-2xl font-bold text-slate-900">{isLoading ? '-' : stats.totalStudents}</h3>
-          <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-wider mt-1">Total Students</p>
+          <h3 className="text-2xl font-bold text-black">{isLoading ? '-' : stats.totalStudents}</h3>
+          <p className="text-black text-[10px] font-semibold uppercase tracking-wider mt-1">Total Students</p>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col items-center text-center">
           <div className="p-2.5 bg-purple-50 rounded-full text-purple-500 mb-2">
             <Users className="w-5 h-5" />
           </div>
-          <h3 className="text-2xl font-bold text-slate-900">{isLoading ? '-' : stats.totalStaff}</h3>
-          <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-wider mt-1">Registered Staff</p>
+          <h3 className="text-2xl font-bold text-black">{isLoading ? '-' : stats.totalStaff}</h3>
+          <p className="text-black text-[10px] font-semibold uppercase tracking-wider mt-1">Registered Staff</p>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col items-center text-center">
           <div className="p-2.5 bg-red-50 rounded-full text-red-500 mb-2">
             <ShieldAlert className="w-5 h-5" />
           </div>
-          <h3 className="text-2xl font-bold text-slate-900">{isLoading ? '-' : stats.activeComplaints}</h3>
-          <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-wider mt-1">Active Complaints</p>
+          <h3 className="text-2xl font-bold text-black">{isLoading ? '-' : stats.activeComplaints}</h3>
+          <p className="text-black text-[10px] font-semibold uppercase tracking-wider mt-1">Active Complaints</p>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col items-center text-center">
           <div className="p-2.5 bg-amber-50 rounded-full text-amber-500 mb-2">
             <Activity className="w-5 h-5" />
           </div>
-          <h3 className="text-2xl font-bold text-slate-900">{isLoading ? '-' : stats.activeEvaluations}</h3>
-          <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-wider mt-1">Live Evaluations</p>
+          <h3 className="text-2xl font-bold text-black">{isLoading ? '-' : stats.activeEvaluations}</h3>
+          <p className="text-black text-[10px] font-semibold uppercase tracking-wider mt-1">Live Evaluations</p>
         </div>
       </div>
 
@@ -110,20 +110,20 @@ export const AdminDashboard: React.FC = () => {
               <MessageSquareIcon className="w-5 h-5 text-emerald-600" />
             </div>
             <div className="text-left">
-              <h3 className="text-sm font-bold text-slate-800">Forum Access Approvals</h3>
-              <p className="text-xs text-slate-500">Approve or reject staff forum posting access</p>
+              <h3 className="text-sm font-bold text-black">Forum Access Approvals</h3>
+              <p className="text-xs text-black">Approve or reject staff forum posting access</p>
             </div>
             {pendingCount > 0 && (
               <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-600">{pendingCount} pending</span>
             )}
           </div>
-          {showForumApprovals ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+          {showForumApprovals ? <ChevronUp className="w-4 h-4 text-black" /> : <ChevronDown className="w-4 h-4 text-black" />}
         </button>
 
         {showForumApprovals && (
           <div className="border-t border-slate-100 divide-y divide-slate-100">
             {pendingStaff.length === 0 ? (
-              <p className="p-5 text-xs text-slate-400 text-center">No pending forum access requests.</p>
+              <p className="p-5 text-xs text-black text-center">No pending forum access requests.</p>
             ) : (
               pendingStaff.map((staff) => {
                 const isApproved = approvedIds.includes(staff.id);
@@ -131,9 +131,9 @@ export const AdminDashboard: React.FC = () => {
                 return (
                   <div key={staff.id} className="flex items-center justify-between p-4 hover:bg-slate-50">
                     <div>
-                      <p className="text-sm font-bold text-slate-800">{staff.name}</p>
-                      <p className="text-xs text-slate-500">{staff.department} · {staff.code}</p>
-                      <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+                      <p className="text-sm font-bold text-black">{staff.name}</p>
+                      <p className="text-xs text-black">{staff.department} · {staff.code}</p>
+                      <p className="text-[10px] text-black flex items-center gap-1 mt-0.5">
                         <Clock className="w-3 h-3" /> Requested {staff.requestedAt}
                       </p>
                     </div>
@@ -169,7 +169,7 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Admin Modules */}
       <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-        <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
+        <h2 className="text-sm font-bold text-black uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
           Administrative Modules
         </h2>
 
@@ -181,11 +181,11 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex items-center space-x-4">
               <div className="bg-blue-100 p-2 rounded-lg text-blue-600"><Users className="w-5 h-5" /></div>
               <div className="text-left">
-                <h3 className="text-sm font-bold text-slate-800">User Management</h3>
-                <p className="text-xs text-slate-500 mt-0.5">View all students and staff registered on the platform.</p>
+                <h3 className="text-sm font-bold text-black">User Management</h3>
+                <p className="text-xs text-black mt-0.5">View all students and staff registered on the platform.</p>
               </div>
             </div>
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors" />
+            <ArrowRight className="w-4 h-4 text-black group-hover:text-blue-500 transition-colors" />
           </button>
 
           <button
@@ -195,11 +195,11 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex items-center space-x-4">
               <div className="bg-red-100 p-2 rounded-lg text-red-600"><ShieldAlert className="w-5 h-5" /></div>
               <div className="text-left">
-                <h3 className="text-sm font-bold text-slate-800">Complaints Desk</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Review and resolve student complaints and requests.</p>
+                <h3 className="text-sm font-bold text-black">Complaints Desk</h3>
+                <p className="text-xs text-black mt-0.5">Review and resolve student complaints and requests.</p>
               </div>
             </div>
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-red-500 transition-colors" />
+            <ArrowRight className="w-4 h-4 text-black group-hover:text-red-500 transition-colors" />
           </button>
 
           <button
@@ -209,11 +209,11 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex items-center space-x-4">
               <div className="bg-purple-100 p-2 rounded-lg text-purple-600"><FileText className="w-5 h-5" /></div>
               <div className="text-left">
-                <h3 className="text-sm font-bold text-slate-800">Complaint Form Editor</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Add or remove fields from complaint form types.</p>
+                <h3 className="text-sm font-bold text-black">Complaint Form Editor</h3>
+                <p className="text-xs text-black mt-0.5">Add or remove fields from complaint form types.</p>
               </div>
             </div>
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-purple-500 transition-colors" />
+            <ArrowRight className="w-4 h-4 text-black group-hover:text-purple-500 transition-colors" />
           </button>
 
           <button
@@ -223,11 +223,11 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex items-center space-x-4">
               <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600"><BookOpen className="w-5 h-5" /></div>
               <div className="text-left">
-                <h3 className="text-sm font-bold text-slate-800">Content & Forum Moderation</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Manage announcements and monitor forum activity.</p>
+                <h3 className="text-sm font-bold text-black">Content & Forum Moderation</h3>
+                <p className="text-xs text-black mt-0.5">Manage announcements and monitor forum activity.</p>
               </div>
             </div>
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+            <ArrowRight className="w-4 h-4 text-black group-hover:text-emerald-500 transition-colors" />
           </button>
 
           <button
@@ -237,11 +237,11 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex items-center space-x-4">
               <div className="bg-amber-100 p-2 rounded-lg text-amber-600"><BookOpen className="w-5 h-5" /></div>
               <div className="text-left">
-                <h3 className="text-sm font-bold text-slate-800">Plagiarism Token Requests</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Approve token purchases for student plagiarism tests.</p>
+                <h3 className="text-sm font-bold text-black">Plagiarism Token Requests</h3>
+                <p className="text-xs text-black mt-0.5">Approve token purchases for student plagiarism tests.</p>
               </div>
             </div>
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-500 transition-colors" />
+            <ArrowRight className="w-4 h-4 text-black group-hover:text-amber-500 transition-colors" />
           </button>
 
           <button
@@ -249,13 +249,13 @@ export const AdminDashboard: React.FC = () => {
             className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-slate-400 hover:bg-slate-100 transition-colors group"
           >
             <div className="flex items-center space-x-4">
-              <div className="bg-slate-200 p-2 rounded-lg text-slate-600"><Settings className="w-5 h-5" /></div>
+              <div className="bg-slate-200 p-2 rounded-lg text-black"><Settings className="w-5 h-5" /></div>
               <div className="text-left">
-                <h3 className="text-sm font-bold text-slate-800">System Settings</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Configure payment info and matricule verification rules.</p>
+                <h3 className="text-sm font-bold text-black">System Settings</h3>
+                <p className="text-xs text-black mt-0.5">Configure payment info and matricule verification rules.</p>
               </div>
             </div>
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
+            <ArrowRight className="w-4 h-4 text-black group-hover:text-black transition-colors" />
           </button>
         </div>
       </div>

@@ -32,7 +32,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-navy-900 border-t border-navy-800 flex justify-around items-center py-2 md:hidden shadow-lg">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-slate-50 border-t border-navy-800 flex justify-around items-center py-2 md:hidden shadow-lg">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = currentPath === tab.path;
@@ -41,7 +41,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             key={tab.id}
             to={tab.path}
             className={`relative flex flex-col items-center justify-center w-full py-1 px-2 transition-all ${
-              isActive ? 'text-emerald-500 font-semibold' : 'text-slate-400 hover:text-offwhite'
+              isActive ? 'text-emerald-500 font-semibold' : 'text-black hover:text-black'
             }`}
           >
             <div className="relative">

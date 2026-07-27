@@ -44,7 +44,7 @@ const statusBadge = (status: DocumentRequest['status']) => {
     pending: { label: 'Pending', cls: 'bg-amber-100 text-amber-700' },
     processing: { label: 'Processing', cls: 'bg-blue-100 text-blue-700' },
     ready: { label: 'Ready for Collection', cls: 'bg-emerald-100 text-emerald-700' },
-    collected: { label: 'Collected', cls: 'bg-slate-100 text-slate-500' },
+    collected: { label: 'Collected', cls: 'bg-slate-100 text-black' },
   };
   const { label, cls } = map[status];
   return <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${cls}`}>{label}</span>;
@@ -115,7 +115,7 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
       <div className="max-w-2xl mx-auto space-y-4 pb-16">
         <button
           onClick={() => { setView('counselling'); setActiveSession(null); }}
-          className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-800 font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-sm"
+          className="flex items-center gap-2 text-xs text-black hover:text-black font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-sm"
         >
           <ArrowLeft className="w-4 h-4 text-emerald-500" /> Back to Counselling
         </button>
@@ -133,7 +133,7 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
       {/* Back */}
       <button
         onClick={() => view === 'menu' ? navigate(-1) : setView('menu')}
-        className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-800 font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-sm"
+        className="flex items-center gap-2 text-xs text-black hover:text-black font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-sm"
       >
         <ArrowLeft className="w-4 h-4 text-emerald-500" />
         {view === 'menu' ? 'Back' : 'Back to Services'}
@@ -143,8 +143,8 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
       {view === 'menu' && (
         <>
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Student Services</h2>
-            <p className="text-sm text-slate-500 mt-1">Request official documents or connect with a counsellor.</p>
+            <h2 className="text-2xl font-bold text-black">Student Services</h2>
+            <p className="text-sm text-black mt-1">Request official documents or connect with a counsellor.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -156,8 +156,8 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
               <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 mb-4">
                 <FileText className="w-6 h-6 text-emerald-600" />
               </div>
-              <h3 className="font-bold text-slate-800 text-base">Request</h3>
-              <p className="text-sm text-slate-500 mt-1 leading-relaxed">
+              <h3 className="font-bold text-black text-base">Request</h3>
+              <p className="text-sm text-black mt-1 leading-relaxed">
                 Request official academic documents such as attestation, attendance letters, and admission letters.
               </p>
               <div className="mt-4 flex items-center gap-1 text-xs font-bold text-emerald-600 group-hover:gap-2 transition-all">
@@ -174,8 +174,8 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
               <div className="p-3 bg-purple-50 rounded-xl border border-purple-200 mb-4">
                 <HeartHandshake className="w-6 h-6 text-purple-600" />
               </div>
-              <h3 className="font-bold text-slate-800 text-base">Chat with Counsellor</h3>
-              <p className="text-sm text-slate-500 mt-1 leading-relaxed">
+              <h3 className="font-bold text-black text-base">Chat with Counsellor</h3>
+              <p className="text-sm text-black mt-1 leading-relaxed">
                 Connect one-on-one with a counsellor online or request an in-person session. Anonymous mode available.
               </p>
               <div className="mt-4 flex items-center gap-1 text-xs font-bold text-purple-600 group-hover:gap-2 transition-all">
@@ -188,14 +188,14 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
           {/* Document request history */}
           {docRequests.length > 0 && (
             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-3">
-              <h3 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Document Request History</h3>
+              <h3 className="font-bold text-black text-sm border-b border-slate-100 pb-3">Document Request History</h3>
               {docRequests.map((req) => {
                 const dt = documentTypes.find((d) => d.type === req.documentType);
                 return (
                   <div key={req.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
                     <div>
-                      <p className="text-sm font-semibold text-slate-800">{dt?.label}</p>
-                      <p className="text-xs text-slate-400">{new Date(req.requestDate).toLocaleDateString()}</p>
+                      <p className="text-sm font-semibold text-black">{dt?.label}</p>
+                      <p className="text-xs text-black">{new Date(req.requestDate).toLocaleDateString()}</p>
                     </div>
                     {statusBadge(req.status)}
                   </div>
@@ -210,8 +210,8 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
       {view === 'document' && (
         <div className="space-y-5">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">Request a Document</h2>
-            <p className="text-sm text-slate-500 mt-1">Select the document type and submit your request.</p>
+            <h2 className="text-xl font-bold text-black">Request a Document</h2>
+            <p className="text-sm text-black mt-1">Select the document type and submit your request.</p>
           </div>
 
           {submitted && (
@@ -234,12 +234,12 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
                   }`}
                 >
                   <div className={`p-2.5 rounded-xl flex-shrink-0 ${selected ? 'bg-emerald-50' : 'bg-slate-100'}`}>
-                    <Icon className={`w-5 h-5 ${selected ? 'text-emerald-600' : 'text-slate-500'}`} />
+                    <Icon className={`w-5 h-5 ${selected ? 'text-emerald-600' : 'text-black'}`} />
                   </div>
                   <div className="flex-1">
-                    <p className="font-bold text-slate-800 text-sm">{dt.label}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{dt.description}</p>
-                    <div className="flex items-center gap-1 mt-1.5 text-[10px] text-slate-400">
+                    <p className="font-bold text-black text-sm">{dt.label}</p>
+                    <p className="text-xs text-black mt-0.5">{dt.description}</p>
+                    <div className="flex items-center gap-1 mt-1.5 text-[10px] text-black">
                       <Clock className="w-3 h-3" /> {dt.processingDays}
                     </div>
                   </div>
@@ -251,17 +251,17 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
 
           {selectedDocType && (
             <form onSubmit={handleDocRequest} className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-4">
-              <h3 className="font-bold text-slate-800">Additional Notes (optional)</h3>
+              <h3 className="font-bold text-black">Additional Notes (optional)</h3>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700">Full Name <span className="text-emerald-500 font-normal">(auto-filled)</span></label>
-                <input readOnly value={user?.name || ''} className="w-full border border-emerald-200 bg-emerald-50 rounded-xl px-4 py-2.5 text-sm text-slate-600" />
+                <label className="text-xs font-semibold text-black">Full Name <span className="text-emerald-500 font-normal">(auto-filled)</span></label>
+                <input readOnly value={user?.name || ''} className="w-full border border-emerald-200 bg-emerald-50 rounded-xl px-4 py-2.5 text-sm text-black" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700">Matricule <span className="text-emerald-500 font-normal">(auto-filled)</span></label>
-                <input readOnly value={user?.matricNo || user?.matricule || ''} className="w-full border border-emerald-200 bg-emerald-50 rounded-xl px-4 py-2.5 text-sm text-slate-600" />
+                <label className="text-xs font-semibold text-black">Matricule <span className="text-emerald-500 font-normal">(auto-filled)</span></label>
+                <input readOnly value={user?.matricNo || user?.matricule || ''} className="w-full border border-emerald-200 bg-emerald-50 rounded-xl px-4 py-2.5 text-sm text-black" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700">Notes / Special Instructions</label>
+                <label className="text-xs font-semibold text-black">Notes / Special Instructions</label>
                 <textarea
                   value={docNotes}
                   onChange={(e) => setDocNotes(e.target.value)}
@@ -270,7 +270,7 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
                   className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm resize-none focus:outline-none focus:border-emerald-500"
                 />
               </div>
-              <button type="submit" className="w-full py-3 bg-slate-900 text-white font-bold rounded-xl text-sm hover:bg-slate-800 transition-colors">
+              <button type="submit" className="w-full py-3 bg-slate-50 text-black font-bold rounded-xl text-sm hover:bg-white transition-colors">
                 Submit Request
               </button>
             </form>
@@ -282,8 +282,8 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
       {view === 'counselling' && (
         <div className="space-y-5">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">Counselling Service</h2>
-            <p className="text-sm text-slate-500 mt-1">Connect with a certified counsellor. Your sessions are private and confidential.</p>
+            <h2 className="text-xl font-bold text-black">Counselling Service</h2>
+            <p className="text-sm text-black mt-1">Connect with a certified counsellor. Your sessions are private and confidential.</p>
           </div>
 
           {counselSubmitted && (
@@ -296,7 +296,7 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
           {/* Active sessions */}
           {activeSessions.length > 0 && (
             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-3">
-              <h3 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Your Sessions</h3>
+              <h3 className="font-bold text-black text-sm border-b border-slate-100 pb-3">Your Sessions</h3>
               {activeSessions.map((sess) => (
                 <button
                   key={sess.id}
@@ -306,17 +306,17 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-purple-50 rounded-xl"><HeartHandshake className="w-4 h-4 text-purple-600" /></div>
                     <div className="text-left">
-                      <p className="text-sm font-bold text-slate-800">Session #{sess.id.slice(-6)}</p>
-                      <p className="text-xs text-slate-500 capitalize">{sess.mode} · {sess.isAnonymous ? 'Anonymous' : 'Identity Revealed'}</p>
+                      <p className="text-sm font-bold text-black">Session #{sess.id.slice(-6)}</p>
+                      <p className="text-xs text-black capitalize">{sess.mode} · {sess.isAnonymous ? 'Anonymous' : 'Identity Revealed'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                       sess.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
                       sess.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                      'bg-slate-100 text-slate-500'
+                      'bg-slate-100 text-black'
                     }`}>{sess.status.charAt(0).toUpperCase() + sess.status.slice(1)}</span>
-                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-purple-500" />
+                    <ChevronRight className="w-4 h-4 text-black group-hover:text-purple-500" />
                   </div>
                 </button>
               ))}
@@ -325,13 +325,13 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
 
           {/* New session form */}
           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-6">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+            <h3 className="font-bold text-black flex items-center gap-2">
               <Plus className="w-4 h-4 text-emerald-500" /> Start New Counselling Session
             </h3>
 
             {/* Mode */}
             <div className="space-y-2">
-              <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">Session Mode</p>
+              <p className="text-xs font-bold text-black uppercase tracking-wider">Session Mode</p>
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { value: 'online', label: 'Online Chat', icon: Wifi, desc: 'Chat via this platform' },
@@ -347,9 +347,9 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
                         : 'border-slate-200 hover:border-slate-400'
                     }`}
                   >
-                    <Icon className={`w-5 h-5 mb-2 ${counselMode === value ? 'text-purple-600' : 'text-slate-500'}`} />
-                    <p className="text-sm font-bold text-slate-800">{label}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{desc}</p>
+                    <Icon className={`w-5 h-5 mb-2 ${counselMode === value ? 'text-purple-600' : 'text-black'}`} />
+                    <p className="text-sm font-bold text-black">{label}</p>
+                    <p className="text-xs text-black mt-0.5">{desc}</p>
                   </button>
                 ))}
               </div>
@@ -358,7 +358,7 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
             {/* Identity */}
             {counselMode === 'online' && (
               <div className="space-y-2">
-                <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">Identity Preference</p>
+                <p className="text-xs font-bold text-black uppercase tracking-wider">Identity Preference</p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     { value: true, label: 'Reveal Identity', icon: Eye, desc: 'Counsellor can see your name' },
@@ -374,9 +374,9 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
                           : 'border-slate-200 hover:border-slate-400'
                       }`}
                     >
-                      <Icon className={`w-5 h-5 mb-2 ${revealIdentity === value ? 'text-blue-600' : 'text-slate-500'}`} />
-                      <p className="text-sm font-bold text-slate-800">{label}</p>
-                      <p className="text-xs text-slate-500 mt-0.5">{desc}</p>
+                      <Icon className={`w-5 h-5 mb-2 ${revealIdentity === value ? 'text-blue-600' : 'text-black'}`} />
+                      <p className="text-sm font-bold text-black">{label}</p>
+                      <p className="text-xs text-black mt-0.5">{desc}</p>
                     </button>
                   ))}
                 </div>
@@ -385,7 +385,7 @@ export const RequestDocuments: React.FC<RequestDocumentsProps> = ({ user }) => {
 
             <button
               onClick={handleCounselRequest}
-              className="w-full py-3 bg-purple-600 text-white font-bold rounded-xl text-sm hover:bg-purple-700 transition-colors"
+              className="w-full py-3 bg-purple-600 text-black font-bold rounded-xl text-sm hover:bg-purple-700 transition-colors"
             >
               Request Counselling Session
             </button>

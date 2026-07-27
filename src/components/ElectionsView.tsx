@@ -67,48 +67,48 @@ export const ElectionsView: React.FC<ElectionsViewProps> = ({ user }) => {
       <div className="flex items-center justify-between">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center space-x-2 text-slate-300 hover:text-white text-xs font-semibold px-3 py-2 bg-navy-800 border border-slate-700/60 rounded-xl transition-colors"
+          className="flex items-center space-x-2 text-black hover:text-white text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl transition-colors"
         >
           <ArrowLeft className="w-4 h-4 text-emerald-400" />
           <span>Back</span>
         </button>
       </div>
 
-      <div className="bg-navy-800 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
-        <div className="flex items-center space-x-3 border-b border-slate-700/60 pb-4">
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xl space-y-6">
+        <div className="flex items-center space-x-3 border-b border-slate-200 pb-4">
           <div className="p-2.5 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30">
             <Vote className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-offwhite">Student Elections</h2>
-            <p className="text-xs text-slate-400">Participate in campus democratic processes.</p>
+            <h2 className="text-xl font-bold text-black">Student Elections</h2>
+            <p className="text-xs text-black">Participate in campus democratic processes.</p>
           </div>
         </div>
 
         {message && (
-          <div className="p-3 bg-navy-900/80 rounded-xl border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+          <div className="p-3 bg-slate-50/80 rounded-xl border border-emerald-500/30 text-emerald-400 text-xs font-bold">
             {message}
           </div>
         )}
 
         <div className="space-y-6">
           {isLoading ? (
-            <div className="text-xs text-slate-400">Loading elections...</div>
+            <div className="text-xs text-black">Loading elections...</div>
           ) : elections.length === 0 ? (
-            <div className="text-xs text-slate-400 text-center py-8">No active elections at this time.</div>
+            <div className="text-xs text-black text-center py-8">No active elections at this time.</div>
           ) : (
             elections.map((election) => (
-              <div key={election.id} className="bg-navy-900 border border-slate-700/60 rounded-xl overflow-hidden">
-                <div className="p-4 bg-navy-800 border-b border-slate-700/60 flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div key={election.id} className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden">
+                <div className="p-4 bg-white border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
                   <div>
-                    <h3 className="text-sm font-bold text-offwhite">{election.title}</h3>
-                    <p className="text-[11px] text-slate-400 mt-1">{election.description}</p>
+                    <h3 className="text-sm font-bold text-black">{election.title}</h3>
+                    <p className="text-[11px] text-black mt-1">{election.description}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                       election.status === 'active' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 
                       election.status === 'upcoming' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                      'bg-slate-700/50 text-slate-400 border border-slate-600'
+                      'bg-slate-100/50 text-black border border-slate-300'
                     }`}>
                       {election.status}
                     </span>
@@ -125,17 +125,17 @@ export const ElectionsView: React.FC<ElectionsViewProps> = ({ user }) => {
                     election.candidates.map((candidate: any) => (
                       <div key={candidate.id} className={`p-4 rounded-xl border flex flex-col justify-between space-y-3 ${
                         election.hasVoted 
-                          ? 'bg-navy-900/50 border-slate-700/40 opacity-75' 
-                          : 'bg-navy-800 border-slate-700 hover:border-purple-500/40 transition-colors'
+                          ? 'bg-slate-50/50 border-slate-200 opacity-75' 
+                          : 'bg-white border-slate-200 hover:border-purple-500/40 transition-colors'
                       }`}>
                         <div>
                           <div className="flex items-center space-x-2">
                             <Users className="w-4 h-4 text-purple-400" />
-                            <h4 className="text-sm font-bold text-slate-200">{candidate.studentName}</h4>
+                            <h4 className="text-sm font-bold text-black">{candidate.studentName}</h4>
                           </div>
                           <p className="text-[10px] text-purple-400 font-bold uppercase tracking-wider mt-1">{candidate.position}</p>
                           {candidate.manifesto && (
-                            <p className="text-xs text-slate-400 mt-2 line-clamp-3">{candidate.manifesto}</p>
+                            <p className="text-xs text-black mt-2 line-clamp-3">{candidate.manifesto}</p>
                           )}
                         </div>
                         
@@ -143,7 +143,7 @@ export const ElectionsView: React.FC<ElectionsViewProps> = ({ user }) => {
                           <button
                             onClick={() => handleVote(election.id, candidate.id)}
                             disabled={isVoting}
-                            className="w-full py-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white font-bold rounded-lg text-xs transition-colors shadow-sm"
+                            className="w-full py-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-black font-bold rounded-lg text-xs transition-colors shadow-sm"
                           >
                             Vote for {candidate.studentName.split(' ')[0]}
                           </button>
@@ -151,7 +151,7 @@ export const ElectionsView: React.FC<ElectionsViewProps> = ({ user }) => {
                       </div>
                     ))
                   ) : (
-                    <div className="col-span-2 text-xs text-slate-400 flex items-center justify-center p-4">
+                    <div className="col-span-2 text-xs text-black flex items-center justify-center p-4">
                       <AlertCircle className="w-4 h-4 mr-2" />
                       No candidates listed for this election yet.
                     </div>

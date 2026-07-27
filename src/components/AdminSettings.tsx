@@ -32,11 +32,11 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-16 md:pb-6 font-sans">
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-          <Settings className="w-6 h-6 text-slate-500" />
+        <h1 className="text-2xl font-bold text-black flex items-center gap-2">
+          <Settings className="w-6 h-6 text-black" />
           System Settings
         </h1>
-        <p className="text-sm text-slate-500 mt-1">Configure plagiarism payment details and matricule verification.</p>
+        <p className="text-sm text-black mt-1">Configure plagiarism payment details and matricule verification.</p>
       </div>
 
       {isSaved && (
@@ -50,15 +50,15 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
         <div className="p-5 border-b border-slate-100 flex items-center gap-3">
           <div className="p-2 bg-amber-50 rounded-lg text-amber-600"><CreditCard className="w-5 h-5" /></div>
           <div>
-            <h2 className="text-sm font-bold text-slate-800">Plagiarism Payment Info</h2>
-            <p className="text-xs text-slate-500">Set the payment numbers and names shown to students.</p>
+            <h2 className="text-sm font-bold text-black">Plagiarism Payment Info</h2>
+            <p className="text-xs text-black">Set the payment numbers and names shown to students.</p>
           </div>
         </div>
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Fee & Primary Payment (MTN MoMo)</h3>
+            <h3 className="text-xs font-bold text-black uppercase tracking-wider">Fee & Primary Payment (MTN MoMo)</h3>
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Test Fee Amount (FCFA)</label>
+              <label className="block text-xs font-medium text-black mb-1">Test Fee Amount (FCFA)</label>
               <input
                 type="text"
                 value={localSettings.plagiarismPayment.amount || '3,500'}
@@ -68,7 +68,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">MoMo Number</label>
+              <label className="block text-xs font-medium text-black mb-1">MoMo Number</label>
               <input
                 type="text"
                 value={localSettings.plagiarismPayment.primaryNumber}
@@ -77,7 +77,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Account Name</label>
+              <label className="block text-xs font-medium text-black mb-1">Account Name</label>
               <input
                 type="text"
                 value={localSettings.plagiarismPayment.primaryName}
@@ -88,9 +88,9 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
           </div>
           
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Secondary (Orange Money) - Optional</h3>
+            <h3 className="text-xs font-bold text-black uppercase tracking-wider">Secondary (Orange Money) - Optional</h3>
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Orange Number</label>
+              <label className="block text-xs font-medium text-black mb-1">Orange Number</label>
               <input
                 type="text"
                 value={localSettings.plagiarismPayment.secondaryNumber || ''}
@@ -99,7 +99,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Account Name</label>
+              <label className="block text-xs font-medium text-black mb-1">Account Name</label>
               <input
                 type="text"
                 value={localSettings.plagiarismPayment.secondaryName || ''}
@@ -117,12 +117,12 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-50 rounded-lg text-blue-600"><ShieldAlert className="w-5 h-5" /></div>
             <div>
-              <h2 className="text-sm font-bold text-slate-800">Matricule Verification</h2>
-              <p className="text-xs text-slate-500">Restrict registration to a pre-approved list of matricules.</p>
+              <h2 className="text-sm font-bold text-black">Matricule Verification</h2>
+              <p className="text-xs text-black">Restrict registration to a pre-approved list of matricules.</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-600">Enabled</span>
+            <span className="text-xs font-bold text-black">Enabled</span>
             <button
               onClick={() => setLocalSettings(s => ({ ...s, matriculeVerificationEnabled: !s.matriculeVerificationEnabled }))}
               className={`w-11 h-6 rounded-full transition-colors relative ${localSettings.matriculeVerificationEnabled ? 'bg-emerald-500' : 'bg-slate-300'}`}
@@ -143,7 +143,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Valid Matricules (One per line)</label>
+              <label className="block text-sm font-bold text-black mb-2">Valid Matricules (One per line)</label>
               <textarea
                 value={rawMatricules}
                 onChange={e => setRawMatricules(e.target.value)}
@@ -156,7 +156,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
             <div className="flex items-center justify-between">
               <div>
                 <input type="file" accept=".pdf,.xlsx,.csv" id="matricule-upload" className="hidden" onChange={handleFileUploadMock} />
-                <label htmlFor="matricule-upload" className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+                <label htmlFor="matricule-upload" className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-black hover:bg-slate-50 transition-colors">
                   <Upload className="w-4 h-4" /> Simulate File Upload
                 </label>
               </div>
@@ -180,7 +180,7 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
       <div className="flex justify-end">
         <button
           onClick={handleSave}
-          className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl flex items-center gap-2 transition-colors shadow-lg"
+          className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-xl flex items-center gap-2 transition-colors shadow-lg"
         >
           <Save className="w-5 h-5" /> Save All Settings
         </button>

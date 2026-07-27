@@ -12,16 +12,15 @@ interface AdminLayoutProps {
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ user, onLogout, onUpdateUser }) => {
   const navigate = useNavigate();
   React.useEffect(() => {
-    // Role check logic for Admin (could use a specific role or check if isStaff and isAdmin)
-    if (!user || user.role !== 'staff') { // Will need better logic for true admin later
+    if (!user || user.role !== 'admin') {
       navigate('/login');
     }
   }, [user, navigate]);
 
-  if (!user || user.role !== 'staff') return null;
+  if (!user || user.role !== 'admin') return null;
 
   return (
-    <div className="min-h-screen bg-ambient-glass text-slate-100 flex flex-col antialiased">
+    <div className="min-h-screen bg-ambient-glass text-black flex flex-col antialiased">
       <Header
         user={user}
         onLogout={onLogout}

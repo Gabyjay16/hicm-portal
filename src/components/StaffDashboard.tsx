@@ -38,8 +38,8 @@ export const StaffDashboard: React.FC = () => {
 
       {/* Header */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-        <h1 className="text-2xl font-bold text-slate-900">Staff Overview Portal</h1>
-        <p className="text-sm text-slate-500 mt-1">Manage your course notes, evaluations, and monitor student progress.</p>
+        <h1 className="text-2xl font-bold text-black">Staff Overview Portal</h1>
+        <p className="text-sm text-black mt-1">Manage your course notes, evaluations, and monitor student progress.</p>
       </div>
 
       {/* Counselling Notifications */}
@@ -65,8 +65,8 @@ export const StaffDashboard: React.FC = () => {
                     <Bell className="w-3.5 h-3.5 text-purple-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-slate-800">{req.displayName}</p>
-                    <p className="text-xs text-slate-500 capitalize">
+                    <p className="text-sm font-semibold text-black">{req.displayName}</p>
+                    <p className="text-xs text-black capitalize">
                       {req.mode === 'online' ? '🌐 Online session' : '📍 In-person session'} ·{' '}
                       {new Date(req.requestedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
@@ -85,8 +85,8 @@ export const StaffDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">Uploaded Notes</p>
-            <h3 className="text-3xl font-bold text-slate-900">{isLoading ? '-' : stats.notesCount}</h3>
+            <p className="text-black text-xs font-semibold uppercase tracking-wider mb-1">Uploaded Notes</p>
+            <h3 className="text-3xl font-bold text-black">{isLoading ? '-' : stats.notesCount}</h3>
           </div>
           <div className="p-3 bg-blue-50 rounded-lg text-blue-500">
             <FileText className="w-6 h-6" />
@@ -95,8 +95,8 @@ export const StaffDashboard: React.FC = () => {
 
         <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">Active Evaluations</p>
-            <h3 className="text-3xl font-bold text-slate-900">{isLoading ? '-' : stats.evaluationsCount}</h3>
+            <p className="text-black text-xs font-semibold uppercase tracking-wider mb-1">Active Evaluations</p>
+            <h3 className="text-3xl font-bold text-black">{isLoading ? '-' : stats.evaluationsCount}</h3>
           </div>
           <div className="p-3 bg-amber-50 rounded-lg text-amber-500">
             <Clock className="w-6 h-6" />
@@ -105,7 +105,7 @@ export const StaffDashboard: React.FC = () => {
 
         <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">System Status</p>
+            <p className="text-black text-xs font-semibold uppercase tracking-wider mb-1">System Status</p>
             <h3 className="text-sm font-bold text-emerald-600 mt-2">All Systems Go</h3>
           </div>
           <div className="p-3 bg-emerald-50 rounded-lg text-emerald-500">
@@ -118,9 +118,9 @@ export const StaffDashboard: React.FC = () => {
             <div className="p-2.5 rounded-xl bg-purple-50 text-purple-500 border border-purple-100">
               <FileText className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-slate-900">Plagiarism Code Lookup</h3>
+            <h3 className="text-base font-bold text-black">Plagiarism Code Lookup</h3>
           </div>
-          <p className="text-sm text-slate-500 mb-5">Enter a student's unique check code to view their plagiarism and AI-writing report.</p>
+          <p className="text-sm text-black mb-5">Enter a student's unique check code to view their plagiarism and AI-writing report.</p>
           <button
             onClick={() => navigate('/staff/plagiarism-lookup')}
             className="w-full flex items-center justify-center space-x-2 py-2.5 bg-purple-500 text-white rounded-xl hover:bg-purple-600 transition-colors text-sm font-bold"
@@ -138,9 +138,9 @@ export const StaffDashboard: React.FC = () => {
             <div className="p-2.5 rounded-xl bg-blue-50 text-blue-500 border border-blue-100">
               <FileText className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-slate-900">Course Materials</h3>
+            <h3 className="text-base font-bold text-black">Course Materials</h3>
           </div>
-          <p className="text-sm text-slate-500 mb-5">Upload and manage lecture notes, slides, and academic resources for your students.</p>
+          <p className="text-sm text-black mb-5">Upload and manage lecture notes, slides, and academic resources for your students.</p>
           <button
             onClick={() => navigate('/staff/notes')}
             className="w-full flex items-center justify-center space-x-2 py-2.5 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors text-sm font-bold"
@@ -155,9 +155,9 @@ export const StaffDashboard: React.FC = () => {
             <div className="p-2.5 rounded-xl bg-amber-50 text-amber-500 border border-amber-100">
               <Clock className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-slate-900">Evaluations & Quizzes</h3>
+            <h3 className="text-base font-bold text-black">Evaluations & Quizzes</h3>
           </div>
-          <p className="text-sm text-slate-500 mb-5">Create timed multiple-choice questions, set durations, and monitor student attempt scores.</p>
+          <p className="text-sm text-black mb-5">Create timed multiple-choice questions, set durations, and monitor student attempt scores.</p>
           <button
             onClick={() => navigate('/staff/evaluations')}
             className="w-full flex items-center justify-center space-x-2 py-2.5 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-colors text-sm font-bold"

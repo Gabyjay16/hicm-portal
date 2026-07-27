@@ -67,8 +67,8 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-16 md:pb-6 font-sans">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">User Management</h2>
-        <p className="text-sm text-slate-500 mt-1">View and manage all registered students and staff.</p>
+        <h2 className="text-2xl font-bold text-black">User Management</h2>
+        <p className="text-sm text-black mt-1">View and manage all registered students and staff.</p>
       </div>
 
       {/* Tabs */}
@@ -82,14 +82,14 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
             onClick={() => { setActiveTab(key); setExpandedId(null); }}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
               activeTab === key
-                ? 'bg-white shadow text-slate-900'
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white shadow text-black'
+                : 'text-black hover:text-black'
             }`}
           >
             <Icon className="w-4 h-4" />
             {label}
             <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-              activeTab === key ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'
+              activeTab === key ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-black'
             }`}>{count}</span>
           </button>
         ))}
@@ -97,7 +97,7 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
+        <Search className="absolute left-3.5 top-3 w-4 h-4 text-black" />
         <input
           type="text"
           value={searchQuery}
@@ -111,7 +111,7 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
         {activeTab === 'students' ? (
           filteredStudents.length === 0 ? (
-            <p className="p-6 text-xs text-slate-400 text-center">No students found.</p>
+            <p className="p-6 text-xs text-black text-center">No students found.</p>
           ) : (
             <div className="divide-y divide-slate-100">
               {filteredStudents.map((student) => {
@@ -126,13 +126,13 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
                         <UserIcon className="w-4 h-4 text-emerald-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-slate-800 truncate">{student.name}</p>
-                        <p className="text-xs text-slate-500">{student.matricNo} · {student.department}</p>
+                        <p className="text-sm font-bold text-black truncate">{student.name}</p>
+                        <p className="text-xs text-black">{student.matricNo} · {student.department}</p>
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
-                        <span className="text-xs text-slate-500 hidden sm:block">{student.level}</span>
+                        <span className="text-xs text-black hidden sm:block">{student.level}</span>
                         {statusBadge(student.status)}
-                        {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                        {isExpanded ? <ChevronUp className="w-4 h-4 text-black" /> : <ChevronDown className="w-4 h-4 text-black" />}
                       </div>
                     </button>
                     {isExpanded && (
@@ -147,32 +147,32 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
                             { label: 'Join Date', value: student.joinDate },
                           ].map(({ label, value }) => (
                             <div key={label} className="space-y-0.5">
-                              <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{label}</p>
-                              <p className="text-sm text-slate-700 font-medium">{value}</p>
+                              <p className="text-[10px] text-black font-semibold uppercase tracking-wider">{label}</p>
+                              <p className="text-sm text-black font-medium">{value}</p>
                             </div>
                           ))}
                         </div>
 
                         {/* Permissions Section */}
                         <div className="border-t border-slate-200 pt-3 mt-1">
-                          <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mb-2">Student Permissions</p>
+                          <p className="text-[10px] text-black font-semibold uppercase tracking-wider mb-2">Student Permissions</p>
                           <div className="flex flex-col sm:flex-row gap-4">
                             <button
                               onClick={() => {
                                 setStudents(prev => prev.map(s => s.id === student.id ? { ...s, canUpdateAnnouncements: !s.canUpdateAnnouncements } : s));
                               }}
-                              className="flex items-center gap-2 text-sm text-slate-700"
+                              className="flex items-center gap-2 text-sm text-black"
                             >
-                              {student.canUpdateAnnouncements ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-slate-300" />}
+                              {student.canUpdateAnnouncements ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-black" />}
                               Can Update Announcement Board
                             </button>
                             <button
                               onClick={() => {
                                 setStudents(prev => prev.map(s => s.id === student.id ? { ...s, canViewAllForums: !s.canViewAllForums } : s));
                               }}
-                              className="flex items-center gap-2 text-sm text-slate-700"
+                              className="flex items-center gap-2 text-sm text-black"
                             >
-                              {student.canViewAllForums ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-slate-300" />}
+                              {student.canViewAllForums ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-black" />}
                               Can View & Reply in All Forums
                             </button>
                           </div>
@@ -186,7 +186,7 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
           )
         ) : (
           filteredStaff.length === 0 ? (
-            <p className="p-6 text-xs text-slate-400 text-center">No staff found.</p>
+            <p className="p-6 text-xs text-black text-center">No staff found.</p>
           ) : (
             <div className="divide-y divide-slate-100">
               {filteredStaff.map((staff) => {
@@ -201,15 +201,15 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
                         <UserIcon className="w-4 h-4 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-slate-800 truncate">{staff.name}</p>
-                        <p className="text-xs text-slate-500">{staff.staffCode} · {staff.department}</p>
+                        <p className="text-sm font-bold text-black truncate">{staff.name}</p>
+                        <p className="text-xs text-black">{staff.staffCode} · {staff.department}</p>
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold hidden sm:block ${
                           staff.isForumApproved ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
                         }`}>{staff.isForumApproved ? 'Forum Approved' : 'Pending Forum'}</span>
                         {statusBadge(staff.status)}
-                        {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                        {isExpanded ? <ChevronUp className="w-4 h-4 text-black" /> : <ChevronDown className="w-4 h-4 text-black" />}
                       </div>
                     </button>
                     {isExpanded && (
@@ -223,8 +223,8 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
                           { label: 'Join Date', value: staff.joinDate },
                         ].map(({ label, value }) => (
                           <div key={label} className="space-y-0.5">
-                            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{label}</p>
-                            <p className="text-sm text-slate-700 font-medium">{value}</p>
+                            <p className="text-[10px] text-black font-semibold uppercase tracking-wider">{label}</p>
+                            <p className="text-sm text-black font-medium">{value}</p>
                           </div>
                         ))}
                       </div>

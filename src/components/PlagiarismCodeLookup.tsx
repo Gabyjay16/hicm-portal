@@ -54,7 +54,7 @@ const MOCK_RESULTS: Record<string, LookupResult> = {
 const PlagiarismGauge: React.FC<{ label: string; pct: number }> = ({ label, pct }) => (
   <div className="space-y-1.5">
     <div className="flex justify-between items-center text-xs">
-      <span className="font-semibold text-slate-700">{label}</span>
+      <span className="font-semibold text-black">{label}</span>
       <span className={`font-bold font-mono ${pct > 30 ? 'text-red-600' : 'text-emerald-600'}`}>{pct}%</span>
     </div>
     <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
@@ -106,14 +106,14 @@ export const PlagiarismCodeLookup: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-16 md:pb-6 font-sans">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Plagiarism Report Lookup</h2>
-        <p className="text-sm text-slate-500 mt-1">Enter the unique check code from a student's plagiarism report to view their results.</p>
+        <h2 className="text-2xl font-bold text-black">Plagiarism Report Lookup</h2>
+        <p className="text-sm text-black mt-1">Enter the unique check code from a student's plagiarism report to view their results.</p>
       </div>
 
       {/* Lookup form */}
       <form onSubmit={handleLookup} className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Check Code</label>
+          <label className="text-xs font-bold text-black uppercase tracking-wider">Check Code</label>
           <div className="flex gap-3">
             <input
               type="text"
@@ -121,12 +121,12 @@ export const PlagiarismCodeLookup: React.FC = () => {
               onChange={(e) => { setCode(e.target.value.toUpperCase()); setError(''); setResult(null); }}
               placeholder="e.g. ABCD1234"
               maxLength={8}
-              className="flex-1 border border-slate-200 rounded-xl px-4 py-3 text-base font-mono font-bold text-slate-800 tracking-widest focus:outline-none focus:border-emerald-500 bg-slate-50"
+              className="flex-1 border border-slate-200 rounded-xl px-4 py-3 text-base font-mono font-bold text-black tracking-widest focus:outline-none focus:border-emerald-500 bg-slate-50"
             />
             <button
               type="submit"
               disabled={!code.trim() || isLooking}
-              className="px-5 py-3 bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition-colors flex items-center gap-2"
+              className="px-5 py-3 bg-slate-50 hover:bg-white disabled:opacity-40 text-black font-bold rounded-xl text-sm transition-colors flex items-center gap-2"
             >
               {isLooking ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
               {isLooking ? 'Searching...' : 'Look Up'}
@@ -145,15 +145,15 @@ export const PlagiarismCodeLookup: React.FC = () => {
       {result && (
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden space-y-0">
           {/* Header */}
-          <div className="p-5 bg-slate-800 text-white flex items-center justify-between">
+          <div className="p-5 bg-white text-white flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2.5 bg-emerald-500/20 rounded-xl border border-emerald-500/30">
                 <FileCheck className="w-5 h-5 text-emerald-400" />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-mono">Code: {result.checkCode}</p>
+                <p className="text-xs text-black font-mono">Code: {result.checkCode}</p>
                 <h3 className="text-sm font-bold">{result.studentName}</h3>
-                <p className="text-xs text-slate-400">{result.studentId} · {result.analyzedAt}</p>
+                <p className="text-xs text-black">{result.studentId} · {result.analyzedAt}</p>
               </div>
             </div>
             <div className={`text-center px-4 py-2 rounded-xl border-2 ${result.passed ? 'bg-emerald-50 border-emerald-300' : 'bg-red-50 border-red-300'}`}>
@@ -170,16 +170,16 @@ export const PlagiarismCodeLookup: React.FC = () => {
           <div className="p-5 space-y-5">
             {/* File info */}
             <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
-              <FileCheck className="w-4 h-4 text-slate-400" />
+              <FileCheck className="w-4 h-4 text-black" />
               <div>
-                <p className="text-sm font-semibold text-slate-800">{result.fileName}</p>
-                <p className="text-xs text-slate-400">Combined score: <strong>{result.combinedPct}%</strong> {result.passed ? '(≤ 30% — Acceptable)' : '(> 30% — Exceeds Threshold)'}</p>
+                <p className="text-sm font-semibold text-black">{result.fileName}</p>
+                <p className="text-xs text-black">Combined score: <strong>{result.combinedPct}%</strong> {result.passed ? '(≤ 30% — Acceptable)' : '(> 30% — Exceeds Threshold)'}</p>
               </div>
             </div>
 
             {/* Gauges */}
             <div className="space-y-4">
-              <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Score Breakdown</h4>
+              <h4 className="text-xs font-bold text-black uppercase tracking-wider">Score Breakdown</h4>
               <PlagiarismGauge label="Plagiarism Detected" pct={result.plagiarismPct} />
               <PlagiarismGauge label="AI-Written Content" pct={result.aiWritingPct} />
               <PlagiarismGauge label="Combined Score" pct={result.combinedPct} />
@@ -188,13 +188,13 @@ export const PlagiarismCodeLookup: React.FC = () => {
             {/* Findings */}
             {result.details.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                <h4 className="text-xs font-bold text-black uppercase tracking-wider flex items-center gap-2">
                   <ShieldAlert className="w-3.5 h-3.5 text-emerald-500" /> AI Findings
                 </h4>
                 <ul className="space-y-2">
                   {result.details.map((d, i) => (
-                    <li key={i} className="flex items-start gap-2 text-xs text-slate-600">
-                      <ExternalLink className="w-3 h-3 mt-0.5 text-slate-400 flex-shrink-0" /> {d}
+                    <li key={i} className="flex items-start gap-2 text-xs text-black">
+                      <ExternalLink className="w-3 h-3 mt-0.5 text-black flex-shrink-0" /> {d}
                     </li>
                   ))}
                 </ul>
@@ -206,7 +206,7 @@ export const PlagiarismCodeLookup: React.FC = () => {
 
       {/* Try demo codes hint */}
       {!result && !error && (
-        <div className="text-center text-xs text-slate-400 space-y-1">
+        <div className="text-center text-xs text-black space-y-1">
           <p>Try demo codes: <button onClick={() => setCode('ABCD1234')} className="font-mono text-emerald-600 hover:underline">ABCD1234</button> or <button onClick={() => setCode('XYZ78901')} className="font-mono text-red-500 hover:underline">XYZ78901</button></p>
         </div>
       )}

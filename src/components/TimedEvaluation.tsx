@@ -165,11 +165,11 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
   const accuracy = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
   
   if (isLoading) {
-    return <div className="text-center text-slate-400 py-10 text-xs">Loading evaluation module...</div>;
+    return <div className="text-center text-black py-10 text-xs">Loading evaluation module...</div>;
   }
   
   if (questions.length === 0) {
-    return <div className="text-center text-slate-400 py-10 text-xs">No active evaluation found.</div>;
+    return <div className="text-center text-black py-10 text-xs">No active evaluation found.</div>;
   }
 
   const currentQuestion = questions[currentQuestionIndex];
@@ -178,11 +178,11 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
     <div className="max-w-3xl w-full mx-auto space-y-6 pb-16 md:pb-6">
       {/* AI MCQ Generator Banner */}
       <div className="glass-panel p-4 rounded-2xl border border-blue-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl backdrop-blur-xl">
-        <div className="flex items-center gap-2.5 text-xs text-slate-200">
+        <div className="flex items-center gap-2.5 text-xs text-black">
           <Sparkles className="w-5 h-5 text-yellow-400 animate-pulse flex-shrink-0" />
           <div>
-            <span className="font-bold text-white block text-sm">OpenRouter AI MCQ Generator</span>
-            <span className="text-[11px] text-slate-400">Generate fresh evaluation questions on any subject</span>
+            <span className="font-bold text-black block text-sm">OpenRouter AI MCQ Generator</span>
+            <span className="text-[11px] text-black">Generate fresh evaluation questions on any subject</span>
           </div>
         </div>
 
@@ -192,7 +192,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
             value={aiTopic}
             onChange={(e) => setAiTopic(e.target.value)}
             placeholder="e.g. Corporate Finance"
-            className="bg-black/60 border border-white/20 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 w-full sm:w-48"
+            className="bg-black/60 border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-400 w-full sm:w-48"
           />
           <button
             type="button"
@@ -210,7 +210,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
       <div className="flex items-center justify-between">
         <button
           onClick={() => navigate('/student/dashboard')}
-          className="flex items-center space-x-2 text-slate-300 hover:text-white text-xs font-semibold px-3 py-2 bg-navy-800 border border-slate-700/60 rounded-xl transition-colors"
+          className="flex items-center space-x-2 text-black hover:text-white text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl transition-colors"
         >
           <ArrowLeft className="w-4 h-4 text-emerald-400" />
           <span>Back to Dashboard</span>
@@ -221,7 +221,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
           className={`flex items-center space-x-2 px-4 py-2 rounded-xl border text-xs font-mono font-bold transition-all shadow-md ${
             isUnderWarningThreshold
               ? 'bg-red-500/20 text-red-400 border-red-500/50 animate-pulse'
-              : 'bg-navy-800 text-amber-400 border-amber-500/40'
+              : 'bg-white text-amber-400 border-amber-500/40'
           }`}
         >
           <Clock className="w-4 h-4" />
@@ -236,24 +236,24 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
 
       {/* Main View Container */}
       {!isSubmitted ? (
-        <div className="bg-navy-800 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xl space-y-6">
           {/* Progress Header */}
-          <div className="flex items-center justify-between border-b border-slate-700/60 pb-4">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-4">
             <div>
               <span className="text-[11px] uppercase tracking-wider font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/20">
                 Question {currentQuestionIndex + 1} of {questions.length}
               </span>
-              <h3 className="text-base font-bold text-offwhite mt-2">
+              <h3 className="text-base font-bold text-black mt-2">
                 HICM Business & Management Evaluation
               </h3>
             </div>
-            <span className="text-xs text-slate-400 font-mono">
+            <span className="text-xs text-black font-mono">
               Answered: {Object.keys(selectedAnswers).length}/{questions.length}
             </span>
           </div>
 
           {/* Progress Bar */}
-          <div className="w-full bg-navy-900 h-2 rounded-full overflow-hidden border border-slate-700/40">
+          <div className="w-full bg-slate-50 h-2 rounded-full overflow-hidden border border-slate-200">
             <div
               className="bg-emerald-500 h-full transition-all duration-300"
               style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
@@ -262,7 +262,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
 
           {/* Question Prompt */}
           <div className="space-y-4">
-            <h4 className="text-base font-semibold text-offwhite leading-relaxed">
+            <h4 className="text-base font-semibold text-black leading-relaxed">
               {currentQuestion.question}
             </h4>
 
@@ -277,13 +277,13 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
                     className={`w-full text-left p-3.5 rounded-xl border text-xs font-medium transition-all flex items-center justify-between ${
                       isSelected
                         ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 font-semibold shadow-sm'
-                        : 'bg-navy-900/80 border-slate-700/60 text-slate-200 hover:bg-slate-800 hover:border-slate-600'
+                        : 'bg-slate-50/80 border-slate-200 text-black hover:bg-white hover:border-slate-300'
                     }`}
                   >
                     <div className="flex items-center space-x-3">
                       <span
                         className={`w-6 h-6 rounded-lg flex items-center justify-center font-mono text-[11px] ${
-                          isSelected ? 'bg-emerald-500 text-navy-900 font-bold' : 'bg-navy-800 text-slate-400 border border-slate-700'
+                          isSelected ? 'bg-emerald-500 text-navy-900 font-bold' : 'bg-white text-black border border-slate-200'
                         }`}
                       >
                         {String.fromCharCode(65 + optionIdx)}
@@ -298,11 +298,11 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
           </div>
 
           {/* Navigation Controls */}
-          <div className="flex items-center justify-between pt-4 border-t border-slate-700/60">
+          <div className="flex items-center justify-between pt-4 border-t border-slate-200">
             <button
               onClick={() => setCurrentQuestionIndex((prev) => Math.max(0, prev - 1))}
               disabled={currentQuestionIndex === 0}
-              className="px-4 py-2 bg-navy-900 text-slate-300 rounded-xl text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-800 border border-slate-700"
+              className="px-4 py-2 bg-slate-50 text-black rounded-xl text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white border border-slate-200"
             >
               Previous
             </button>
@@ -326,38 +326,38 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
         </div>
       ) : (
         /* Results View Card */
-        <div className="bg-navy-800 border border-slate-700/60 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
           <div className="text-center space-y-3">
             <div className="inline-flex p-4 rounded-3xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
               <Award className="w-10 h-10" />
             </div>
-            <h3 className="text-2xl font-bold text-offwhite">Evaluation Completed</h3>
-            <p className="text-xs text-slate-400">
+            <h3 className="text-2xl font-bold text-black">Evaluation Completed</h3>
+            <p className="text-xs text-black">
               Your results have been computed against standard evaluation criteria.
             </p>
           </div>
 
           {/* Score Stats Grid */}
           <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="p-4 bg-navy-900 rounded-xl border border-slate-700/50 space-y-1">
-              <span className="text-xs text-slate-400">Final Score</span>
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <span className="text-xs text-black">Final Score</span>
               <p className="text-xl font-extrabold text-emerald-400">
                 {score} / {questions.length}
               </p>
             </div>
-            <div className="p-4 bg-navy-900 rounded-xl border border-slate-700/50 space-y-1">
-              <span className="text-xs text-slate-400">Accuracy</span>
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <span className="text-xs text-black">Accuracy</span>
               <p className="text-xl font-extrabold text-amber-400">{accuracy}%</p>
             </div>
-            <div className="p-4 bg-navy-900 rounded-xl border border-slate-700/50 space-y-1">
-              <span className="text-xs text-slate-400">Time Taken</span>
-              <p className="text-xl font-extrabold text-slate-200">{formatTime(600 - timeLeft)}</p>
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <span className="text-xs text-black">Time Taken</span>
+              <p className="text-xl font-extrabold text-black">{formatTime(600 - timeLeft)}</p>
             </div>
           </div>
 
           {/* Per-Question Explanations Breakdown */}
           <div className="space-y-4 pt-2">
-            <h4 className="text-sm font-bold text-offwhite uppercase tracking-wider border-b border-slate-700/60 pb-2">
+            <h4 className="text-sm font-bold text-black uppercase tracking-wider border-b border-slate-200 pb-2">
               Question Review & Explanations
             </h4>
             <div className="space-y-3">
@@ -369,12 +369,12 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
                     key={q.id}
                     className={`p-4 rounded-xl border text-xs space-y-2 ${
                       isCorrect
-                        ? 'bg-emerald-500/10 border-emerald-500/40 text-slate-200'
-                        : 'bg-red-500/10 border-red-500/40 text-slate-200'
+                        ? 'bg-emerald-500/10 border-emerald-500/40 text-black'
+                        : 'bg-red-500/10 border-red-500/40 text-black'
                     }`}
                   >
                     <div className="flex items-start justify-between">
-                      <p className="font-semibold text-offwhite">
+                      <p className="font-semibold text-black">
                         {idx + 1}. {q.question}
                       </p>
                       {isCorrect ? (
@@ -387,7 +387,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
                         </span>
                       )}
                     </div>
-                    <div className="text-slate-300">
+                    <div className="text-black">
                       <span>Your Answer: </span>
                       <strong className={isCorrect ? 'text-emerald-400' : 'text-red-400'}>
                         {userChoice !== undefined ? q.options[userChoice] : 'Not Answered'}
@@ -399,7 +399,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
                         <strong>{q.options[q.correctAnswer]}</strong>
                       </div>
                     )}
-                    <div className="p-2.5 bg-navy-900/80 rounded-lg border border-slate-700/40 text-slate-400 text-[11px] leading-relaxed">
+                    <div className="p-2.5 bg-slate-50/80 rounded-lg border border-slate-200 text-black text-[11px] leading-relaxed">
                       💡 <strong>Explanation:</strong> {q.explanation}
                     </div>
                   </div>
@@ -412,7 +412,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
           <div className="flex space-x-3 pt-2">
             <button
               onClick={handleRestart}
-              className="flex-1 py-2.5 bg-navy-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold rounded-xl text-xs flex items-center justify-center space-x-2 transition-colors"
+              className="flex-1 py-2.5 bg-slate-50 hover:bg-white border border-slate-200 text-black font-semibold rounded-xl text-xs flex items-center justify-center space-x-2 transition-colors"
             >
               <RefreshCw className="w-4 h-4 text-emerald-400" />
               <span>Retake Quiz</span>

@@ -35,8 +35,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ user }) => {
     <div className="space-y-6 pb-16 md:pb-6 font-sans">
       {/* Header Greeting */}
       <div className="space-y-1">
-        <h2 className="text-2xl font-bold text-slate-900">Welcome back 👋</h2>
-        <p className="text-sm text-slate-500">Here's what's happening in your campus today.</p>
+        <h2 className="text-2xl font-bold text-black">Welcome back 👋</h2>
+        <p className="text-sm text-black">Here's what's happening in your campus today.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -22,7 +22,7 @@ export const StudentLayout: React.FC<StudentLayoutProps> = ({ user, onLogout, on
   if (!user || user.role !== 'student') return null;
 
   return (
-    <div className="min-h-screen bg-ambient-glass flex font-sans text-slate-100">
+    <div className="min-h-screen bg-ambient-glass flex font-sans text-black">
       <Sidebar
         user={user}
         plagiarismTokens={5} // Mock for now

@@ -25,7 +25,7 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
       {/* Username Settings */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-500">Posting as:</span>
+          <span className="text-sm text-black">Posting as:</span>
           {isEditingUsername ? (
             <input
               type="text"
@@ -34,12 +34,12 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
               className="px-2 py-1 border rounded text-sm"
             />
           ) : (
-            <span className="font-bold text-slate-900">{customUsername}</span>
+            <span className="font-bold text-black">{customUsername}</span>
           )}
         </div>
         <button
           onClick={() => setIsEditingUsername(!isEditingUsername)}
-          className="text-slate-500 hover:text-slate-900"
+          className="text-black hover:text-black"
         >
           {isEditingUsername ? <Save className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
         </button>
@@ -50,7 +50,7 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
         <button
           onClick={() => setActiveTab('general')}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
-            activeTab === 'general' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'
+            activeTab === 'general' ? 'bg-white shadow text-black' : 'text-black hover:text-black'
           }`}
         >
           <Users className="w-4 h-4" /> General Forum
@@ -58,7 +58,7 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
         <button
           onClick={() => setActiveTab('department')}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
-            activeTab === 'department' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'
+            activeTab === 'department' ? 'bg-white shadow text-black' : 'text-black hover:text-black'
           }`}
         >
           <GraduationCap className="w-4 h-4" /> {dept} Forum
