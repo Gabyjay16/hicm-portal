@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { User, AdminSettingsConfig } from '../types';
-import { ShieldCheck, UserCheck, Key, User as UserIcon, BookOpen, AlertCircle, Lock, Phone, UserCheck2 } from 'lucide-react';
+import { ShieldCheck, UserCheck, User as UserIcon, BookOpen, AlertCircle, Lock, Phone, UserCheck2, Bell, ChevronUp, ChevronDown, Image as ImageIcon, Video } from 'lucide-react';
 
 interface LoginFormProps {
   onLogin: (user: User) => void;
@@ -10,9 +10,49 @@ interface LoginFormProps {
 
 type AuthMode = 'login' | 'student_register' | 'staff_register';
 
+interface PublicAnnouncement {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  category: string;
+  imageUrl?: string;
+  videoUrl?: string;
+}
+
+const DEFAULT_ANNOUNCEMENTS: PublicAnnouncement[] = [
+  {
+    id: 'ann-1',
+    title: '📢 2026/2027 Academic Year Registration & Semester Start Notice',
+    content: 'Welcome to the Higher Institute of Human Resource Management (HICM). Online course registrations, CA mark verifications, and student services are now active for all departments.',
+    date: 'July 26, 2026',
+    category: 'Official Notice',
+    imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 'ann-2',
+    title: '🎓 Welcome & Orientation Address by the Director',
+    content: 'Watch the official orientation address detailing academic integrity policies, evaluation timetables, and campus facilities.',
+    date: 'July 20, 2026',
+    category: 'Campus Life',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+  },
+  {
+    id: 'ann-3',
+    title: '📜 CA Marks Verification & Script Remarking Window',
+    content: 'All students are advised to check their continuous assessment marks. Any discrepancies or script review requests should be submitted through the portal Complaints Desk.',
+    date: 'July 15, 2026',
+    category: 'Academic Update',
+  },
+];
+
 export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSettings }) => {
   const [mode, setMode] = useState<AuthMode>('login');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Announcements state
+  const [announcements, setAnnouncements] = useState<PublicAnnouncement[]>(DEFAULT_ANNOUNCEMENTS);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   // Login inputs
   const [loginName, setLoginName] = useState<string>('');
@@ -33,7 +73,34 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
 
-  // Helper to test if a string is a staff verification code
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const res = await fetch('/api/announcements');
+        const data = await res.json();
+        if (data.success && data.data && data.data.length > 0) {
+          setAnnouncements(data.data);
+        }
+      } catch {
+        // Fallback to default announcements with images/videos
+      }
+    };
+    fetchAnnouncements();
+  }, []);
+
+  const handleScrollUp = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ top: -180, behavior: 'smooth' });
+    }
+  };
+
+  const handleScrollDown = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ top: 180, behavior: 'smooth' });
+    }
+  };
+
+  // Silent staff verification check (no hints displayed)
   const isStaffVerificationCode = (input: string): boolean => {
     const clean = input.trim().toUpperCase();
     return clean === 'STF-123' || clean === 'ADM-123' || clean.startsWith('STF-') || clean.startsWith('ADM-');
@@ -45,11 +112,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
     setSuccessMessage('');
 
     if (!loginName.trim()) {
-      setErrorMessage('Please enter your name or staff code.');
+      setErrorMessage('Please enter your full name.');
       return;
     }
 
-    // 1. Check if user typed a Staff Verification Code in the Name field
+    // 1. Silent Staff Code Trigger
     if (isStaffVerificationCode(loginName)) {
       const code = loginName.trim().toUpperCase();
       setMode('staff_register');
@@ -58,23 +125,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
       } else {
         setPosition('Lecturer');
       }
-      setSuccessMessage(`Staff Code '${code}' recognized! Complete your staff registration below.`);
+      setSuccessMessage('Staff verification successful! Complete your staff profile below.');
       return;
     }
 
-    // 2. Standard Login (Student or Staff)
+    // 2. Standard Sign In
     if (!loginSecret.trim()) {
-      setErrorMessage('Please enter your Matricule Number or Password.');
+      setErrorMessage('Please enter your matricule number or password.');
       return;
     }
 
     setIsLoading(true);
 
-    // Case-insensitive name comparison
     const cleanLoginName = loginName.trim().toLowerCase();
     const cleanSecret = loginSecret.trim();
 
-    // Check if staff/admin login
     let role: 'student' | 'staff' | 'admin' = 'student';
     let isStaff = false;
 
@@ -87,10 +152,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
     }
 
     setTimeout(() => {
-      // Construct user object
       const authenticatedUser: User = {
         id: `${role}-${Date.now()}`,
-        name: loginName.trim(), // Keep original capitalization for display
+        name: loginName.trim(),
         role: role,
         isStaff: isStaff,
         phone: phone || '+237 670 000 089',
@@ -132,10 +196,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
       return;
     }
 
-    // Check Matricule Verification if enabled
     if (adminSettings?.matriculeVerificationEnabled) {
       if (!adminSettings.validMatricules.includes(matricNo.trim())) {
-        setErrorMessage(`Matricule '${matricNo}' is not found in the official system. Please check your matricule.`);
+        setErrorMessage(`Matricule '${matricNo}' is not recognized in the system. Please check your matricule.`);
         return;
       }
     }
@@ -202,21 +265,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
   };
 
   return (
-    <div className="max-w-md w-full mx-auto my-6 bg-navy-800 border border-slate-700/60 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6 font-sans">
+    <div className="max-w-xl w-full mx-auto my-6 bg-navy-800 border border-slate-700/60 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6 font-sans text-slate-100">
       {/* Header Banner */}
       <div className="text-center space-y-2">
         <div className="inline-flex p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 mb-1">
           <BookOpen className="w-8 h-8" />
         </div>
         <h2 className="text-2xl font-bold text-offwhite tracking-tight">
-          {mode === 'login' && 'Portal Sign In'}
-          {mode === 'student_register' && 'Student Registration'}
-          {mode === 'staff_register' && 'Staff Registration'}
+          {mode === 'login' && 'HICM Student Portal & Public Announcements'}
+          {mode === 'student_register' && 'Student Account Registration'}
+          {mode === 'staff_register' && 'Staff Account Registration'}
         </h2>
         <p className="text-xs text-slate-400">
-          {mode === 'login' && 'Students sign in with Name & Matricule. Staff enter Staff Code into Name field.'}
-          {mode === 'student_register' && 'Fill in your details below to register your student account.'}
-          {mode === 'staff_register' && 'Enter your staff credentials to complete your staff profile.'}
+          {mode === 'login' && 'Higher Institute of Human Resource Management - Academic Portal'}
+          {mode === 'student_register' && 'Register your student account with your details below.'}
+          {mode === 'staff_register' && 'Complete your official staff profile.'}
         </p>
       </div>
 
@@ -235,7 +298,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
               : 'text-slate-400 hover:text-offwhite'
           }`}
         >
-          Sign In
+          Sign In &amp; Announcements
         </button>
         <button
           type="button"
@@ -269,48 +332,153 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
         </div>
       )}
 
-      {/* ── 1. SIGN IN FORM ────────────────────────────────────────────────────── */}
+      {/* ── 1. SIGN IN & PUBLIC ANNOUNCEMENTS PAGE ───────────────────────────── */}
       {mode === 'login' && (
-        <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs">
-          <div className="space-y-1">
-            <label className="block text-slate-300 font-medium">Name or Staff Verification Code</label>
-            <div className="relative">
-              <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-              <input
-                type="text"
-                value={loginName}
-                onChange={(e) => setLoginName(e.target.value)}
-                placeholder="Enter Full Name (or STF-123 for Staff)"
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500 transition-colors"
-                required
-              />
+        <div className="space-y-6">
+          {/* TOP LOGIN BUTTON SECTION */}
+          <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs bg-navy-900/60 p-5 rounded-2xl border border-slate-700/40">
+            <div className="flex items-center justify-between border-b border-slate-700/50 pb-2 mb-3">
+              <span className="font-bold text-emerald-400 text-sm flex items-center gap-1.5">
+                <UserCheck className="w-4 h-4" /> Quick Student Sign In
+              </span>
+              <span className="text-[10px] text-slate-400">Name + Matricule</span>
             </div>
-            <p className="text-[10px] text-slate-500">Staff: Enter your Staff Code (e.g. STF-123) here and click Sign In.</p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="block text-slate-300 font-medium">Full Name</label>
+                <div className="relative">
+                  <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <input
+                    type="text"
+                    value={loginName}
+                    onChange={(e) => setLoginName(e.target.value)}
+                    placeholder="Enter Full Name"
+                    className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500 transition-colors"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-slate-300 font-medium">Matricule Number</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <input
+                    type="password"
+                    value={loginSecret}
+                    onChange={(e) => setLoginSecret(e.target.value)}
+                    placeholder="UBa26C0001"
+                    className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500 transition-colors font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* TOP LOGIN BUTTON */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-navy-900 font-bold rounded-xl transition-colors shadow-lg flex items-center justify-center space-x-2 mt-2"
+            >
+              <UserCheck className="w-4 h-4" />
+              <span>{isLoading ? 'Signing In...' : 'Sign In to Portal (Top)'}</span>
+            </button>
+          </form>
+
+          {/* PUBLIC ADMIN ANNOUNCEMENTS SECTION */}
+          <div className="bg-navy-900/90 border border-slate-700/80 rounded-2xl p-5 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-700 pb-3">
+              <div className="flex items-center gap-2 text-offwhite font-bold text-sm">
+                <Bell className="w-5 h-5 text-emerald-400" />
+                <span>Campus Announcements &amp; Official Notices</span>
+              </div>
+
+              {/* SCROLL UP & SCROLL DOWN BUTTONS */}
+              <div className="flex items-center space-x-1">
+                <button
+                  type="button"
+                  onClick={handleScrollUp}
+                  title="Scroll Up"
+                  className="p-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-slate-300 hover:text-white transition-colors"
+                >
+                  <ChevronUp className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleScrollDown}
+                  title="Scroll Down"
+                  className="p-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-slate-300 hover:text-white transition-colors"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Announcements List */}
+            <div
+              ref={scrollRef}
+              className="max-h-[380px] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-slate-700"
+            >
+              {announcements.map((ann) => (
+                <div key={ann.id} className="p-4 bg-navy-800/80 border border-slate-700/60 rounded-xl space-y-2">
+                  <div className="flex justify-between items-start">
+                    <h3 className="text-sm font-bold text-white leading-tight">{ann.title}</h3>
+                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full flex-shrink-0">
+                      {ann.category || 'Announcement'}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-slate-300 leading-relaxed">{ann.content}</p>
+
+                  {/* Render Photos if attached */}
+                  {ann.imageUrl && (
+                    <div className="mt-2 rounded-xl overflow-hidden border border-slate-700/60">
+                      <img src={ann.imageUrl} alt={ann.title} className="w-full max-h-56 object-cover" />
+                    </div>
+                  )}
+
+                  {/* Render Videos if attached */}
+                  {ann.videoUrl && (
+                    <div className="mt-2 rounded-xl overflow-hidden border border-slate-700/60 bg-black">
+                      <video controls src={ann.videoUrl} className="w-full max-h-56 object-contain" />
+                    </div>
+                  )}
+
+                  <p className="text-[10px] text-slate-500 pt-1">Posted: {ann.date}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="space-y-1">
-            <label className="block text-slate-300 font-medium">Matricule Number or Password</label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-              <input
-                type="password"
-                value={loginSecret}
-                onChange={(e) => setLoginSecret(e.target.value)}
-                placeholder="Enter Matricule (Students) or Password (Staff)"
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500 transition-colors"
-              />
-            </div>
+          {/* BOTTOM LOGIN BUTTON SECTION */}
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={handleLoginSubmit}
+              disabled={isLoading}
+              className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/40 font-bold rounded-xl transition-colors shadow-lg flex items-center justify-center space-x-2"
+            >
+              <UserCheck className="w-4 h-4" />
+              <span>{isLoading ? 'Signing In...' : 'Sign In to Portal (Bottom)'}</span>
+            </button>
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-navy-900 font-bold rounded-xl transition-colors shadow-lg flex items-center justify-center space-x-2 mt-4"
-          >
-            <UserCheck className="w-4 h-4" />
-            <span>{isLoading ? 'Authenticating...' : 'Sign In to Portal'}</span>
-          </button>
-        </form>
+          {/* NOT A STUDENT? REGISTRATION REDIRECT LINK */}
+          <div className="text-center pt-2 border-t border-slate-700/40">
+            <button
+              type="button"
+              onClick={() => {
+                setMode('student_register');
+                setErrorMessage('');
+                setSuccessMessage('');
+              }}
+              className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 hover:underline transition-colors cursor-pointer"
+            >
+              Not a student? Click here to register your account →
+            </button>
+          </div>
+        </div>
       )}
 
       {/* ── 2. STUDENT REGISTRATION FORM ────────────────────────────────────────── */}
@@ -352,7 +520,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
               type="text"
               value={matricNo}
               onChange={(e) => setMatricNo(e.target.value)}
-              placeholder="e.g. HICM-2024-001"
+              placeholder="UBa26C0001"
               className="w-full bg-navy-900 border border-slate-700 rounded-xl px-3 py-2.5 text-offwhite font-mono uppercase focus:outline-none focus:border-emerald-500"
               required
             />
