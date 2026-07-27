@@ -28,6 +28,7 @@ export interface AdminSettingsConfig {
     primaryName: string;
     secondaryNumber?: string;
     secondaryName?: string;
+    amount?: string;
   };
 }
 

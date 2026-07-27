@@ -56,7 +56,17 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
         </div>
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Primary (MTN MoMo)</h3>
+            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Fee & Primary Payment (MTN MoMo)</h3>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Test Fee Amount (FCFA)</label>
+              <input
+                type="text"
+                value={localSettings.plagiarismPayment.amount || '3,500'}
+                onChange={e => setLocalSettings(s => ({ ...s, plagiarismPayment: { ...s.plagiarismPayment, amount: e.target.value } }))}
+                placeholder="e.g. 3,500"
+                className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 font-bold"
+              />
+            </div>
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">MoMo Number</label>
               <input

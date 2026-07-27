@@ -49,7 +49,8 @@ export default function App() {
       primaryNumber: '681 597 837',
       primaryName: 'B. Judmi',
       secondaryNumber: '',
-      secondaryName: ''
+      secondaryName: '',
+      amount: '3,500',
     }
   });
 

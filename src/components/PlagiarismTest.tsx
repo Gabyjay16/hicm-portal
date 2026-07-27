@@ -269,7 +269,7 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                 <div className="bg-white border border-amber-200 rounded-xl p-3 text-center">
                   <p className="text-xs text-slate-500 font-medium mb-1">Amount</p>
-                  <p className="text-2xl font-extrabold text-slate-900">3,500</p>
+                  <p className="text-2xl font-extrabold text-slate-900">{adminSettings.plagiarismPayment.amount || '3,500'}</p>
                   <p className="text-xs font-bold text-amber-700">FCFA</p>
                 </div>
                 <div className="bg-white border border-amber-200 rounded-xl p-3 text-center">
