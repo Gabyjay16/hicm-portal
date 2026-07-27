@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User } from '../types';
 import { AccordionNav } from './AccordionNav';
-import { Bell, MapPin, ChevronRight, Clock, AlertCircle, Info, Calendar } from 'lucide-react';
+import { Bell, MapPin, ChevronRight, Clock, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface StudentDashboardProps {
@@ -9,9 +9,7 @@ interface StudentDashboardProps {
   plagiarismTokens: number;
 }
 
-export const StudentDashboard: React.FC<StudentDashboardProps> = ({
-  user,
-}) => {
+export const StudentDashboard: React.FC<StudentDashboardProps> = ({ user }) => {
   const navigate = useNavigate();
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [isLoadingAnnouncements, setIsLoadingAnnouncements] = useState(true);
@@ -22,7 +20,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         const res = await fetch('/api/announcements');
         const data = await res.json();
         if (data.success && data.data) {
-          setAnnouncements(data.data.slice(0, 3)); // Just top 3 for the widget
+          setAnnouncements(data.data.slice(0, 3));
         }
       } catch (err) {
         console.error('Failed to fetch announcements:', err);
@@ -35,7 +33,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
   return (
     <div className="space-y-6 pb-16 md:pb-6 font-sans">
-      
+
       {/* Header Greeting */}
       <div className="space-y-1">
         <h2 className="text-2xl font-bold text-slate-900">Welcome back 👋</h2>
@@ -43,17 +41,17 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Left Column: Navigation Accordions */}
         <div className="lg:col-span-2 space-y-4">
-          <AccordionNav 
+          <AccordionNav
             onSelectItem={(_, itemId) => navigate(`/student/${itemId}`)}
           />
         </div>
 
         {/* Right Column: Widgets */}
         <div className="space-y-6">
-          
+
           {/* Recent Announcements Widget */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
             <div className="flex items-center justify-between mb-4">
@@ -63,7 +61,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </div>
               <button className="text-xs text-emerald-600 font-medium hover:underline">View all</button>
             </div>
-            
+
             <div className="space-y-4">
               {isLoadingAnnouncements ? (
                 <div className="text-slate-400 text-xs text-center py-2">Loading...</div>
@@ -79,7 +77,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">New</span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-500 mt-1">{new Date(ann.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {new Date(ann.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
                   </div>
                 ))
               )}
@@ -90,52 +90,6 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </button>
           </div>
 
-          {/* Alerts Widget */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-2 text-slate-800 font-bold text-sm">
-                <AlertCircle className="w-4 h-4 text-slate-600" />
-                <span>Alerts</span>
-              </div>
-              <button className="text-xs text-emerald-600 font-medium hover:underline">View all</button>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex items-start space-x-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                 <div className="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-xs font-bold">!</span>
-                 </div>
-                 <div className="flex-1">
-                   <p className="text-sm font-semibold text-slate-800">Library book due in 2 days</p>
-                   <p className="text-xs text-slate-500 mt-0.5">"Marketing Management"</p>
-                 </div>
-                 <span className="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-1 rounded">Due Soon</span>
-              </div>
-              
-              <div className="flex items-start space-x-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                 <div className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Clock className="w-3.5 h-3.5" />
-                 </div>
-                 <div className="flex-1">
-                   <p className="text-sm font-semibold text-slate-800">Fee payment pending</p>
-                   <p className="text-xs text-slate-500 mt-0.5">Last date: May 25, 2024</p>
-                 </div>
-                 <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">Action Required</span>
-              </div>
-
-              <div className="flex items-start space-x-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                 <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Info className="w-3.5 h-3.5" />
-                 </div>
-                 <div className="flex-1">
-                   <p className="text-sm font-semibold text-slate-800">Wi-Fi maintenance</p>
-                   <p className="text-xs text-slate-500 mt-0.5">May 18, 12:00 AM - 4:00 AM</p>
-                 </div>
-                 <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">Info</span>
-              </div>
-            </div>
-          </div>
-
           {/* Upcoming Evaluation Widget */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
             <div className="flex items-center justify-between mb-4">
@@ -143,9 +97,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <Calendar className="w-4 h-4 text-emerald-600" />
                 <span>Upcoming Evaluation</span>
               </div>
-              <button className="text-xs text-emerald-600 font-medium hover:underline">View all</button>
+              <button
+                onClick={() => navigate('/student/evaluation')}
+                className="text-xs text-emerald-600 font-medium hover:underline"
+              >View all</button>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="flex flex-col items-center justify-center w-14 h-14 rounded-xl border border-slate-200 bg-slate-50">
                 <span className="text-[10px] font-bold text-slate-500 uppercase">May</span>
@@ -161,8 +118,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 </div>
               </div>
               <div className="text-center">
-                 <p className="text-xl font-bold text-emerald-600">2</p>
-                 <p className="text-[10px] text-slate-500">days left</p>
+                <p className="text-xl font-bold text-emerald-600">2</p>
+                <p className="text-[10px] text-slate-500">days left</p>
               </div>
             </div>
           </div>

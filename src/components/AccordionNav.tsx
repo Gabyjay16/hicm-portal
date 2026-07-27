@@ -5,12 +5,14 @@ import {
   BookOpen,
   Award,
   FileCheck,
-  Heart,
   Users,
   Activity,
   Shield,
   Layers,
-  FileText
+  FileText,
+  HeartHandshake,
+  Search,
+  MapPin,
 } from 'lucide-react';
 
 interface AccordionCategory {
@@ -25,7 +27,7 @@ interface AccordionNavProps {
 }
 
 export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
-  // Category accordion state - explicitly all false by default
+  // All closed by default
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({
     academics: false,
     services: false,
@@ -55,8 +57,9 @@ export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
       title: 'Student Services',
       icon: Shield,
       items: [
-        { id: 'complaints', label: 'Complaints Desk', icon: Heart },
-        { id: 'lost-and-found', label: 'Lost & Found', icon: Shield },
+        { id: 'complaints', label: 'Complaints Desk', icon: HeartHandshake },
+        { id: 'lost-and-found', label: 'Lost & Found', icon: MapPin },
+        { id: 'request-documents', label: 'Request Document', icon: Search },
       ],
     },
     {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { User, ForumMessage } from './types';
+import { User } from './types';
 
 // Layouts
 import { StudentLayout } from './layouts/StudentLayout';
@@ -21,23 +21,24 @@ import { ComplaintsDesk } from './components/ComplaintsDesk';
 import { LostAndFound } from './components/LostAndFound';
 import { ElectionsView } from './components/ElectionsView';
 import { TokenRequestsAdmin } from './components/TokenRequestsAdmin';
+import { RequestDocuments } from './components/RequestDocuments';
+import { UserManagement } from './components/UserManagement';
 
 export default function App() {
-  // Authenticated user state
   const [user, setUser] = useState<User | null>({
     id: 'std-2026-089',
     name: 'Jane Doe',
     email: 'j.doe@student.hicm.edu',
     role: 'student',
     matricNo: 'HICM-2024-089',
+    matricule: 'HICM-2024-089',
     department: 'Business Administration',
     level: 'Level 300',
     status: 'Active Student - Verified',
+    phone: '+237 670 000 089',
   });
 
   const [plagiarismTokens, setPlagiarismTokens] = useState<number>(5);
-
-
 
   const handleUsePlagiarismToken = (): boolean => {
     if (plagiarismTokens >= 1) {
@@ -50,8 +51,6 @@ export default function App() {
   const handleAddTokens = (amount: number) => {
     setPlagiarismTokens((prev) => prev + amount);
   };
-
-
 
   const handleLogin = (newUser: User) => {
     setUser(newUser);
@@ -68,40 +67,32 @@ export default function App() {
         <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
 
         {/* Root Redirect based on Role */}
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
             !user ? <Navigate to="/login" replace /> :
             user.role === 'student' ? <Navigate to="/student/dashboard" replace /> :
             user.role === 'staff' ? <Navigate to="/staff/dashboard" replace /> :
             <Navigate to="/admin/dashboard" replace />
-          } 
+          }
         />
 
         {/* Student Routes */}
         <Route path="/student" element={<StudentLayout user={user} onLogout={handleLogout} />}>
           <Route path="dashboard" element={
-            <StudentDashboard 
-              user={user} 
-              plagiarismTokens={plagiarismTokens} 
-            />
+            <StudentDashboard user={user} plagiarismTokens={plagiarismTokens} />
           } />
           <Route path="evaluation" element={<TimedEvaluation user={user} />} />
           <Route path="plagiarism" element={
-            <PlagiarismTest 
-              user={user}
-            />
+            <PlagiarismTest user={user} />
           } />
-          <Route path="forum" element={
-            <GeneralForum 
-              currentUser={user} 
-            />
-          } />
+          <Route path="forum" element={<GeneralForum currentUser={user} />} />
           <Route path="alerts" element={<AlertsView />} />
           <Route path="notes" element={<NotesView user={user} />} />
           <Route path="complaints" element={<ComplaintsDesk user={user} />} />
           <Route path="lost-and-found" element={<LostAndFound user={user} />} />
           <Route path="elections" element={<ElectionsView user={user} />} />
+          <Route path="request-documents" element={<RequestDocuments user={user} />} />
         </Route>
 
         {/* Staff Routes */}
@@ -113,6 +104,8 @@ export default function App() {
         <Route path="/admin" element={<AdminLayout user={user} onLogout={handleLogout} />}>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="tokens" element={<TokenRequestsAdmin />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="complaint-fields" element={<ComplaintsDesk user={user} isAdmin={true} />} />
         </Route>
 
         {/* Catch All */}

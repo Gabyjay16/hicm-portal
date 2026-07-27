@@ -1,0 +1,198 @@
+import React, { useState } from 'react';
+import { Search, Users, GraduationCap, ChevronDown, ChevronUp, User as UserIcon } from 'lucide-react';
+
+// Mock data for demo
+const MOCK_STUDENTS = [
+  { id: 'std-2026-089', name: 'Jane Doe', matricNo: 'HICM-2024-089', department: 'Business Administration', level: 'Level 300', status: 'Active', joinDate: '2024-09-01', email: 'j.doe@student.hicm.edu' },
+  { id: 'std-2026-090', name: 'Paul Nkemdirim', matricNo: 'HICM-2024-090', department: 'Human Resources', level: 'Level 200', status: 'Active', joinDate: '2024-09-01', email: 'p.nkemdirim@student.hicm.edu' },
+  { id: 'std-2026-091', name: 'Fatima Bah', matricNo: 'HICM-2024-091', department: 'Business Administration', level: 'Level 400', status: 'Active', joinDate: '2024-09-02', email: 'f.bah@student.hicm.edu' },
+  { id: 'std-2026-092', name: 'Chukwuemeka Eze', matricNo: 'HICM-2024-092', department: 'Marketing', level: 'Level 100', status: 'Active', joinDate: '2025-09-01', email: 'c.eze@student.hicm.edu' },
+  { id: 'std-2026-093', name: 'Abena Mensah', matricNo: 'HICM-2024-093', department: 'Accounting', level: 'Level 500', status: 'Suspended', joinDate: '2023-09-01', email: 'a.mensah@student.hicm.edu' },
+  { id: 'std-2026-094', name: 'Kwame Asante', matricNo: 'HICM-2024-094', department: 'Finance', level: 'Level 600', status: 'Active', joinDate: '2022-09-01', email: 'k.asante@student.hicm.edu' },
+];
+
+const MOCK_STAFF = [
+  { id: 'stf-001', name: 'Dr. Samuel Ngwa', staffCode: 'STF-123', department: 'Business Administration', role: 'Lecturer', status: 'Active', isForumApproved: false, joinDate: '2020-01-15', email: 's.ngwa@staff.hicm.edu' },
+  { id: 'stf-002', name: 'Prof. Amina Bello', staffCode: 'STF-456', department: 'Human Resources', role: 'Professor', status: 'Active', isForumApproved: true, joinDate: '2018-08-20', email: 'a.bello@staff.hicm.edu' },
+  { id: 'stf-003', name: 'Ms. Grace Okafor', staffCode: 'STF-789', department: 'Counselling', role: 'Counsellor', status: 'Active', isForumApproved: true, joinDate: '2021-03-10', email: 'g.okafor@staff.hicm.edu' },
+];
+
+type Tab = 'students' | 'staff';
+
+export const UserManagement: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<Tab>('students');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const filteredStudents = MOCK_STUDENTS.filter(
+    (s) =>
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.matricNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.department.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredStaff = MOCK_STAFF.filter(
+    (s) =>
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.staffCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.department.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const toggleExpand = (id: string) => {
+    setExpandedId((prev) => (prev === id ? null : id));
+  };
+
+  const statusBadge = (status: string) => (
+    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+      status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'
+    }`}>{status}</span>
+  );
+
+  return (
+    <div className="max-w-5xl mx-auto space-y-6 pb-16 md:pb-6 font-sans">
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900">User Management</h2>
+        <p className="text-sm text-slate-500 mt-1">View and manage all registered students and staff.</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2 bg-slate-100 p-1 rounded-2xl w-fit">
+        {[
+          { key: 'students' as Tab, label: 'Students', icon: GraduationCap, count: filteredStudents.length },
+          { key: 'staff' as Tab, label: 'Staff', icon: Users, count: filteredStaff.length },
+        ].map(({ key, label, icon: Icon, count }) => (
+          <button
+            key={key}
+            onClick={() => { setActiveTab(key); setExpandedId(null); }}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
+              activeTab === key
+                ? 'bg-white shadow text-slate-900'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <Icon className="w-4 h-4" />
+            {label}
+            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+              activeTab === key ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'
+            }`}>{count}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder={`Search ${activeTab === 'students' ? 'students' : 'staff'}...`}
+          className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:border-emerald-500 shadow-sm"
+        />
+      </div>
+
+      {/* List */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        {activeTab === 'students' ? (
+          filteredStudents.length === 0 ? (
+            <p className="p-6 text-xs text-slate-400 text-center">No students found.</p>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {filteredStudents.map((student) => {
+                const isExpanded = expandedId === student.id;
+                return (
+                  <div key={student.id}>
+                    <button
+                      onClick={() => toggleExpand(student.id)}
+                      className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors text-left"
+                    >
+                      <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                        <UserIcon className="w-4 h-4 text-emerald-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-800 truncate">{student.name}</p>
+                        <p className="text-xs text-slate-500">{student.matricNo} · {student.department}</p>
+                      </div>
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <span className="text-xs text-slate-500 hidden sm:block">{student.level}</span>
+                        {statusBadge(student.status)}
+                        {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                      </div>
+                    </button>
+                    {isExpanded && (
+                      <div className="px-6 pb-4 pt-2 bg-slate-50 border-t border-slate-100 grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {[
+                          { label: 'Student ID', value: student.id },
+                          { label: 'Email', value: student.email },
+                          { label: 'Level', value: student.level },
+                          { label: 'Department', value: student.department },
+                          { label: 'Status', value: student.status },
+                          { label: 'Join Date', value: student.joinDate },
+                        ].map(({ label, value }) => (
+                          <div key={label} className="space-y-0.5">
+                            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{label}</p>
+                            <p className="text-sm text-slate-700 font-medium">{value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )
+        ) : (
+          filteredStaff.length === 0 ? (
+            <p className="p-6 text-xs text-slate-400 text-center">No staff found.</p>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {filteredStaff.map((staff) => {
+                const isExpanded = expandedId === staff.id;
+                return (
+                  <div key={staff.id}>
+                    <button
+                      onClick={() => toggleExpand(staff.id)}
+                      className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors text-left"
+                    >
+                      <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <UserIcon className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-800 truncate">{staff.name}</p>
+                        <p className="text-xs text-slate-500">{staff.staffCode} · {staff.department}</p>
+                      </div>
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold hidden sm:block ${
+                          staff.isForumApproved ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                        }`}>{staff.isForumApproved ? 'Forum Approved' : 'Pending Forum'}</span>
+                        {statusBadge(staff.status)}
+                        {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                      </div>
+                    </button>
+                    {isExpanded && (
+                      <div className="px-6 pb-4 pt-2 bg-slate-50 border-t border-slate-100 grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {[
+                          { label: 'Staff ID', value: staff.id },
+                          { label: 'Email', value: staff.email },
+                          { label: 'Role', value: staff.role },
+                          { label: 'Department', value: staff.department },
+                          { label: 'Forum Status', value: staff.isForumApproved ? 'Approved' : 'Pending' },
+                          { label: 'Join Date', value: staff.joinDate },
+                        ].map(({ label, value }) => (
+                          <div key={label} className="space-y-0.5">
+                            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{label}</p>
+                            <p className="text-sm text-slate-700 font-medium">{value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )
+        )}
+      </div>
+    </div>
+  );
+};

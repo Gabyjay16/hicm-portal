@@ -4,6 +4,7 @@ export interface User {
   email: string;
   role: 'student' | 'staff' | 'admin';
   isStaff?: boolean;
+  isForumApproved?: boolean;
   matricNo?: string;
   matricule?: string;
   staffCode?: string;
@@ -11,6 +12,8 @@ export interface User {
   level?: string;
   avatarUrl?: string;
   status?: string;
+  phone?: string;
+  joinDate?: string;
 }
 
 export type NavTab = 'home' | 'forum' | 'alerts' | 'notes';
@@ -23,6 +26,8 @@ export interface ForumMessage {
   role: 'student' | 'staff' | 'admin';
   text?: string;
   content?: string;
+  imageUrl?: string;
+  audioUrl?: string;
   timestamp: string;
 }
 
@@ -86,4 +91,46 @@ export interface NoteItem {
   date: string;
   isShared: boolean;
   tags: string[];
+}
+
+export type ComplaintType = 'wrong_marks' | 'wrong_course_code' | 'remark_script';
+
+export interface ComplaintField {
+  id: string;
+  label: string;
+  type: 'text' | 'number' | 'select' | 'textarea' | 'toggle';
+  placeholder?: string;
+  options?: string[];
+  autoFill?: 'name' | 'matricule' | 'phone';
+  toggleLabel?: string; // e.g., "NO MARK"
+}
+
+export interface ComplaintFormConfig {
+  type: ComplaintType;
+  title: string;
+  description: string;
+  fields: ComplaintField[];
+}
+
+export interface DocumentRequest {
+  id: string;
+  studentId: string;
+  studentName: string;
+  documentType: 'attestation' | 'attendance' | 'admission';
+  status: 'pending' | 'processing' | 'ready' | 'collected';
+  requestDate: string;
+  notes?: string;
+}
+
+export interface CounsellingSession {
+  id: string;
+  studentId: string;
+  studentName: string;
+  isAnonymous: boolean;
+  mode: 'online' | 'in_person';
+  status: 'pending' | 'active' | 'closed';
+  createdAt: string;
+  assignedCounsellorId?: string;
+  assignedCounsellorName?: string;
+  messages: ForumMessage[];
 }
