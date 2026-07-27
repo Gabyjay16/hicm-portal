@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { QuizQuestion, User } from '../types';
-import { Clock, AlertTriangle, CheckCircle2, XCircle, ArrowLeft, RefreshCw, Award, HelpCircle } from 'lucide-react';
+import { Clock, AlertTriangle, CheckCircle2, XCircle, ArrowLeft, RefreshCw, Award, HelpCircle, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface TimedEvaluationProps {
@@ -18,6 +18,10 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [evaluationId, setEvaluationId] = useState<string>('eval-midterm-1');
 
+  // AI MCQ Generation State
+  const [isGeneratingAI, setIsGeneratingAI] = useState<boolean>(false);
+  const [aiTopic, setAiTopic] = useState<string>('Human Resource Management');
+
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
@@ -34,6 +38,52 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
     };
     fetchQuestions();
   }, []);
+
+  const handleGenerateAIMCQs = async () => {
+    setIsGeneratingAI(true);
+    try {
+      const res = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: 'system',
+              content: `You are an academic exam generator. Generate 5 multiple-choice questions on the topic provided. Return ONLY a valid JSON array of 5 objects (no markdown, no code fences):
+[
+  {
+    "id": "q1",
+    "question": "<question string>",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correctAnswer": 0,
+    "explanation": "<explanation string>"
+  }
+]`
+            },
+            {
+              role: 'user',
+              content: `Generate 5 academic MCQs for subject: ${aiTopic}`
+            }
+          ]
+        })
+      });
+      const data = await res.json();
+      const raw = data.choices?.[0]?.message?.content || data.content || '[]';
+      const cleanJson = raw.replace(/```json?/g, '').replace(/```/g, '').trim();
+      const parsed = JSON.parse(cleanJson);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        setQuestions(parsed);
+        setSelectedAnswers({});
+        setCurrentQuestionIndex(0);
+        setTimeLeft(600);
+        setIsSubmitted(false);
+      }
+    } catch (err) {
+      console.error('AI MCQ generation error:', err);
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
 
   // Countdown effect
   useEffect(() => {
@@ -126,6 +176,36 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
 
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6 pb-16 md:pb-6">
+      {/* AI MCQ Generator Banner */}
+      <div className="glass-panel p-4 rounded-2xl border border-blue-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl backdrop-blur-xl">
+        <div className="flex items-center gap-2.5 text-xs text-slate-200">
+          <Sparkles className="w-5 h-5 text-yellow-400 animate-pulse flex-shrink-0" />
+          <div>
+            <span className="font-bold text-white block text-sm">OpenRouter AI MCQ Generator</span>
+            <span className="text-[11px] text-slate-400">Generate fresh evaluation questions on any subject</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <input
+            type="text"
+            value={aiTopic}
+            onChange={(e) => setAiTopic(e.target.value)}
+            placeholder="e.g. Corporate Finance"
+            className="bg-black/60 border border-white/20 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 w-full sm:w-48"
+          />
+          <button
+            type="button"
+            onClick={handleGenerateAIMCQs}
+            disabled={isGeneratingAI}
+            className="px-3.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs rounded-xl shadow-lg transition-all flex items-center gap-1.5 flex-shrink-0 cursor-pointer disabled:opacity-50"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
+            <span>{isGeneratingAI ? 'Generating...' : 'Generate MCQs'}</span>
+          </button>
+        </div>
+      </div>
+
       {/* Top Controls & Navigation */}
       <div className="flex items-center justify-between">
         <button

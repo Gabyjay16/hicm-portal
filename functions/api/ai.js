@@ -72,7 +72,7 @@ export async function onRequestPost(context) {
           details: data,
         }),
         {
-          status: groqResponse.status,
+          status: apiResponse.status,
           headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
