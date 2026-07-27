@@ -1,43 +1,45 @@
 import React from 'react';
 import { Home, MessageSquare, Bell, FileText } from 'lucide-react';
-import { NavTab, SubView } from '../types';
+import { User } from '../types';
+import { Link, useLocation } from 'react-router-dom';
 
 interface BottomNavProps {
-  activeTab: NavTab;
-  setActiveTab: (tab: NavTab) => void;
-  setActiveSubView: (view: SubView) => void;
+  user: User | null;
   unreadAlertsCount?: number;
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({
-  activeTab,
-  setActiveTab,
-  setActiveSubView,
+  user,
   unreadAlertsCount = 0,
 }) => {
-  const tabs = [
-    { id: 'home' as NavTab, label: 'Home', icon: Home },
-    { id: 'forum' as NavTab, label: 'Forum', icon: MessageSquare },
-    { id: 'alerts' as NavTab, label: 'Alerts', icon: Bell, badge: unreadAlertsCount },
-    { id: 'notes' as NavTab, label: 'Notes', icon: FileText },
-  ];
+  const location = useLocation();
+  const currentPath = location.pathname;
 
-  const handleTabClick = (tabId: NavTab) => {
-    setActiveTab(tabId);
-    if (tabId === 'home') {
-      setActiveSubView('dashboard');
-    }
+  const getBasePath = () => {
+    if (!user) return '/login';
+    if (user.role === 'staff') return '/staff';
+    if (user.role === 'admin') return '/admin';
+    return '/student';
   };
+  
+  const basePath = getBasePath();
+
+  const tabs = [
+    { id: 'dashboard', path: `${basePath}/dashboard`, label: 'Home', icon: Home },
+    { id: 'forum', path: `${basePath}/forum`, label: 'Forum', icon: MessageSquare },
+    { id: 'alerts', path: `${basePath}/alerts`, label: 'Alerts', icon: Bell, badge: unreadAlertsCount },
+    { id: 'notes', path: `${basePath}/notes`, label: 'Notes', icon: FileText },
+  ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-navy-900 border-t border-navy-800 flex justify-around items-center py-2 md:hidden shadow-lg">
       {tabs.map((tab) => {
         const Icon = tab.icon;
-        const isActive = activeTab === tab.id;
+        const isActive = currentPath === tab.path;
         return (
-          <button
+          <Link
             key={tab.id}
-            onClick={() => handleTabClick(tab.id)}
+            to={tab.path}
             className={`relative flex flex-col items-center justify-center w-full py-1 px-2 transition-all ${
               isActive ? 'text-emerald-500 font-semibold' : 'text-slate-400 hover:text-offwhite'
             }`}
@@ -54,7 +56,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             {isActive && (
               <span className="absolute bottom-0 w-8 h-0.5 bg-emerald-500 rounded-full"></span>
             )}
-          </button>
+          </Link>
         );
       })}
     </nav>

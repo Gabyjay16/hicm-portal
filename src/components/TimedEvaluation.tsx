@@ -1,90 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { QuizQuestion } from '../types';
+import { QuizQuestion, User } from '../types';
 import { Clock, AlertTriangle, CheckCircle2, XCircle, ArrowLeft, RefreshCw, Award, HelpCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface TimedEvaluationProps {
-  onBackToDashboard: () => void;
+  user: User | null;
 }
 
-const SAMPLE_QUESTIONS: QuizQuestion[] = [
-  {
-    id: 'q1',
-    question: 'Which accounting statement presents a snapshot of a company’s financial position at a specific point in time?',
-    options: [
-      'Income Statement',
-      'Balance Sheet',
-      'Statement of Cash Flows',
-      'Statement of Retained Earnings'
-    ],
-    correctAnswer: 1,
-    explanation: 'The Balance Sheet lists assets, liabilities, and equity at a specific point in time, providing a financial position snapshot.'
-  },
-  {
-    id: 'q2',
-    question: 'In modern business management, what does the acronym SWOT stand for?',
-    options: [
-      'Strengths, Weaknesses, Opportunities, Threats',
-      'Strategy, Workforce, Objectives, Tactics',
-      'Sales, Wealth, Operations, Targets',
-      'System, Web, Optimization, Testing'
-    ],
-    correctAnswer: 0,
-    explanation: 'SWOT stands for Strengths, Weaknesses, Opportunities, and Threats — a key framework for strategic analysis.'
-  },
-  {
-    id: 'q3',
-    question: 'What is the primary function of a Central Bank in a modern monetary economy?',
-    options: [
-      'Provide retail loans to private consumers',
-      'Regulate national money supply and interest rates',
-      'Sell corporate stock shares directly to investors',
-      'Manage municipal waste services'
-    ],
-    correctAnswer: 1,
-    explanation: 'Central banks (like the Bank of Central African States or Fed) control monetary policy, interest rates, and currency issuance.'
-  },
-  {
-    id: 'q4',
-    question: 'Which marketing mix component involves pricing strategies, discounts, and credit terms?',
-    options: [
-      'Product',
-      'Place',
-      'Price',
-      'Promotion'
-    ],
-    correctAnswer: 2,
-    explanation: 'The Price component of the 4 Ps deals with setting price points, discounts, financing, and payment structures.'
-  },
-  {
-    id: 'q5',
-    question: 'In Database Management Systems (DBMS), what does SQL stand for?',
-    options: [
-      'Systemic Query Logic',
-      'Structured Query Language',
-      'Sequential Queue Listing',
-      'Standardized Quality Metric'
-    ],
-    correctAnswer: 1,
-    explanation: 'SQL stands for Structured Query Language, the standard domain-specific language used in relational databases.'
-  }
-];
-
-export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ onBackToDashboard }) => {
+export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
+  const navigate = useNavigate();
   // Timer state: 10 minutes = 600 seconds
   const [timeLeft, setTimeLeft] = useState<number>(600);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [evaluationId, setEvaluationId] = useState<string>('eval-midterm-1');
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const res = await fetch('/api/evaluations');
+        const data = await res.json();
+        if (data.success) {
+          setQuestions(data.data);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchQuestions();
+  }, []);
 
   // Countdown effect
   useEffect(() => {
-    if (isSubmitted) return;
+    if (isSubmitted || isLoading || questions.length === 0) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          setIsSubmitted(true);
+          handleSubmit(); // Auto-submit when time's up
           return 0;
         }
         return prev - 1;
@@ -92,7 +51,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ onBackToDashbo
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isSubmitted]);
+  }, [isSubmitted, isLoading, questions]);
 
   // Format time mm:ss
   const formatTime = (seconds: number) => {
@@ -111,8 +70,37 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ onBackToDashbo
     }));
   };
 
-  const handleSubmit = () => {
+  const calculateScore = () => {
+    let score = 0;
+    questions.forEach((q, idx) => {
+      if (selectedAnswers[idx] === q.correctAnswer) {
+        score += 1;
+      }
+    });
+    return score;
+  };
+
+  const handleSubmit = async () => {
     setIsSubmitted(true);
+    if (!user) return; // Wait, guest can't submit officially
+    const score = calculateScore();
+    const timeSpent = 600 - timeLeft;
+
+    try {
+      await fetch('/api/evaluations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId: user.id,
+          evaluationId,
+          score,
+          answers: selectedAnswers,
+          timeSpent,
+        })
+      });
+    } catch (err) {
+      console.error('Failed to submit evaluation to backend:', err);
+    }
   };
 
   const handleRestart = () => {
@@ -122,27 +110,26 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ onBackToDashbo
     setIsSubmitted(false);
   };
 
-  // Calculate results
-  const calculateScore = () => {
-    let score = 0;
-    SAMPLE_QUESTIONS.forEach((q, idx) => {
-      if (selectedAnswers[idx] === q.correctAnswer) {
-        score += 1;
-      }
-    });
-    return score;
-  };
 
   const score = calculateScore();
-  const accuracy = Math.round((score / SAMPLE_QUESTIONS.length) * 100);
-  const currentQuestion = SAMPLE_QUESTIONS[currentQuestionIndex];
+  const accuracy = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+  
+  if (isLoading) {
+    return <div className="text-center text-slate-400 py-10 text-xs">Loading evaluation module...</div>;
+  }
+  
+  if (questions.length === 0) {
+    return <div className="text-center text-slate-400 py-10 text-xs">No active evaluation found.</div>;
+  }
+
+  const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6 pb-16 md:pb-6">
       {/* Top Controls & Navigation */}
       <div className="flex items-center justify-between">
         <button
-          onClick={onBackToDashboard}
+          onClick={() => navigate('/student/dashboard')}
           className="flex items-center space-x-2 text-slate-300 hover:text-white text-xs font-semibold px-3 py-2 bg-navy-800 border border-slate-700/60 rounded-xl transition-colors"
         >
           <ArrowLeft className="w-4 h-4 text-emerald-400" />
@@ -174,14 +161,14 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ onBackToDashbo
           <div className="flex items-center justify-between border-b border-slate-700/60 pb-4">
             <div>
               <span className="text-[11px] uppercase tracking-wider font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/20">
-                Question {currentQuestionIndex + 1} of {SAMPLE_QUESTIONS.length}
+                Question {currentQuestionIndex + 1} of {questions.length}
               </span>
               <h3 className="text-base font-bold text-offwhite mt-2">
                 HICM Business & Management Evaluation
               </h3>
             </div>
             <span className="text-xs text-slate-400 font-mono">
-              Answered: {Object.keys(selectedAnswers).length}/{SAMPLE_QUESTIONS.length}
+              Answered: {Object.keys(selectedAnswers).length}/{questions.length}
             </span>
           </div>
 
@@ -189,7 +176,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ onBackToDashbo
           <div className="w-full bg-navy-900 h-2 rounded-full overflow-hidden border border-slate-700/40">
             <div
               className="bg-emerald-500 h-full transition-all duration-300"
-              style={{ width: `${((currentQuestionIndex + 1) / SAMPLE_QUESTIONS.length) * 100}%` }}
+              style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
             ></div>
           </div>
 
@@ -240,7 +227,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ onBackToDashbo
               Previous
             </button>
 
-            {currentQuestionIndex < SAMPLE_QUESTIONS.length - 1 ? (
+            {currentQuestionIndex < questions.length - 1 ? (
               <button
                 onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
                 className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-navy-900 font-bold rounded-xl text-xs transition-colors shadow"
@@ -275,7 +262,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ onBackToDashbo
             <div className="p-4 bg-navy-900 rounded-xl border border-slate-700/50 space-y-1">
               <span className="text-xs text-slate-400">Final Score</span>
               <p className="text-xl font-extrabold text-emerald-400">
-                {score} / {SAMPLE_QUESTIONS.length}
+                {score} / {questions.length}
               </p>
             </div>
             <div className="p-4 bg-navy-900 rounded-xl border border-slate-700/50 space-y-1">
@@ -294,7 +281,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ onBackToDashbo
               Question Review & Explanations
             </h4>
             <div className="space-y-3">
-              {SAMPLE_QUESTIONS.map((q, idx) => {
+              {questions.map((q, idx) => {
                 const userChoice = selectedAnswers[idx];
                 const isCorrect = userChoice === q.correctAnswer;
                 return (
@@ -351,7 +338,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ onBackToDashbo
               <span>Retake Quiz</span>
             </button>
             <button
-              onClick={onBackToDashboard}
+              onClick={() => navigate('/student/dashboard')}
               className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-navy-900 font-bold rounded-xl text-xs transition-colors shadow"
             >
               Return to Dashboard
