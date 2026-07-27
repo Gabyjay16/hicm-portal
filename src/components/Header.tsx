@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Home, MessageSquare, Bell, LogOut, ChevronDown } from 'lucide-react';
+import { Search, Home, MessageSquare, Bell, User as UserIcon, LogOut, ChevronDown } from 'lucide-react';
 import { User } from '../types';
 import { Link, useLocation } from 'react-router-dom';
 

@@ -2,7 +2,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'staff';
+  role: 'student' | 'staff' | 'admin';
   isStaff?: boolean;
   matricNo?: string;
   matricule?: string;
@@ -20,7 +20,7 @@ export type SubView = 'dashboard' | 'evaluation' | 'plagiarism' | 'login';
 export interface ForumMessage {
   id: string;
   author: string;
-  role: 'student' | 'staff';
+  role: 'student' | 'staff' | 'admin';
   text?: string;
   content?: string;
   timestamp: string;
