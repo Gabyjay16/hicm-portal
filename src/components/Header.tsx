@@ -129,7 +129,12 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-slate-700">Phone Number</label>
-                <input type="text" placeholder="e.g. 671234567" defaultValue={user?.phone} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500" />
+                <input 
+                  type="text" 
+                  placeholder="e.g. 671234567" 
+                  defaultValue={user?.phone} 
+                  className="w-full bg-slate-800 border border-slate-700 text-white placeholder-slate-400 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors" 
+                />
               </div>
               <div className="space-y-1.5 flex items-center justify-between">
                 <div>
