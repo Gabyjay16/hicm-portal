@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { User } from './types';
+import { User, AdminSettingsConfig } from './types';
 
 // Layouts
 import { StudentLayout } from './layouts/StudentLayout';
@@ -24,6 +24,7 @@ import { TokenRequestsAdmin } from './components/TokenRequestsAdmin';
 import { RequestDocuments } from './components/RequestDocuments';
 import { UserManagement } from './components/UserManagement';
 import { PlagiarismCodeLookup } from './components/PlagiarismCodeLookup';
+import { AdminSettings } from './components/AdminSettings';
 
 export default function App() {
   const [user, setUser] = useState<User | null>({
@@ -40,6 +41,28 @@ export default function App() {
   });
 
   const [plagiarismTokens, setPlagiarismTokens] = useState<number>(5);
+  
+  const [adminSettings, setAdminSettings] = useState<AdminSettingsConfig>({
+    matriculeVerificationEnabled: false,
+    validMatricules: [],
+    plagiarismPayment: {
+      primaryNumber: '681 597 837',
+      primaryName: 'B. Judmi',
+      secondaryNumber: '',
+      secondaryName: ''
+    }
+  });
+
+  const handleEnforceMatricules = () => {
+    // In a real app this would call an API. 
+    // Here we can log out the current user if they are a student and invalid
+    if (user?.role === 'student' && adminSettings.matriculeVerificationEnabled) {
+      if (user.matricNo && !adminSettings.validMatricules.includes(user.matricNo)) {
+        alert("Your account has been suspended due to an invalid matricule.");
+        handleLogout();
+      }
+    }
+  };
 
   const handleUsePlagiarismToken = (): boolean => {
     if (plagiarismTokens >= 1) {
@@ -65,7 +88,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
-        <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
+        <Route path="/login" element={<LoginForm onLogin={handleLogin} adminSettings={adminSettings} />} />
 
         {/* Root Redirect based on Role */}
         <Route
@@ -85,7 +108,7 @@ export default function App() {
           } />
           <Route path="evaluation" element={<TimedEvaluation user={user} />} />
           <Route path="plagiarism" element={
-            <PlagiarismTest user={user} />
+            <PlagiarismTest user={user} adminSettings={adminSettings} />
           } />
           <Route path="forum" element={<ForumPage currentUser={user} />} />
           <Route path="alerts" element={<AlertsView />} />
@@ -106,8 +129,15 @@ export default function App() {
         <Route path="/admin" element={<AdminLayout user={user} onLogout={handleLogout} />}>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="tokens" element={<TokenRequestsAdmin />} />
-          <Route path="users" element={<UserManagement />} />
+          <Route path="users" element={<UserManagement adminSettings={adminSettings} />} />
           <Route path="complaint-fields" element={<ComplaintsDesk user={user} isAdmin={true} />} />
+          <Route path="settings" element={
+            <AdminSettings 
+              settings={adminSettings} 
+              onUpdateSettings={setAdminSettings} 
+              onEnforceMatricules={handleEnforceMatricules} 
+            />
+          } />
         </Route>
 
         {/* Catch All */}

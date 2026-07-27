@@ -14,6 +14,20 @@ export interface User {
   status?: string;
   phone?: string;
   joinDate?: string;
+  canUpdateAnnouncements?: boolean;
+  canViewAllForums?: boolean;
+  customUsername?: string;
+}
+
+export interface AdminSettingsConfig {
+  matriculeVerificationEnabled: boolean;
+  validMatricules: string[];
+  plagiarismPayment: {
+    primaryNumber: string;
+    primaryName: string;
+    secondaryNumber?: string;
+    secondaryName?: string;
+  };
 }
 
 export type NavTab = 'home' | 'forum' | 'alerts' | 'notes';

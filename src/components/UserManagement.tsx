@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Search, Users, GraduationCap, ChevronDown, ChevronUp, User as UserIcon } from 'lucide-react';
+import { Search, Users, GraduationCap, ChevronDown, ChevronUp, User as UserIcon, ShieldAlert, CheckSquare, Square } from 'lucide-react';
+import { AdminSettingsConfig } from '../types';
 
 // Mock data for demo
 const MOCK_STUDENTS = [
-  { id: 'std-2026-089', name: 'Jane Doe', matricNo: 'HICM-2024-089', department: 'Business Administration', level: 'Level 300', status: 'Active', joinDate: '2024-09-01', email: 'j.doe@student.hicm.edu' },
-  { id: 'std-2026-090', name: 'Paul Nkemdirim', matricNo: 'HICM-2024-090', department: 'Human Resources', level: 'Level 200', status: 'Active', joinDate: '2024-09-01', email: 'p.nkemdirim@student.hicm.edu' },
-  { id: 'std-2026-091', name: 'Fatima Bah', matricNo: 'HICM-2024-091', department: 'Business Administration', level: 'Level 400', status: 'Active', joinDate: '2024-09-02', email: 'f.bah@student.hicm.edu' },
-  { id: 'std-2026-092', name: 'Chukwuemeka Eze', matricNo: 'HICM-2024-092', department: 'Marketing', level: 'Level 100', status: 'Active', joinDate: '2025-09-01', email: 'c.eze@student.hicm.edu' },
-  { id: 'std-2026-093', name: 'Abena Mensah', matricNo: 'HICM-2024-093', department: 'Accounting', level: 'Level 500', status: 'Suspended', joinDate: '2023-09-01', email: 'a.mensah@student.hicm.edu' },
-  { id: 'std-2026-094', name: 'Kwame Asante', matricNo: 'HICM-2024-094', department: 'Finance', level: 'Level 600', status: 'Active', joinDate: '2022-09-01', email: 'k.asante@student.hicm.edu' },
+  { id: 'std-2026-089', name: 'Jane Doe', matricNo: 'HICM-2024-089', department: 'Business Administration', level: 'Level 300', status: 'Active', joinDate: '2024-09-01', email: 'j.doe@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false },
+  { id: 'std-2026-090', name: 'Paul Nkemdirim', matricNo: 'HICM-2024-090', department: 'Human Resources', level: 'Level 200', status: 'Active', joinDate: '2024-09-01', email: 'p.nkemdirim@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false },
+  { id: 'std-2026-091', name: 'Fatima Bah', matricNo: 'HICM-2024-091', department: 'Business Administration', level: 'Level 400', status: 'Active', joinDate: '2024-09-02', email: 'f.bah@student.hicm.edu', canUpdateAnnouncements: true, canViewAllForums: true },
+  { id: 'std-2026-092', name: 'Chukwuemeka Eze', matricNo: 'HICM-2024-092', department: 'Marketing', level: 'Level 100', status: 'Active', joinDate: '2025-09-01', email: 'c.eze@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false },
+  { id: 'std-2026-093', name: 'Abena Mensah', matricNo: 'HICM-2024-093', department: 'Accounting', level: 'Level 500', status: 'Suspended', joinDate: '2023-09-01', email: 'a.mensah@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false },
+  { id: 'std-2026-094', name: 'Kwame Asante', matricNo: 'HICM-2024-094', department: 'Finance', level: 'Level 600', status: 'Active', joinDate: '2022-09-01', email: 'k.asante@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false },
 ];
 
 const MOCK_STAFF = [
@@ -19,12 +20,27 @@ const MOCK_STAFF = [
 
 type Tab = 'students' | 'staff';
 
-export const UserManagement: React.FC = () => {
+export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> = ({ adminSettings }) => {
   const [activeTab, setActiveTab] = useState<Tab>('students');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [students, setStudents] = useState(MOCK_STUDENTS);
 
-  const filteredStudents = MOCK_STUDENTS.filter(
+  // Update students if matricules are enforced
+  React.useEffect(() => {
+    if (adminSettings?.matriculeVerificationEnabled && adminSettings.validMatricules.length > 0) {
+      setStudents(prev => prev.map(s => {
+        if (!adminSettings.validMatricules.includes(s.matricNo)) {
+          return { ...s, status: 'Suspended (Invalid Matricule)' };
+        } else if (s.status === 'Suspended (Invalid Matricule)') {
+          return { ...s, status: 'Active' };
+        }
+        return s;
+      }));
+    }
+  }, [adminSettings]);
+
+  const filteredStudents = students.filter(
     (s) =>
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.matricNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -120,20 +136,47 @@ export const UserManagement: React.FC = () => {
                       </div>
                     </button>
                     {isExpanded && (
-                      <div className="px-6 pb-4 pt-2 bg-slate-50 border-t border-slate-100 grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {[
-                          { label: 'Student ID', value: student.id },
-                          { label: 'Email', value: student.email },
-                          { label: 'Level', value: student.level },
-                          { label: 'Department', value: student.department },
-                          { label: 'Status', value: student.status },
-                          { label: 'Join Date', value: student.joinDate },
-                        ].map(({ label, value }) => (
-                          <div key={label} className="space-y-0.5">
-                            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{label}</p>
-                            <p className="text-sm text-slate-700 font-medium">{value}</p>
+                      <div className="px-6 pb-4 pt-2 bg-slate-50 border-t border-slate-100 flex flex-col gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {[
+                            { label: 'Student ID', value: student.id },
+                            { label: 'Email', value: student.email },
+                            { label: 'Level', value: student.level },
+                            { label: 'Department', value: student.department },
+                            { label: 'Status', value: student.status },
+                            { label: 'Join Date', value: student.joinDate },
+                          ].map(({ label, value }) => (
+                            <div key={label} className="space-y-0.5">
+                              <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{label}</p>
+                              <p className="text-sm text-slate-700 font-medium">{value}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Permissions Section */}
+                        <div className="border-t border-slate-200 pt-3 mt-1">
+                          <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mb-2">Student Permissions</p>
+                          <div className="flex flex-col sm:flex-row gap-4">
+                            <button
+                              onClick={() => {
+                                setStudents(prev => prev.map(s => s.id === student.id ? { ...s, canUpdateAnnouncements: !s.canUpdateAnnouncements } : s));
+                              }}
+                              className="flex items-center gap-2 text-sm text-slate-700"
+                            >
+                              {student.canUpdateAnnouncements ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-slate-300" />}
+                              Can Update Announcement Board
+                            </button>
+                            <button
+                              onClick={() => {
+                                setStudents(prev => prev.map(s => s.id === student.id ? { ...s, canViewAllForums: !s.canViewAllForums } : s));
+                              }}
+                              className="flex items-center gap-2 text-sm text-slate-700"
+                            >
+                              {student.canViewAllForums ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-slate-300" />}
+                              Can View & Reply in All Forums
+                            </button>
                           </div>
-                        ))}
+                        </div>
                       </div>
                     )}
                   </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Users, FileText, Activity, ArrowRight, ShieldAlert, BookOpen,
-  CheckCircle, XCircle, Clock, Search, ChevronDown, ChevronUp
+  CheckCircle, XCircle, Clock, Search, ChevronDown, ChevronUp, Settings
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -242,6 +242,20 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-500 transition-colors" />
+          </button>
+
+          <button
+            onClick={() => navigate('/admin/settings')}
+            className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-slate-400 hover:bg-slate-100 transition-colors group"
+          >
+            <div className="flex items-center space-x-4">
+              <div className="bg-slate-200 p-2 rounded-lg text-slate-600"><Settings className="w-5 h-5" /></div>
+              <div className="text-left">
+                <h3 className="text-sm font-bold text-slate-800">System Settings</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Configure payment info and matricule verification rules.</p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
           </button>
         </div>
       </div>

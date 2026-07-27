@@ -9,6 +9,7 @@ interface GeneralForumProps {
   currentUser: User | null;
   forumType?: 'general' | 'department';
   departmentName?: string;
+  customUsername?: string;
 }
 
 // Notification sound (short beep via Web Audio API)
@@ -59,6 +60,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
   currentUser,
   forumType = 'general',
   departmentName,
+  customUsername,
 }) => {
   const [messages, setMessages] = useState<LocalMessage[]>([]);
   const [inputText, setInputText] = useState('');
@@ -160,7 +162,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
 
     const newMsg: LocalMessage = {
       id: `msg-${Date.now()}`,
-      author: currentUser.name,
+      author: customUsername || currentUser.name,
       role: currentUser.role,
       text: text || undefined,
       imageUrl: pendingImage || undefined,
@@ -232,7 +234,8 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
             </div>
           ) : (
             messages.map((msg) => {
-              const isMe = currentUser?.name === msg.author;
+              const currentName = customUsername || currentUser?.name;
+              const isMe = currentName === msg.author || currentUser?.name === msg.author;
               const isStaffMsg = msg.role === 'staff' || msg.role === 'admin';
 
               if (msg.deleted) {

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { User } from '../types';
-import { ShieldCheck, UserCheck, Key, Mail, User as UserIcon, BookOpen, AlertCircle, Sparkles, Lock } from 'lucide-react';
+import { ShieldCheck, UserCheck, Key, Mail, User as UserIcon, BookOpen, AlertCircle, Lock } from 'lucide-react';
+import { AdminSettingsConfig } from '../types';
 
 interface LoginFormProps {
   onLogin: (user: User) => void;
   onCancel?: () => void;
+  adminSettings?: AdminSettingsConfig;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSettings }) => {
   const [isRegisterMode, setIsRegisterMode] = useState<boolean>(false);
   const [role, setRole] = useState<'student' | 'staff'>('student');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -58,6 +60,20 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel }) => {
 
     try {
       if (isRegisterMode) {
+        // Matricule Validation
+        if (role === 'student' && adminSettings?.matriculeVerificationEnabled) {
+          if (!matricNo.trim()) {
+            setErrorMessage('Please enter your matricule number.');
+            setIsLoading(false);
+            return;
+          }
+          if (!adminSettings.validMatricules.includes(matricNo.trim())) {
+            setErrorMessage(`Matricule '${matricNo}' is not found in the system. Please verify and try again.`);
+            setIsLoading(false);
+            return;
+          }
+        }
+
         // Register Flow
         const payload = {
           name,

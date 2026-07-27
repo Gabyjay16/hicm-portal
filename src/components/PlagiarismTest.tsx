@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { User } from '../types';
+import { User, AdminSettingsConfig } from '../types';
 import {
   UploadCloud, FileText, CheckCircle2, AlertTriangle,
   ArrowLeft, Loader2, ShieldAlert, FileCheck, Camera,
@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 interface PlagiarismTestProps {
   user: User | null;
+  adminSettings: AdminSettingsConfig;
 }
 
 // Generate a unique 8-char alphanumeric code
@@ -45,7 +46,7 @@ const PlagiarismGauge: React.FC<{ label: string; pct: number; color: string }> =
   </div>
 );
 
-export const PlagiarismTest: React.FC<PlagiarismTestProps> = ({ user }) => {
+export const PlagiarismTest: React.FC<PlagiarismTestProps> = ({ user, adminSettings }) => {
   const navigate = useNavigate();
   const [stage, setStage] = useState<Stage>('payment_gate');
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
@@ -273,17 +274,33 @@ Be realistic: most student work will be 5-40% plagiarism and 5-30% AI writing. d
                 </div>
                 <div className="bg-white border border-amber-200 rounded-xl p-3 text-center">
                   <p className="text-xs text-slate-500 font-medium mb-1">MTN MoMo Number</p>
-                  <p className="text-xl font-extrabold text-slate-900 font-mono tracking-wider">681 597 837</p>
+                  <p className="text-xl font-extrabold text-slate-900 font-mono tracking-wider">{adminSettings.plagiarismPayment.primaryNumber}</p>
                   <p className="text-xs font-bold text-amber-700">MTN Mobile Money</p>
                 </div>
                 <div className="bg-white border border-amber-200 rounded-xl p-3 text-center">
                   <p className="text-xs text-slate-500 font-medium mb-1">Account Name</p>
-                  <p className="text-lg font-extrabold text-slate-900">B. Judmi</p>
+                  <p className="text-lg font-extrabold text-slate-900 truncate px-1">{adminSettings.plagiarismPayment.primaryName}</p>
                   <p className="text-xs font-bold text-amber-700">MoMo Registered Name</p>
                 </div>
               </div>
-              <ol className="text-xs text-amber-800 space-y-1.5 list-decimal list-inside font-medium">
-                <li>Open your MTN MoMo app and send <strong>3,500 FCFA</strong> to <strong>681 597 837</strong>.</li>
+              
+              {adminSettings.plagiarismPayment.secondaryNumber && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mt-3 pt-3 border-t border-amber-200/50">
+                  <div className="bg-white border border-amber-200 rounded-xl p-3 text-center">
+                    <p className="text-xs text-slate-500 font-medium mb-1">Orange Money Number</p>
+                    <p className="text-xl font-extrabold text-slate-900 font-mono tracking-wider">{adminSettings.plagiarismPayment.secondaryNumber}</p>
+                    <p className="text-xs font-bold text-amber-700">Orange Money</p>
+                  </div>
+                  <div className="bg-white border border-amber-200 rounded-xl p-3 text-center">
+                    <p className="text-xs text-slate-500 font-medium mb-1">Account Name</p>
+                    <p className="text-lg font-extrabold text-slate-900 truncate px-1">{adminSettings.plagiarismPayment.secondaryName}</p>
+                    <p className="text-xs font-bold text-amber-700">Orange Registered Name</p>
+                  </div>
+                </div>
+              )}
+              
+              <ol className="text-xs text-amber-800 space-y-1.5 list-decimal list-inside font-medium mt-4">
+                <li>Open your Mobile Money app and send <strong>3,500 FCFA</strong> to <strong>{adminSettings.plagiarismPayment.primaryNumber}</strong>{adminSettings.plagiarismPayment.secondaryNumber && <span> or <strong>{adminSettings.plagiarismPayment.secondaryNumber}</strong></span>}.</li>
                 <li>Note your transaction reference number from the confirmation SMS.</li>
                 <li>Take a clear screenshot of the payment confirmation screen.</li>
                 <li>Upload the screenshot below and submit — admin will verify within 1 hour.</li>
