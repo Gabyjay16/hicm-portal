@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User, AdminSettingsConfig } from '../types';
-import { ShieldCheck, UserCheck, User as UserIcon, BookOpen, AlertCircle, Lock, Phone, UserCheck2, Bell, ChevronUp, ChevronDown, Image as ImageIcon, Video } from 'lucide-react';
+import { ShieldCheck, UserCheck, User as UserIcon, BookOpen, AlertCircle, Lock, Phone, UserCheck2, Bell, ChevronUp, ChevronDown, ArrowLeft, LogIn, UserPlus } from 'lucide-react';
 
 interface LoginFormProps {
   onLogin: (user: User) => void;
@@ -8,7 +8,7 @@ interface LoginFormProps {
   adminSettings?: AdminSettingsConfig;
 }
 
-type AuthMode = 'login' | 'student_register' | 'staff_register';
+type AuthMode = 'landing' | 'login_form' | 'student_register' | 'staff_register';
 
 interface PublicAnnouncement {
   id: string;
@@ -47,10 +47,10 @@ const DEFAULT_ANNOUNCEMENTS: PublicAnnouncement[] = [
 ];
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSettings }) => {
-  const [mode, setMode] = useState<AuthMode>('login');
+  const [mode, setMode] = useState<AuthMode>('landing');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Announcements state
+  // Public Announcements state
   const [announcements, setAnnouncements] = useState<PublicAnnouncement[]>(DEFAULT_ANNOUNCEMENTS);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -100,7 +100,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
     }
   };
 
-  // Silent staff verification check (no hints displayed)
+  // Silent staff verification check (no hints displayed anywhere)
   const isStaffVerificationCode = (input: string): boolean => {
     const clean = input.trim().toUpperCase();
     return clean === 'STF-123' || clean === 'ADM-123' || clean.startsWith('STF-') || clean.startsWith('ADM-');
@@ -272,49 +272,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
           <BookOpen className="w-8 h-8" />
         </div>
         <h2 className="text-2xl font-bold text-offwhite tracking-tight">
-          {mode === 'login' && 'HICM Student Portal & Public Announcements'}
+          {mode === 'landing' && 'HICM Public Portal'}
+          {mode === 'login_form' && 'Portal Sign In'}
           {mode === 'student_register' && 'Student Account Registration'}
           {mode === 'staff_register' && 'Staff Account Registration'}
         </h2>
         <p className="text-xs text-slate-400">
-          {mode === 'login' && 'Higher Institute of Human Resource Management - Academic Portal'}
+          {mode === 'landing' && 'Higher Institute of Human Resource Management - Campus Announcements'}
+          {mode === 'login_form' && 'Sign in with your Name and Matricule Number.'}
           {mode === 'student_register' && 'Register your student account with your details below.'}
           {mode === 'staff_register' && 'Complete your official staff profile.'}
         </p>
-      </div>
-
-      {/* Mode Switcher Tabs */}
-      <div className="flex bg-navy-900/80 p-1 rounded-xl border border-slate-700/50 text-xs font-semibold">
-        <button
-          type="button"
-          onClick={() => {
-            setMode('login');
-            setErrorMessage('');
-            setSuccessMessage('');
-          }}
-          className={`flex-1 py-2 rounded-lg transition-all ${
-            mode === 'login'
-              ? 'bg-emerald-500 text-navy-900 font-bold shadow'
-              : 'text-slate-400 hover:text-offwhite'
-          }`}
-        >
-          Sign In &amp; Announcements
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setMode('student_register');
-            setErrorMessage('');
-            setSuccessMessage('');
-          }}
-          className={`flex-1 py-2 rounded-lg transition-all ${
-            mode === 'student_register' || mode === 'staff_register'
-              ? 'bg-emerald-500 text-navy-900 font-bold shadow'
-              : 'text-slate-400 hover:text-offwhite'
-          }`}
-        >
-          {mode === 'staff_register' ? 'Staff Registration' : 'Student Register'}
-        </button>
       </div>
 
       {/* Error / Info Messages */}
@@ -332,61 +300,26 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
         </div>
       )}
 
-      {/* ── 1. SIGN IN & PUBLIC ANNOUNCEMENTS PAGE ───────────────────────────── */}
-      {mode === 'login' && (
+      {/* ── 1. PUBLIC LANDING PAGE (MODE = 'landing') ────────────────────────── */}
+      {mode === 'landing' && (
         <div className="space-y-6">
-          {/* TOP LOGIN BUTTON SECTION */}
-          <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs bg-navy-900/60 p-5 rounded-2xl border border-slate-700/40">
-            <div className="flex items-center justify-between border-b border-slate-700/50 pb-2 mb-3">
-              <span className="font-bold text-emerald-400 text-sm flex items-center gap-1.5">
-                <UserCheck className="w-4 h-4" /> Quick Student Sign In
-              </span>
-              <span className="text-[10px] text-slate-400">Name + Matricule</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="block text-slate-300 font-medium">Full Name</label>
-                <div className="relative">
-                  <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                  <input
-                    type="text"
-                    value={loginName}
-                    onChange={(e) => setLoginName(e.target.value)}
-                    placeholder="Enter Full Name"
-                    className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500 transition-colors"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="block text-slate-300 font-medium">Matricule Number</label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                  <input
-                    type="password"
-                    value={loginSecret}
-                    onChange={(e) => setLoginSecret(e.target.value)}
-                    placeholder="UBa26C0001"
-                    className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500 transition-colors font-mono"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* TOP LOGIN BUTTON */}
+          {/* SINGLE NORMAL TOP LOGIN BUTTON */}
+          <div>
             <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-navy-900 font-bold rounded-xl transition-colors shadow-lg flex items-center justify-center space-x-2 mt-2"
+              type="button"
+              onClick={() => {
+                setMode('login_form');
+                setErrorMessage('');
+                setSuccessMessage('');
+              }}
+              className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-navy-900 font-extrabold text-sm rounded-xl transition-all shadow-lg flex items-center justify-center space-x-2 cursor-pointer"
             >
-              <UserCheck className="w-4 h-4" />
-              <span>{isLoading ? 'Signing In...' : 'Sign In to Portal (Top)'}</span>
+              <LogIn className="w-5 h-5" />
+              <span>Log In to Portal</span>
             </button>
-          </form>
+          </div>
 
-          {/* PUBLIC ADMIN ANNOUNCEMENTS SECTION */}
+          {/* PUBLIC ADMIN ANNOUNCEMENTS FEED */}
           <div className="bg-navy-900/90 border border-slate-700/80 rounded-2xl p-5 space-y-4 shadow-xl">
             <div className="flex items-center justify-between border-b border-slate-700 pb-3">
               <div className="flex items-center gap-2 text-offwhite font-bold text-sm">
@@ -431,14 +364,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
 
                   <p className="text-xs text-slate-300 leading-relaxed">{ann.content}</p>
 
-                  {/* Render Photos if attached */}
+                  {/* Photos */}
                   {ann.imageUrl && (
                     <div className="mt-2 rounded-xl overflow-hidden border border-slate-700/60">
                       <img src={ann.imageUrl} alt={ann.title} className="w-full max-h-56 object-cover" />
                     </div>
                   )}
 
-                  {/* Render Videos if attached */}
+                  {/* Videos */}
                   {ann.videoUrl && (
                     <div className="mt-2 rounded-xl overflow-hidden border border-slate-700/60 bg-black">
                       <video controls src={ann.videoUrl} className="w-full max-h-56 object-contain" />
@@ -451,21 +384,25 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
             </div>
           </div>
 
-          {/* BOTTOM LOGIN BUTTON SECTION */}
-          <div className="pt-2">
+          {/* SECONDARY LOGIN BUTTON BELOW ANNOUNCEMENTS */}
+          <div>
             <button
               type="button"
-              onClick={handleLoginSubmit}
-              disabled={isLoading}
-              className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/40 font-bold rounded-xl transition-colors shadow-lg flex items-center justify-center space-x-2"
+              onClick={() => {
+                setMode('login_form');
+                setErrorMessage('');
+                setSuccessMessage('');
+              }}
+              className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/40 font-bold text-sm rounded-xl transition-all shadow-lg flex items-center justify-center space-x-2 cursor-pointer"
             >
-              <UserCheck className="w-4 h-4" />
-              <span>{isLoading ? 'Signing In...' : 'Sign In to Portal (Bottom)'}</span>
+              <LogIn className="w-4 h-4" />
+              <span>Log In to Portal</span>
             </button>
           </div>
 
-          {/* NOT A STUDENT? REGISTRATION REDIRECT LINK */}
-          <div className="text-center pt-2 border-t border-slate-700/40">
+          {/* NOT A STUDENT? TEXT LINK TO REGISTRATION PAGE */}
+          <div className="text-center pt-3 border-t border-slate-700/50 space-y-1">
+            <p className="text-xs text-slate-400 font-medium">Not a student?</p>
             <button
               type="button"
               onClick={() => {
@@ -473,17 +410,99 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                 setErrorMessage('');
                 setSuccessMessage('');
               }}
-              className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 hover:underline transition-colors cursor-pointer"
+              className="text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:underline transition-colors cursor-pointer"
             >
-              Not a student? Click here to register your account →
+              Click here to go to the Registration Page →
             </button>
           </div>
         </div>
       )}
 
-      {/* ── 2. STUDENT REGISTRATION FORM ────────────────────────────────────────── */}
+      {/* ── 2. LOGIN FORM PAGE (MODE = 'login_form') ─────────────────────────── */}
+      {mode === 'login_form' && (
+        <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs">
+          <button
+            type="button"
+            onClick={() => {
+              setMode('landing');
+              setErrorMessage('');
+              setSuccessMessage('');
+            }}
+            className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white font-medium mb-2"
+          >
+            <ArrowLeft className="w-4 h-4 text-emerald-400" /> Back to Public Home
+          </button>
+
+          <div className="space-y-1">
+            <label className="block text-slate-300 font-medium">Full Name</label>
+            <div className="relative">
+              <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <input
+                type="text"
+                value={loginName}
+                onChange={(e) => setLoginName(e.target.value)}
+                placeholder="Enter Full Name"
+                className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500 transition-colors"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-slate-300 font-medium">Matricule Number</label>
+            <div className="relative">
+              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <input
+                type="password"
+                value={loginSecret}
+                onChange={(e) => setLoginSecret(e.target.value)}
+                placeholder="UBa26C0001"
+                className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500 transition-colors font-mono"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-navy-900 font-bold rounded-xl transition-colors shadow-lg flex items-center justify-center space-x-2 mt-4"
+          >
+            <UserCheck className="w-4 h-4" />
+            <span>{isLoading ? 'Authenticating...' : 'Sign In to Portal'}</span>
+          </button>
+
+          <div className="text-center pt-3 border-t border-slate-700/50 space-y-1">
+            <p className="text-xs text-slate-400 font-medium">Not a student?</p>
+            <button
+              type="button"
+              onClick={() => {
+                setMode('student_register');
+                setErrorMessage('');
+                setSuccessMessage('');
+              }}
+              className="text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:underline transition-colors cursor-pointer"
+            >
+              Click here to go to the Registration Page →
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* ── 3. STUDENT REGISTRATION FORM (MODE = 'student_register') ─────────── */}
       {mode === 'student_register' && (
         <form onSubmit={handleStudentRegisterSubmit} className="space-y-4 text-xs">
+          <button
+            type="button"
+            onClick={() => {
+              setMode('landing');
+              setErrorMessage('');
+              setSuccessMessage('');
+            }}
+            className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white font-medium mb-2"
+          >
+            <ArrowLeft className="w-4 h-4 text-emerald-400" /> Back to Public Home
+          </button>
+
           <div className="space-y-1">
             <label className="block text-slate-300 font-medium">Full Name</label>
             <div className="relative">
@@ -593,10 +612,24 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
             <UserCheck2 className="w-4 h-4" />
             <span>{isLoading ? 'Registering...' : 'Register Student Account'}</span>
           </button>
+
+          <div className="text-center pt-3 border-t border-slate-700/50">
+            <button
+              type="button"
+              onClick={() => {
+                setMode('login_form');
+                setErrorMessage('');
+                setSuccessMessage('');
+              }}
+              className="text-xs font-semibold text-emerald-400 hover:underline"
+            >
+              Already registered? Click here to Sign In →
+            </button>
+          </div>
         </form>
       )}
 
-      {/* ── 3. STAFF REGISTRATION FORM ────────────────────────────────────────── */}
+      {/* ── 4. STAFF REGISTRATION FORM (MODE = 'staff_register') ───────────── */}
       {mode === 'staff_register' && (
         <form onSubmit={handleStaffRegisterSubmit} className="space-y-4 text-xs">
           <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center gap-2 text-amber-400 font-bold">
