@@ -17,11 +17,11 @@ export async function onRequestOptions() {
 export async function onRequestPost(context) {
   const { request, env } = context;
 
-  const apiKey = env.GROQ_API_KEY;
+  const apiKey = env.OPENROUTER_API_KEY;
   if (!apiKey) {
     return new Response(
       JSON.stringify({
-        error: 'GROQ_API_KEY environment variable is not configured.',
+        error: 'OPENROUTER_API_KEY environment variable is not configured.',
       }),
       {
         status: 500,
@@ -37,8 +37,8 @@ export async function onRequestPost(context) {
     const requestBody = await request.json();
 
     // Support both direct messages array or single prompt
-    const groqPayload = {
-      model: requestBody.model || 'llama-3.1-8b-instant',
+    const payload = {
+      model: requestBody.model || 'meta-llama/llama-3.1-8b-instruct:free',
       messages: requestBody.messages || [
         {
           role: 'user',
@@ -49,24 +49,26 @@ export async function onRequestPost(context) {
       max_tokens: requestBody.max_tokens ?? 1024,
     };
 
-    const groqResponse = await fetch(
-      'https://api.groq.com/openai/v1/chat/completions',
+    const apiResponse = await fetch(
+      'https://openrouter.ai/api/v1/chat/completions',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${apiKey}`,
+          'HTTP-Referer': 'https://hicm-portal.pages.dev',
+          'X-Title': 'HICM Portal',
         },
-        body: JSON.stringify(groqPayload),
+        body: JSON.stringify(payload),
       }
     );
 
-    const data = await groqResponse.json();
+    const data = await apiResponse.json();
 
-    if (!groqResponse.ok) {
+    if (!apiResponse.ok) {
       return new Response(
         JSON.stringify({
-          error: 'Groq API request failed',
+          error: 'OpenRouter API request failed',
           details: data,
         }),
         {
