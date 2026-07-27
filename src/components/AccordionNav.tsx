@@ -31,7 +31,7 @@ interface AccordionNavProps {
 export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
   // Category accordion state
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({
-    academics: true, // open Academics by default
+    academics: false,
     services: false,
     campus: false,
   });

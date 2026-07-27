@@ -90,16 +90,16 @@ export default function App() {
 
   const handleLogout = () => {
     setUser(null);
+    setActiveSubView('login');
   };
 
   // Render main content area based on active tab and subview
   const renderMainContent = () => {
-    // If login subview is triggered explicitly
-    if (activeSubView === 'login') {
+    // If user is logged out or login subview is active, render LoginForm immediately
+    if (!user || activeSubView === 'login') {
       return (
         <LoginForm
           onLogin={handleLogin}
-          onCancel={() => setActiveSubView('dashboard')}
         />
       );
     }

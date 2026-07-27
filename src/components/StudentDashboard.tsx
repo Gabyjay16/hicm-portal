@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { User, SubView } from '../types';
 import { AccordionNav } from './AccordionNav';
 import { Clock, FileCheck, Bell, ShieldCheck, User as UserIcon, ArrowRight, Sparkles, AlertTriangle } from 'lucide-react';
@@ -21,29 +21,67 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
     { id: 3, text: '💡 HICM General Academic Forum rules updated: External web links strictly forbidden.', tag: 'Policy' },
   ];
 
+  const [isAnnouncementsOpen, setIsAnnouncementsOpen] = useState<boolean>(true);
+  const [selectedQuickModule, setSelectedQuickModule] = useState<string>('');
+
   return (
     <div className="space-y-6 pb-16 md:pb-6">
-      {/* Prominent Announcement Ribbon / Ticker */}
-      <div className="bg-gradient-to-r from-navy-800 via-navy-800 to-navy-900 border border-emerald-500/30 rounded-2xl p-4 shadow-lg">
-        <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs uppercase tracking-wider mb-2">
-          <Bell className="w-4 h-4 animate-bounce" />
-          <span>Campus Announcement Ribbon</span>
+      {/* Quick Access Dropdown Bar */}
+      <div className="bg-navy-800 border border-slate-700/60 rounded-2xl p-4 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs uppercase tracking-wider">
+          <Sparkles className="w-4 h-4 text-emerald-400" />
+          <span>Quick Access Portal Dropdown</span>
         </div>
-        <div className="space-y-2">
-          {announcements.map((ann) => (
-            <div
-              key={ann.id}
-              className="flex items-center justify-between p-2.5 rounded-xl bg-navy-900/80 border border-slate-700/50 text-xs text-slate-200"
-            >
-              <div className="flex items-center space-x-2 truncate">
-                <span className="text-offwhite font-medium truncate">{ann.text}</span>
+        <div className="w-full sm:w-64">
+          <select
+            value={selectedQuickModule}
+            onChange={(e) => {
+              const val = e.target.value as SubView;
+              if (val) {
+                setSelectedQuickModule('');
+                onNavigateSubView(val);
+              }
+            }}
+            className="w-full bg-navy-900 border border-slate-700 rounded-xl px-3 py-2 text-offwhite text-xs font-semibold focus:outline-none focus:border-emerald-500"
+          >
+            <option value="">-- Jump to Portal Module --</option>
+            <option value="evaluation">⏱️ Timed Evaluation (10-Min Quiz)</option>
+            <option value="plagiarism">📄 Plagiarism & Similarity Check</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Prominent Announcement Ribbon / Ticker (Collapsible) */}
+      <div className="bg-gradient-to-r from-navy-800 via-navy-800 to-navy-900 border border-emerald-500/30 rounded-2xl p-4 shadow-lg transition-all">
+        <div className="flex items-center justify-between text-emerald-400 font-bold text-xs uppercase tracking-wider">
+          <div className="flex items-center space-x-2">
+            <Bell className="w-4 h-4 animate-bounce" />
+            <span>Campus Announcement Ribbon</span>
+          </div>
+          <button
+            onClick={() => setIsAnnouncementsOpen(!isAnnouncementsOpen)}
+            className="text-xs text-slate-400 hover:text-emerald-400 flex items-center space-x-1"
+          >
+            <span>{isAnnouncementsOpen ? 'Hide' : 'Show (3)'}</span>
+          </button>
+        </div>
+        {isAnnouncementsOpen && (
+          <div className="space-y-2 mt-3 animate-in fade-in duration-200">
+            {announcements.map((ann) => (
+              <div
+                key={ann.id}
+                className="flex items-center justify-between p-2.5 rounded-xl bg-navy-900/80 border border-slate-700/50 text-xs text-slate-200"
+              >
+                <div className="flex items-center space-x-2 truncate">
+                  <span className="text-offwhite font-medium truncate">{ann.text}</span>
+                </div>
+                <span className="ml-2 flex-shrink-0 text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase">
+                  {ann.tag}
+                </span>
               </div>
-              <span className="ml-2 flex-shrink-0 text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase">
-                {ann.tag}
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* User Information Card */}

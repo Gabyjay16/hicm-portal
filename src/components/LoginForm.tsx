@@ -282,6 +282,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel }) => {
                   <option value="Level 200">Level 200</option>
                   <option value="Level 300">Level 300</option>
                   <option value="Level 400">Level 400</option>
+                  <option value="Level 500">Level 500</option>
+                  <option value="Level 600">Level 600</option>
                 </select>
               </div>
             </div>
