@@ -68,59 +68,59 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-950/85 backdrop-blur-xl px-6 sm:px-8 py-4 flex items-center justify-between border-b border-white/10 shadow-2xl text-white">
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl px-6 sm:px-8 py-4 flex items-center justify-between border-b border-slate-200 shadow-md text-slate-900">
       {/* Title Area */}
       <div className="hidden sm:block">
-        <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-white via-yellow-200 to-yellow-400 bg-clip-text text-transparent flex items-center gap-2">
+        <h1 className="text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2">
           HICM Hub
         </h1>
-        <p className="text-[12px] text-slate-300 font-medium">Student Academic &amp; Services Portal</p>
+        <p className="text-[12px] text-slate-500 font-medium">Student Academic &amp; Services Portal</p>
       </div>
 
       {/* Navigation Links & Profile */}
-      <div className="flex items-center space-x-6 text-sm font-semibold text-slate-200">
+      <div className="flex items-center space-x-6 text-sm font-bold text-slate-700">
         <Link 
           to={getHomePath()} 
-          className="hidden md:flex items-center space-x-1.5 hover:text-yellow-400 transition-colors border-b-2 border-blue-500 text-yellow-400 pb-0.5"
+          className="hidden md:flex items-center space-x-1.5 hover:text-blue-600 transition-colors border-b-2 border-blue-600 text-blue-600 pb-0.5"
         >
-          <Home className="w-4 h-4 text-blue-400" />
+          <Home className="w-4 h-4 text-blue-600" />
           <span>Home</span>
         </Link>
         
         <Link 
           to="/student/forum" 
-          className="hidden md:flex items-center space-x-1.5 hover:text-yellow-400 transition-colors text-slate-200"
+          className="hidden md:flex items-center space-x-1.5 hover:text-blue-600 transition-colors text-slate-700"
         >
-          <MessageSquare className="w-4 h-4 text-blue-400" />
+          <MessageSquare className="w-4 h-4 text-blue-600" />
           <span>Forum</span>
         </Link>
 
         <div className="relative">
           <div 
-            className="flex items-center space-x-2.5 cursor-pointer hover:text-yellow-400 transition-colors group p-1 rounded-xl hover:bg-white/5"
+            className="flex items-center space-x-2.5 cursor-pointer hover:text-blue-600 transition-colors group p-1 rounded-xl hover:bg-slate-100"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            <div className="w-9 h-9 rounded-full bg-blue-950/80 overflow-hidden border-2 border-yellow-500/50 flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <div className="w-9 h-9 rounded-full bg-blue-50 overflow-hidden border-2 border-blue-500 flex items-center justify-center shadow-md shadow-blue-500/10">
                {user?.avatarUrl ? (
                   <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <UserIcon className="w-5 h-5 text-yellow-400" />
+                  <UserIcon className="w-5 h-5 text-blue-600" />
                 )}
             </div>
-            <span className="hidden lg:block font-bold text-white group-hover:text-yellow-400">Profile</span>
-            <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-yellow-400 transition-colors" />
+            <span className="hidden lg:block font-bold text-slate-900 group-hover:text-blue-600">Profile</span>
+            <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
           </div>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-3 w-52 glass-panel border border-white/20 shadow-2xl rounded-2xl py-2 z-50 backdrop-blur-2xl">
+            <div className="absolute right-0 mt-3 w-52 bg-white border border-slate-200 shadow-2xl rounded-2xl py-2 z-50">
               <button
                 onClick={() => {
                   setIsDropdownOpen(false);
                   setIsProfileModalOpen(true);
                 }}
-                className="w-full flex items-center px-4 py-2.5 text-sm text-slate-200 hover:bg-blue-600/20 hover:text-yellow-400 transition-all font-medium"
+                className="w-full flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-all font-semibold"
               >
-                <Settings className="w-4 h-4 mr-2.5 text-blue-400" />
+                <Settings className="w-4 h-4 mr-2.5 text-blue-600" />
                 Update Profile
               </button>
               <button
@@ -128,9 +128,9 @@ export const Header: React.FC<HeaderProps> = ({
                   setIsDropdownOpen(false);
                   if (onLogout) onLogout();
                 }}
-                className="w-full flex items-center px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/20 transition-all font-medium"
+                className="w-full flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-all font-semibold"
               >
-                <LogOut className="w-4 h-4 mr-2.5 text-red-400" />
+                <LogOut className="w-4 h-4 mr-2.5 text-red-600" />
                 Logout
               </button>
             </div>

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User, AdminSettingsConfig } from '../types';
-import { ShieldCheck, UserCheck, User as UserIcon, BookOpen, AlertCircle, Lock, Phone, UserCheck2, Bell, ChevronUp, ChevronDown, ArrowLeft, LogIn, UserPlus } from 'lucide-react';
+import { ShieldCheck, UserCheck, User as UserIcon, BookOpen, AlertCircle, Lock, Phone, UserCheck2, Bell, ChevronUp, ChevronDown, ArrowLeft, LogIn, UserPlus, Sparkles } from 'lucide-react';
 
 interface LoginFormProps {
   onLogin: (user: User) => void;
@@ -265,19 +265,20 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
   };
 
   return (
-    <div className="max-w-xl w-full mx-auto my-8 glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 font-sans text-white border border-white/20 backdrop-blur-2xl animate-float-subtle">
+    <div className="max-w-xl w-full mx-auto my-8 glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 font-sans text-slate-900 border border-slate-200/90 backdrop-blur-2xl animate-float-subtle">
       {/* Header Banner */}
       <div className="text-center space-y-2">
-        <div className="inline-flex p-3.5 rounded-2xl bg-blue-600/25 border border-blue-400/40 text-blue-400 mb-1 shadow-lg shadow-blue-600/20 backdrop-blur-md">
-          <BookOpen className="w-8 h-8 text-yellow-400" />
+        <div className="inline-flex p-3.5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-600 mb-1 shadow-md shadow-blue-500/10">
+          <BookOpen className="w-8 h-8 text-blue-600" />
         </div>
-        <h2 className="text-2xl font-bold text-offwhite tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center justify-center gap-2">
           {mode === 'landing' && 'HICM Public Portal'}
           {mode === 'login_form' && 'Portal Sign In'}
           {mode === 'student_register' && 'Student Account Registration'}
           {mode === 'staff_register' && 'Staff Account Registration'}
+          <Sparkles className="w-5 h-5 text-yellow-500 animate-pulse" />
         </h2>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs font-semibold text-slate-600">
           {mode === 'landing' && 'Higher Institute of Human Resource Management - Campus Announcements'}
           {mode === 'login_form' && 'Sign in with your Name and Matricule Number.'}
           {mode === 'student_register' && 'Register your student account with your details below.'}
@@ -320,20 +321,22 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
           </div>
 
           {/* PUBLIC ADMIN ANNOUNCEMENTS FEED */}
-          <div className="bg-navy-900/90 border border-slate-700/80 rounded-2xl p-5 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-700 pb-3">
-              <div className="flex items-center gap-2 text-offwhite font-bold text-sm">
-                <Bell className="w-5 h-5 text-emerald-400" />
-                <span>Campus Announcements &amp; Official Notices</span>
+          <div className="bg-white/90 border border-slate-200/90 rounded-2xl p-5 space-y-4 shadow-xl backdrop-blur-xl">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-2 text-slate-900 font-extrabold text-sm">
+                <Bell className="w-5 h-5 text-yellow-600 animate-bounce" />
+                <span className="text-slate-900">
+                  Campus Announcements &amp; Official Notices
+                </span>
               </div>
 
               {/* SCROLL UP & SCROLL DOWN BUTTONS */}
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-1.5">
                 <button
                   type="button"
                   onClick={handleScrollUp}
                   title="Scroll Up"
-                  className="p-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-slate-300 hover:text-white transition-colors"
+                  className="p-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl text-blue-700 transition-all shadow hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   <ChevronUp className="w-4 h-4" />
                 </button>
@@ -341,7 +344,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                   type="button"
                   onClick={handleScrollDown}
                   title="Scroll Down"
-                  className="p-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-slate-300 hover:text-white transition-colors"
+                  className="p-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl text-blue-700 transition-all shadow hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   <ChevronDown className="w-4 h-4" />
                 </button>
@@ -351,36 +354,55 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
             {/* Scrollable Announcements List */}
             <div
               ref={scrollRef}
-              className="max-h-[380px] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-slate-700"
+              className="max-h-[380px] overflow-y-auto space-y-4 pr-2 scrollbar-thin"
             >
-              {announcements.map((ann) => (
-                <div key={ann.id} className="p-4 bg-navy-800/80 border border-slate-700/60 rounded-xl space-y-2">
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-sm font-bold text-white leading-tight">{ann.title}</h3>
-                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full flex-shrink-0">
-                      {ann.category || 'Announcement'}
-                    </span>
+              {announcements.map((ann, idx) => {
+                const isYellow = idx % 3 === 1;
+                const isRed = idx % 3 === 2;
+                return (
+                  <div
+                    key={ann.id}
+                    className={`p-4 rounded-2xl border transition-all duration-300 hover:scale-[1.01] ${
+                      isRed
+                        ? 'glass-card-red'
+                        : isYellow
+                        ? 'glass-card-yellow'
+                        : 'glass-card-blue'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start gap-2">
+                      <h3 className="text-sm font-extrabold text-slate-900 leading-tight">{ann.title}</h3>
+                      <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full flex-shrink-0 uppercase border shadow-sm ${
+                        isRed
+                          ? 'bg-red-100 border-red-300 text-red-700'
+                          : isYellow
+                          ? 'bg-yellow-100 border-yellow-300 text-yellow-800'
+                          : 'bg-blue-100 border-blue-300 text-blue-800'
+                      }`}>
+                        {ann.category || 'Notice'}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-700 leading-relaxed mt-2 font-medium">{ann.content}</p>
+
+                    {/* Photos */}
+                    {ann.imageUrl && (
+                      <div className="mt-3 rounded-xl overflow-hidden border border-slate-200 shadow-md">
+                        <img src={ann.imageUrl} alt={ann.title} className="w-full max-h-56 object-cover hover:scale-105 transition-transform duration-500" />
+                      </div>
+                    )}
+
+                    {/* Videos */}
+                    {ann.videoUrl && (
+                      <div className="mt-3 rounded-xl overflow-hidden border border-slate-200 bg-black shadow-md">
+                        <video controls src={ann.videoUrl} className="w-full max-h-56 object-contain" />
+                      </div>
+                    )}
+
+                    <p className="text-[10px] text-slate-500 pt-2 font-semibold">Posted: {ann.date}</p>
                   </div>
-
-                  <p className="text-xs text-slate-300 leading-relaxed">{ann.content}</p>
-
-                  {/* Photos */}
-                  {ann.imageUrl && (
-                    <div className="mt-2 rounded-xl overflow-hidden border border-slate-700/60">
-                      <img src={ann.imageUrl} alt={ann.title} className="w-full max-h-56 object-cover" />
-                    </div>
-                  )}
-
-                  {/* Videos */}
-                  {ann.videoUrl && (
-                    <div className="mt-2 rounded-xl overflow-hidden border border-slate-700/60 bg-black">
-                      <video controls src={ann.videoUrl} className="w-full max-h-56 object-contain" />
-                    </div>
-                  )}
-
-                  <p className="text-[10px] text-slate-500 pt-1">Posted: {ann.date}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -428,36 +450,36 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
               setErrorMessage('');
               setSuccessMessage('');
             }}
-            className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white font-medium mb-2"
+            className="flex items-center gap-1.5 text-xs text-blue-700 hover:text-blue-900 font-extrabold mb-2 transition-colors cursor-pointer"
           >
-            <ArrowLeft className="w-4 h-4 text-emerald-400" /> Back to Public Home
+            <ArrowLeft className="w-4 h-4 text-blue-600" /> Back to Public Home
           </button>
 
           <div className="space-y-1">
-            <label className="block text-slate-300 font-medium">Full Name</label>
+            <label className="block text-slate-800 font-bold">Full Name</label>
             <div className="relative">
-              <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <UserIcon className="w-4 h-4 text-blue-600 absolute left-3 top-3.5" />
               <input
                 type="text"
                 value={loginName}
                 onChange={(e) => setLoginName(e.target.value)}
                 placeholder="Enter Full Name"
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500 transition-colors"
+                className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-3 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all font-semibold"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="block text-slate-300 font-medium">Matricule Number</label>
+            <label className="block text-slate-800 font-bold">Matricule Number</label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Lock className="w-4 h-4 text-blue-600 absolute left-3 top-3.5" />
               <input
                 type="password"
                 value={loginSecret}
                 onChange={(e) => setLoginSecret(e.target.value)}
                 placeholder="UBa26C0001"
-                className="w-full bg-navy-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-offwhite focus:outline-none focus:border-emerald-500 transition-colors font-mono"
+                className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-3 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all font-mono tracking-wider"
               />
             </div>
           </div>
@@ -465,9 +487,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-navy-900 font-bold rounded-xl transition-colors shadow-lg flex items-center justify-center space-x-2 mt-4"
+            className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-2xl transition-all shadow-lg shadow-blue-600/25 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center space-x-2 mt-4 cursor-pointer"
           >
-            <UserCheck className="w-4 h-4" />
+            <UserCheck className="w-4 h-4 text-yellow-300" />
             <span>{isLoading ? 'Authenticating...' : 'Sign In to Portal'}</span>
           </button>
 

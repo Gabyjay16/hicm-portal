@@ -3,59 +3,59 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: #030712;
-  color: #f8fafc;
+  background-color: #ffffff;
+  color: #0f172a;
   overflow-x: hidden;
 }
 
-/* Ambient Glass Mesh Background */
+/* Ambient Glass Light Mesh Background */
 .bg-ambient-glass {
   background: 
-    radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 85% 20%, rgba(239, 68, 68, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 50% 80%, rgba(234, 179, 8, 0.12) 0%, transparent 45%),
-    linear-gradient(135deg, #030712 0%, #0b132b 50%, #050811 100%);
+    radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(239, 68, 68, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(234, 179, 8, 0.08) 0%, transparent 50%),
+    linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
   background-attachment: fixed;
 }
 
-/* Custom Glassmorphism Classes */
+/* Custom Glassmorphism Classes (Light Theme) */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 .glass-card-blue {
-  background: linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.7) 100%);
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.8) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(147, 197, 253, 0.8);
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .glass-card-yellow {
-  background: linear-gradient(135deg, rgba(120, 53, 15, 0.35) 0%, rgba(15, 23, 42, 0.7) 100%);
+  background: linear-gradient(135deg, rgba(254, 252, 232, 0.95) 0%, rgba(254, 240, 138, 0.8) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  box-shadow: 0 10px 30px -10px rgba(234, 179, 8, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(253, 224, 71, 0.8);
+  box-shadow: 0 10px 25px -5px rgba(234, 179, 8, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .glass-card-red {
-  background: linear-gradient(135deg, rgba(127, 29, 29, 0.35) 0%, rgba(15, 23, 42, 0.7) 100%);
+  background: linear-gradient(135deg, rgba(254, 242, 242, 0.95) 0%, rgba(254, 202, 202, 0.8) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(239, 68, 68, 0.35);
-  box-shadow: 0 10px 30px -10px rgba(239, 68, 68, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(252, 165, 165, 0.8);
+  box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 /* Subtle Micro-Animations */
