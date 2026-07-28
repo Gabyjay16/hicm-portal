@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, FileText, Activity, ArrowRight, ShieldAlert, BookOpen, CheckCircle, XCircle, Clock, Search, ChevronDown, ChevronUp, Settings } from 'lucide-react';
+import { Users, FileText, Activity, ArrowRight, ShieldAlert, BookOpen, CheckCircle, XCircle, Clock, Search, ChevronDown, ChevronUp, Settings, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Simulated staff pending forum approval list
@@ -103,7 +103,7 @@ export const AdminDashboard: React.FC = () => {
         >
           <div className="flex items-center gap-3">
             <div className="bg-emerald-50 p-2 rounded-lg">
-              <MessageSquareIcon className="w-5 h-5 text-emerald-600" />
+              <MessageSquare className="w-5 h-5 text-emerald-600" />
             </div>
             <div className="text-left">
               <h3 className="text-sm font-bold text-black">Forum Access Approvals</h3>
