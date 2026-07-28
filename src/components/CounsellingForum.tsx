@@ -30,7 +30,7 @@ export const CounsellingForum: React.FC<CounsellingForumProps> = ({
   const audioChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Removed auto-scroll on mount/update to prevent page jump
   }, [messages]);
 
   const displayName = session.isAnonymous && currentUser?.role === 'student'
