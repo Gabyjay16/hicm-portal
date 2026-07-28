@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { User, ComplaintType, ComplaintFormConfig } from '../types';
 import {
   ArrowLeft, CheckCircle, ChevronRight, BarChart2, BookOpen, FileSearch, 
-  Plus, Trash2, Filter, Paperclip, MessageSquare, Clock, User as UserIcon, List
+  Plus, Trash2, Filter, Paperclip, MessageSquare, Clock, User as UserIcon, List, Download
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -112,6 +112,14 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
   const [groupBy, setGroupBy] = useState<'none' | 'courseName' | 'courseCode' | 'noMark'>('none');
   const [selectedComplaint, setSelectedComplaint] = useState<any | null>(null);
   const [adminResponseInput, setAdminResponseInput] = useState('');
+  const [examCodeInput, setExamCodeInput] = useState('');
+
+  // Update exam code input when complaint changes
+  useEffect(() => {
+    if (selectedComplaint) {
+      setExamCodeInput(selectedComplaint.examCode || '');
+    }
+  }, [selectedComplaint]);
 
   // Auto-fill on type select
   useEffect(() => {
@@ -201,10 +209,53 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
 
   const handleResolveComplaint = (id: string, status: string) => {
     setAllComplaints(prev => prev.map(c => 
-      c.id === id ? { ...c, status, adminResponse: adminResponseInput || c.adminResponse } : c
+      c.id === id ? { ...c, status, adminResponse: adminResponseInput || c.adminResponse, examCode: examCodeInput } : c
     ));
     setAdminResponseInput('');
     setSelectedComplaint(null);
+  };
+
+  const handleSaveExamCode = (id: string) => {
+    setAllComplaints(prev => prev.map(c => 
+      c.id === id ? { ...c, examCode: examCodeInput } : c
+    ));
+    setSelectedComplaint((prev: any) => ({ ...prev, examCode: examCodeInput }));
+    setSuccessMsg('Exam code saved successfully.');
+    setTimeout(() => setSuccessMsg(''), 3000);
+  };
+
+  const handleExportCSV = () => {
+    const itemsToExport = Object.values(groupedComplaints).flat();
+
+    const headers = ['ID', 'Student Name', 'Matricule', 'Subject', 'Status', 'Date', 'Exam Code', 'Course Name', 'Course Code', 'CA Mark', 'Description'];
+    const rows = itemsToExport.map(c => {
+      let desc: any = {};
+      try { desc = JSON.parse(c.description || '{}'); } catch(e) {}
+      
+      return [
+        c.id,
+        c.studentName,
+        c.matricule,
+        c.subject,
+        c.status,
+        new Date(c.createdAt).toLocaleDateString(),
+        c.examCode || '',
+        desc.courseName || '',
+        desc.courseCode || desc.wrongCode || desc.correctCode || '',
+        desc.camark || '',
+        JSON.stringify(desc).replace(/"/g, '""')
+      ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+    });
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `complaints_export_${new Date().getTime()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // Grouping logic for Management View
@@ -402,6 +453,9 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
               <option value="courseCode">Group by Course Code</option>
               <option value="noMark">Filter: No CA Mark</option>
             </select>
+            <button onClick={handleExportCSV} className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-2">
+              <Download className="w-4 h-4" /> Export
+            </button>
             {user?.role !== 'admin' && (
               <button 
                 onClick={() => setViewMode('my_complaints')}
@@ -464,16 +518,40 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
                 </div>
               </div>
             </div>
+            
             <div className="md:w-1/2 p-6 bg-slate-50 flex flex-col justify-between">
               <div className="space-y-4">
                 <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4" /> Admin Response
+                  <MessageSquare className="w-4 h-4" /> Administration
                 </h4>
+                
+                {/* Exam Code Section */}
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-2">
+                  <label className="block text-xs font-bold text-slate-700 mb-2">Exam Code (Optional)</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="e.g. EC-1029"
+                      value={examCodeInput}
+                      onChange={(e) => setExamCodeInput(e.target.value)}
+                      className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                    />
+                    <button 
+                      onClick={() => handleSaveExamCode(selectedComplaint.id)}
+                      className="px-3 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-lg hover:bg-slate-200 transition-colors border border-slate-200"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+
                 {selectedComplaint.adminResponse && (
                   <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-sm text-slate-700">
+                    <span className="font-bold text-slate-900 block mb-1">Previous Response:</span>
                     {selectedComplaint.adminResponse}
                   </div>
                 )}
+                
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-slate-600">Update Response (Optional)</label>
                   <textarea 
