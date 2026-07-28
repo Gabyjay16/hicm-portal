@@ -125,6 +125,7 @@ export default function App() {
           <Route path="users" element={<UserManagement adminSettings={adminSettings} />} />
           <Route path="complaints" element={<ComplaintsDesk user={user} adminMode="manage" />} />
           <Route path="complaint-fields" element={<ComplaintsDesk user={user} adminMode="fields" />} />
+          <Route path="forum" element={<ForumPage currentUser={user} />} />
           <Route path="content" element={<AdminAnnouncementsManager />} />
           <Route path="settings" element={
             <AdminSettings 

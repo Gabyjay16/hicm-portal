@@ -18,10 +18,13 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
     }
   }, [currentUser]);
 
-  const dept = currentUser?.department || 'General';
+  const [adminDept, setAdminDept] = useState('Business Administration');
+
+  const dept = currentUser?.role === 'admin' ? adminDept : (currentUser?.department || 'General');
+  const isAdmin = currentUser?.role === 'admin';
 
   return (
-    <div className="max-w-4xl w-full mx-auto space-y-4 pb-20 md:pb-6">
+    <div className="max-w-4xl w-full mx-auto space-y-4 pb-20 md:pb-6 font-sans">
       {/* Username Settings */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -31,7 +34,7 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
               type="text"
               value={customUsername}
               onChange={(e) => setCustomUsername(e.target.value)}
-              className="px-2 py-1 border rounded text-sm"
+              className="px-2 py-1 border rounded text-sm text-black"
             />
           ) : (
             <span className="font-bold text-black">{customUsername}</span>
@@ -39,30 +42,47 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
         </div>
         <button
           onClick={() => setIsEditingUsername(!isEditingUsername)}
-          className="text-black hover:text-black"
+          className="text-black hover:text-blue-600 transition-colors"
         >
           {isEditingUsername ? <Save className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
         </button>
       </div>
 
       {/* Tab switcher */}
-      <div className="flex gap-2 bg-slate-100 p-1 rounded-2xl w-fit">
-        <button
-          onClick={() => setActiveTab('general')}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
-            activeTab === 'general' ? 'bg-white shadow text-black' : 'text-black hover:text-black'
-          }`}
-        >
-          <Users className="w-4 h-4" /> General Forum
-        </button>
-        <button
-          onClick={() => setActiveTab('department')}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
-            activeTab === 'department' ? 'bg-white shadow text-black' : 'text-black hover:text-black'
-          }`}
-        >
-          <GraduationCap className="w-4 h-4" /> {dept} Forum
-        </button>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex gap-2 bg-slate-100 p-1 rounded-2xl w-fit">
+          <button
+            onClick={() => setActiveTab('general')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
+              activeTab === 'general' ? 'bg-white shadow text-black' : 'text-slate-600 hover:text-black'
+            }`}
+          >
+            <Users className="w-4 h-4" /> General Forum
+          </button>
+          <button
+            onClick={() => setActiveTab('department')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
+              activeTab === 'department' ? 'bg-white shadow text-black' : 'text-slate-600 hover:text-black'
+            }`}
+          >
+            <GraduationCap className="w-4 h-4" /> {isAdmin ? 'Dept Forums' : `${dept} Forum`}
+          </button>
+        </div>
+
+        {isAdmin && activeTab === 'department' && (
+          <select 
+            value={adminDept}
+            onChange={(e) => setAdminDept(e.target.value)}
+            className="px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-black focus:outline-none focus:border-blue-500 shadow-sm"
+          >
+            <option value="Business Administration">Business Administration</option>
+            <option value="Human Resources">Human Resources</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Accounting">Accounting</option>
+            <option value="Finance">Finance</option>
+            <option value="Counselling">Counselling</option>
+          </select>
+        )}
       </div>
 
       {activeTab === 'general' ? (
@@ -73,3 +93,4 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
     </div>
   );
 };
+

@@ -199,6 +199,20 @@ export const AdminDashboard: React.FC = () => {
           </Link>
 
           <Link
+            to="/admin/forum"
+            className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-indigo-400 hover:bg-indigo-50 transition-colors group"
+          >
+            <div className="flex items-center space-x-4">
+              <div className="bg-indigo-100 p-2 rounded-lg text-indigo-600"><MessageSquare className="w-5 h-5" /></div>
+              <div className="text-left">
+                <h3 className="text-sm font-bold text-black">General Forum</h3>
+                <p className="text-xs text-black mt-0.5">View and moderate all general and department forums.</p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-black group-hover:text-indigo-500 transition-colors" />
+          </Link>
+
+          <Link
             to="/admin/complaint-fields"
             className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-purple-400 hover:bg-purple-50 transition-colors group"
           >
