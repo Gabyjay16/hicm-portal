@@ -18,6 +18,7 @@ export interface User {
   canViewAllForums?: boolean;
   customUsername?: string;
   showAvatarInForum?: boolean;
+  canManageComplaints?: boolean;
 }
 
 export interface AdminSettingsConfig {
@@ -114,7 +115,7 @@ export type ComplaintType = 'wrong_marks' | 'wrong_course_code' | 'remark_script
 export interface ComplaintField {
   id: string;
   label: string;
-  type: 'text' | 'number' | 'select' | 'textarea' | 'toggle';
+  type: 'text' | 'number' | 'select' | 'textarea' | 'toggle' | 'file';
   placeholder?: string;
   options?: string[];
   autoFill?: 'name' | 'matricule' | 'phone';
@@ -126,6 +127,8 @@ export interface ComplaintFormConfig {
   title: string;
   description: string;
   fields: ComplaintField[];
+  allowFileUpload?: boolean;
+  fileUploadRequired?: boolean;
 }
 
 export interface DocumentRequest {

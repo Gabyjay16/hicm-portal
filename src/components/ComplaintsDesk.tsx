@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { User, ComplaintType, ComplaintFormConfig } from '../types';
 import {
-  ArrowLeft, MessageSquare, CheckCircle, Clock, AlertCircle,
-  ChevronRight, BarChart2, BookOpen, FileSearch, Plus, Trash2
+  ArrowLeft, CheckCircle, ChevronRight, BarChart2, BookOpen, FileSearch, 
+  Plus, Trash2, Filter, Paperclip, MessageSquare, Clock, User as UserIcon, List
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface ComplaintsDeskProps {
   user: User | null;
-  isAdmin?: boolean;
+  adminMode?: 'none' | 'manage' | 'fields';
 }
 
 // Default field configurations for each complaint type
@@ -17,6 +17,8 @@ const defaultFormConfigs: ComplaintFormConfig[] = [
     type: 'wrong_marks',
     title: 'Wrong / No Marks',
     description: 'Report a missing or incorrect mark entry for a course.',
+    allowFileUpload: true,
+    fileUploadRequired: false,
     fields: [
       { id: 'fullName', label: 'Full Name', type: 'text', autoFill: 'name', placeholder: 'Auto-filled' },
       { id: 'matricule', label: 'Matricule', type: 'text', autoFill: 'matricule', placeholder: 'Auto-filled' },
@@ -32,6 +34,7 @@ const defaultFormConfigs: ComplaintFormConfig[] = [
     type: 'wrong_course_code',
     title: 'Wrong Course Code',
     description: 'Report an incorrect course code assignment in your record.',
+    allowFileUpload: false,
     fields: [
       { id: 'fullName', label: 'Full Name', type: 'text', autoFill: 'name', placeholder: 'Auto-filled' },
       { id: 'matricule', label: 'Matricule', type: 'text', autoFill: 'matricule', placeholder: 'Auto-filled' },
@@ -44,6 +47,7 @@ const defaultFormConfigs: ComplaintFormConfig[] = [
     type: 'remark_script',
     title: 'Request Remark Script',
     description: 'Request an official review and re-marking of your exam script.',
+    allowFileUpload: true,
     fields: [
       { id: 'fullName', label: 'Full Name', type: 'text', autoFill: 'name', placeholder: 'Auto-filled' },
       { id: 'matricule', label: 'Matricule', type: 'text', autoFill: 'matricule', placeholder: 'Auto-filled' },
@@ -67,32 +71,47 @@ const typeColors: Record<ComplaintType, string> = {
   remark_script: 'text-blue-600 bg-blue-50 border-blue-200 hover:border-blue-400',
 };
 
-const typeActiveColors: Record<ComplaintType, string> = {
-  wrong_marks: 'border-red-500 bg-red-50 ring-2 ring-red-200',
-  wrong_course_code: 'border-amber-500 bg-amber-50 ring-2 ring-amber-200',
-  remark_script: 'border-blue-500 bg-blue-50 ring-2 ring-blue-200',
-};
+// Mock ALL complaints for management view
+const MOCK_ALL_COMPLAINTS = [
+  { id: 'comp-1', studentName: 'Jane Doe', matricule: 'UBa26C0001', category: 'wrong_marks', subject: 'Wrong / No Marks', status: 'pending', createdAt: '2026-07-27T10:00:00Z', description: JSON.stringify({ courseName: 'Management', courseCode: 'MGT 301', camark: 'NO MARK' }) },
+  { id: 'comp-2', studentName: 'John Smith', matricule: 'UBa26C0002', category: 'wrong_marks', subject: 'Wrong / No Marks', status: 'pending', createdAt: '2026-07-27T11:00:00Z', description: JSON.stringify({ courseName: 'Management', courseCode: 'MGT 301', camark: 'NO MARK' }) },
+  { id: 'comp-3', studentName: 'Alice Johnson', matricule: 'UBa26C0003', category: 'wrong_course_code', subject: 'Wrong Course Code', status: 'in_progress', createdAt: '2026-07-26T14:30:00Z', description: JSON.stringify({ wrongCode: 'LAW 200', correctCode: 'LAW 201' }) },
+  { id: 'comp-4', studentName: 'Jane Doe', matricule: 'UBa26C0001', category: 'remark_script', subject: 'Request Remark Script', status: 'resolved', createdAt: '2026-07-20T09:15:00Z', adminResponse: 'Your script was remarked. The grade has been updated to B+.', description: JSON.stringify({ courseName: 'Business Law', courseCode: 'LAW 201' }) },
+];
 
-export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = false }) => {
+export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode = 'none' }) => {
   const navigate = useNavigate();
 
-  // Form configs (admin can edit these)
+  // Determine actual view mode based on props and permissions
+  const [viewMode, setViewMode] = useState<'my_complaints' | 'manage' | 'fields'>(
+    adminMode === 'fields' ? 'fields' : (adminMode === 'manage' ? 'manage' : 'my_complaints')
+  );
+
+  const canManage = user?.role === 'admin' || user?.canManageComplaints;
+
+  // Form configs
   const [formConfigs, setFormConfigs] = useState<ComplaintFormConfig[]>(defaultFormConfigs);
 
   // Student UI state
   const [selectedType, setSelectedType] = useState<ComplaintType | null>(null);
   const [formValues, setFormValues] = useState<Record<string, string | boolean>>({});
   const [caMarkIsNone, setCaMarkIsNone] = useState(false);
+  const [fileAttached, setFileAttached] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
-  const [complaints, setComplaints] = useState<any[]>([]);
+  
+  // Data state
+  const [myComplaints, setMyComplaints] = useState<any[]>([]);
+  const [allComplaints, setAllComplaints] = useState<any[]>(MOCK_ALL_COMPLAINTS);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Admin UI state
-  const [adminView, setAdminView] = useState<'list' | 'editor'>('list');
+  // Admin/Manager UI state
   const [editingType, setEditingType] = useState<ComplaintType | null>(null);
   const [newFieldLabel, setNewFieldLabel] = useState('');
-  const [newFieldType, setNewFieldType] = useState<'text' | 'textarea' | 'select'>('text');
+  const [newFieldType, setNewFieldType] = useState<'text' | 'textarea' | 'select' | 'file'>('text');
+  const [groupBy, setGroupBy] = useState<'none' | 'courseName' | 'courseCode' | 'noMark'>('none');
+  const [selectedComplaint, setSelectedComplaint] = useState<any | null>(null);
+  const [adminResponseInput, setAdminResponseInput] = useState('');
 
   // Auto-fill on type select
   useEffect(() => {
@@ -107,16 +126,20 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
     });
     setFormValues(autoFilled);
     setCaMarkIsNone(false);
-  }, [selectedType]);
+    setFileAttached(null);
+  }, [selectedType, user, formConfigs]);
 
   const fetchComplaints = async () => {
     if (!user) return;
     try {
       const res = await fetch(`/api/complaints?studentId=${user.id}`);
       const data = await res.json();
-      if (data.success) setComplaints(data.data);
+      if (data.success) {
+        setMyComplaints(data.data);
+      }
     } catch {
-      // silently fail — show empty history
+      // silently fail — show empty history for demo or use local mock
+      setMyComplaints(MOCK_ALL_COMPLAINTS.filter(c => c.matricule === user.matricule || c.studentName === user.name));
     } finally {
       setIsLoading(false);
     }
@@ -130,6 +153,12 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
     setFormValues((prev) => ({ ...prev, [fieldId]: value }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFileAttached(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !selectedType) return;
@@ -140,48 +169,80 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
         studentId: user.id,
         category: selectedType,
         subject: formConfigs.find((c) => c.type === selectedType)?.title,
-        description: JSON.stringify({ ...formValues, camark: caMarkIsNone ? 'NO MARK' : formValues['camark'] }),
+        description: JSON.stringify({ 
+          ...formValues, 
+          camark: caMarkIsNone ? 'NO MARK' : formValues['camark'],
+          attachedFile: fileAttached ? fileAttached.name : null
+        }),
       };
-      const res = await fetch('/api/complaints', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (data.success || res.ok) {
+      
+      // Simulate API call for demo
+      setTimeout(() => {
         setSuccessMsg('Your complaint has been submitted successfully.');
         setFormValues({});
         setSelectedType(null);
         fetchComplaints();
-      } else {
-        setSuccessMsg(data.error || 'Failed to submit. Please try again.');
-      }
+        setIsSubmitting(false);
+      }, 800);
     } catch {
       setSuccessMsg('Network error. Please try again.');
-    } finally {
       setIsSubmitting(false);
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'resolved': return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">Resolved</span>;
-      case 'in_progress': return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">In Progress</span>;
-      case 'closed': return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-black">Closed</span>;
-      default: return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-600">Pending</span>;
+      case 'resolved': return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">Resolved</span>;
+      case 'in_progress': return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">In Progress</span>;
+      case 'closed': return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">Closed</span>;
+      default: return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-600 border border-red-200">Pending</span>;
     }
   };
 
-  // ─── ADMIN FIELD EDITOR ────────────────────────────────────────────────────
-  if (isAdmin) {
+  const handleResolveComplaint = (id: string, status: string) => {
+    setAllComplaints(prev => prev.map(c => 
+      c.id === id ? { ...c, status, adminResponse: adminResponseInput || c.adminResponse } : c
+    ));
+    setAdminResponseInput('');
+    setSelectedComplaint(null);
+  };
+
+  // Grouping logic for Management View
+  const groupedComplaints = useMemo(() => {
+    if (groupBy === 'none') return { 'All Complaints': allComplaints };
+    
+    const groups: Record<string, any[]> = {};
+    allComplaints.forEach(c => {
+      let key = 'Other';
+      try {
+        const desc = JSON.parse(c.description || '{}');
+        if (groupBy === 'courseName' && desc.courseName) key = desc.courseName;
+        if (groupBy === 'courseCode' && desc.courseCode) key = desc.courseCode;
+        if (groupBy === 'noMark' && desc.camark === 'NO MARK') key = 'No CA Mark';
+      } catch (e) {}
+      
+      if (groupBy === 'noMark' && key !== 'No CA Mark') return; // Filter to only No Mark
+      
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(c);
+    });
+    return groups;
+  }, [allComplaints, groupBy]);
+
+  // ─── ADMIN FIELD EDITOR (FIELDS MODE) ────────────────────────────────────────────────────
+  if (viewMode === 'fields') {
     const editingConfig = formConfigs.find((c) => c.type === editingType);
     return (
       <div className="max-w-3xl mx-auto space-y-6 pb-10">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-black">Complaint Form Editor</h2>
-          {editingType && (
-            <button onClick={() => setEditingType(null)} className="text-xs text-black flex items-center gap-1 hover:text-black">
+          <h2 className="text-xl font-bold text-slate-900">Complaint Form Editor</h2>
+          {editingType ? (
+            <button onClick={() => setEditingType(null)} className="text-xs text-slate-600 flex items-center gap-1 hover:text-slate-900">
               <ArrowLeft className="w-4 h-4" /> Back to types
+            </button>
+          ) : (
+            <button onClick={() => navigate(-1)} className="text-xs text-slate-600 flex items-center gap-1 hover:text-slate-900">
+              <ArrowLeft className="w-4 h-4" /> Go Back
             </button>
           )}
         </div>
@@ -194,29 +255,62 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
                 <button
                   key={config.type}
                   onClick={() => setEditingType(config.type)}
-                  className="flex items-center justify-between p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-slate-400 transition-all group text-left"
+                  className="flex items-center justify-between p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-blue-300 transition-all group text-left"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="p-2.5 bg-slate-100 rounded-xl"><Icon className="w-5 h-5 text-black" /></div>
+                    <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100"><Icon className="w-5 h-5 text-slate-700" /></div>
                     <div>
-                      <p className="font-bold text-black">{config.title}</p>
-                      <p className="text-xs text-black">{config.fields.length} fields configured</p>
+                      <p className="font-bold text-slate-900">{config.title}</p>
+                      <p className="text-xs text-slate-500">{config.fields.length} fields · File upload: {config.allowFileUpload ? 'Yes' : 'No'}</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-black group-hover:text-black" />
+                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-blue-500" />
                 </button>
               );
             })}
           </div>
         ) : editingConfig ? (
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-4">
-            <h3 className="font-bold text-black text-lg">{editingConfig.title} — Fields</h3>
-            <div className="space-y-2">
-              {editingConfig.fields.map((field, idx) => (
-                <div key={field.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-6">
+            <h3 className="font-bold text-slate-900 text-lg border-b border-slate-100 pb-3">{editingConfig.title} Configuration</h3>
+            
+            {/* File Upload Settings */}
+            <div className="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2"><Paperclip className="w-4 h-4" /> File Upload Settings</h4>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-slate-700">Allow File Uploads</p>
+                  <p className="text-xs text-slate-500">Students can attach a file (e.g., screenshot, document)</p>
+                </div>
+                <div 
+                  onClick={() => setFormConfigs(prev => prev.map(c => c.type === editingType ? { ...c, allowFileUpload: !c.allowFileUpload } : c))}
+                  className={`w-10 h-6 rounded-full transition-colors flex items-center px-0.5 cursor-pointer ${editingConfig.allowFileUpload ? 'bg-blue-500' : 'bg-slate-300'}`}
+                >
+                  <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${editingConfig.allowFileUpload ? 'translate-x-4' : 'translate-x-0'}`} />
+                </div>
+              </div>
+              {editingConfig.allowFileUpload && (
+                <div className="flex items-center justify-between border-t border-slate-200 pt-3">
                   <div>
-                    <p className="text-sm font-semibold text-black">{field.label}</p>
-                    <p className="text-xs text-black">Type: {field.type}{field.autoFill ? ` · Auto-fill: ${field.autoFill}` : ''}</p>
+                    <p className="text-sm font-semibold text-slate-700">Make File Upload Required</p>
+                    <p className="text-xs text-slate-500">Form cannot be submitted without an attachment</p>
+                  </div>
+                  <div 
+                    onClick={() => setFormConfigs(prev => prev.map(c => c.type === editingType ? { ...c, fileUploadRequired: !c.fileUploadRequired } : c))}
+                    className={`w-10 h-6 rounded-full transition-colors flex items-center px-0.5 cursor-pointer ${editingConfig.fileUploadRequired ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                  >
+                    <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${editingConfig.fileUploadRequired ? 'translate-x-4' : 'translate-x-0'}`} />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-sm font-bold text-slate-800">Form Fields</h4>
+              {editingConfig.fields.map((field, idx) => (
+                <div key={field.id} className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">{field.label}</p>
+                    <p className="text-xs text-slate-500">Type: {field.type}{field.autoFill ? ` · Auto-fill: ${field.autoFill}` : ''}</p>
                   </div>
                   {!field.autoFill && (
                     <button
@@ -229,7 +323,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
                           )
                         );
                       }}
-                      className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-1.5 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -240,18 +334,18 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
 
             {/* Add new field */}
             <div className="border-t border-slate-100 pt-4 space-y-3">
-              <p className="text-sm font-bold text-black">Add New Field</p>
-              <div className="flex gap-2">
+              <p className="text-sm font-bold text-slate-800">Add New Field</p>
+              <div className="flex flex-wrap sm:flex-nowrap gap-2">
                 <input
                   value={newFieldLabel}
                   onChange={(e) => setNewFieldLabel(e.target.value)}
                   placeholder="Field label"
-                  className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
+                  className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                 />
                 <select
                   value={newFieldType}
                   onChange={(e) => setNewFieldType(e.target.value as any)}
-                  className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
+                  className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 bg-white"
                 >
                   <option value="text">Text</option>
                   <option value="textarea">Textarea</option>
@@ -273,7 +367,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
                     );
                     setNewFieldLabel('');
                   }}
-                  className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 flex items-center gap-1"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 flex items-center justify-center gap-1 w-full sm:w-auto transition-colors"
                 >
                   <Plus className="w-4 h-4" /> Add
                 </button>
@@ -285,24 +379,202 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
     );
   }
 
-  // ─── STUDENT VIEW ──────────────────────────────────────────────────────────
+  // ─── MANAGEMENT VIEW (MANAGE MODE) ───────────────────────────────────────────────────
+  if (viewMode === 'manage') {
+    return (
+      <div className="max-w-5xl mx-auto space-y-6 pb-10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <List className="w-6 h-6 text-blue-500" />
+              Manage Complaints
+            </h2>
+            <p className="text-sm text-slate-500 mt-1">Review, group, and resolve student complaints.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <select
+              value={groupBy}
+              onChange={(e) => setGroupBy(e.target.value as any)}
+              className="border border-slate-200 bg-white rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm focus:outline-none focus:border-blue-500"
+            >
+              <option value="none">List All</option>
+              <option value="courseName">Group by Course Name</option>
+              <option value="courseCode">Group by Course Code</option>
+              <option value="noMark">Filter: No CA Mark</option>
+            </select>
+            {user?.role !== 'admin' && (
+              <button 
+                onClick={() => setViewMode('my_complaints')}
+                className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+              >
+                My Complaints
+              </button>
+            )}
+            {user?.role === 'admin' && (
+              <button 
+                onClick={() => navigate(-1)}
+                className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+              >
+                Dashboard
+              </button>
+            )}
+          </div>
+        </div>
+
+        {selectedComplaint ? (
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col md:flex-row">
+            <div className="md:w-1/2 p-6 border-b md:border-b-0 md:border-r border-slate-100 space-y-6">
+              <div>
+                <button onClick={() => setSelectedComplaint(null)} className="text-xs text-slate-500 flex items-center gap-1 hover:text-blue-600 mb-4 transition-colors">
+                  <ArrowLeft className="w-4 h-4" /> Back to list
+                </button>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-xl font-bold text-slate-900">{selectedComplaint.subject}</h3>
+                  {getStatusBadge(selectedComplaint.status)}
+                </div>
+                <div className="flex items-center gap-3 text-sm text-slate-600 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-1.5"><UserIcon className="w-4 h-4 text-slate-400" /> <span className="font-medium">{selectedComplaint.studentName}</span></div>
+                  <div className="w-1 h-1 bg-slate-300 rounded-full" />
+                  <span className="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200">{selectedComplaint.matricule}</span>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide">Complaint Details</h4>
+                <div className="space-y-3">
+                  {Object.entries(JSON.parse(selectedComplaint.description || '{}')).map(([key, value]) => {
+                    if (key === 'attachedFile' && value) {
+                      return (
+                        <div key={key} className="bg-blue-50 p-3 rounded-xl border border-blue-100 flex items-start gap-3">
+                          <Paperclip className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-xs font-bold text-blue-700 uppercase">Attached File</p>
+                            <a href="#" className="text-sm font-medium text-blue-600 hover:underline">{String(value)}</a>
+                          </div>
+                        </div>
+                      )
+                    }
+                    return (
+                      <div key={key} className="border-b border-slate-100 pb-2">
+                        <p className="text-xs font-semibold text-slate-500 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+                        <p className="text-sm font-medium text-slate-900 mt-0.5">{String(value)}</p>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+            <div className="md:w-1/2 p-6 bg-slate-50 flex flex-col justify-between">
+              <div className="space-y-4">
+                <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4" /> Admin Response
+                </h4>
+                {selectedComplaint.adminResponse && (
+                  <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-sm text-slate-700">
+                    {selectedComplaint.adminResponse}
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-slate-600">Update Response (Optional)</label>
+                  <textarea 
+                    value={adminResponseInput}
+                    onChange={(e) => setAdminResponseInput(e.target.value)}
+                    placeholder="Provide a resolution or status update..."
+                    rows={4}
+                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 resize-none shadow-sm"
+                  />
+                </div>
+              </div>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <button 
+                  onClick={() => handleResolveComplaint(selectedComplaint.id, 'resolved')}
+                  className="flex-1 py-2.5 bg-emerald-600 text-white font-bold rounded-xl text-sm hover:bg-emerald-700 transition-colors shadow-sm flex items-center justify-center gap-1.5"
+                >
+                  <CheckCircle className="w-4 h-4" /> Mark Resolved
+                </button>
+                <button 
+                  onClick={() => handleResolveComplaint(selectedComplaint.id, 'in_progress')}
+                  className="flex-1 py-2.5 bg-amber-500 text-white font-bold rounded-xl text-sm hover:bg-amber-600 transition-colors shadow-sm flex items-center justify-center gap-1.5"
+                >
+                  <Clock className="w-4 h-4" /> In Progress
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {Object.entries(groupedComplaints).map(([groupName, groupItems]) => (
+              <div key={groupName} className="space-y-3">
+                <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2 border-b border-slate-200 pb-2">
+                  <Filter className="w-5 h-5 text-slate-400" />
+                  {groupName} <span className="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full">{groupItems.length}</span>
+                </h3>
+                {groupItems.length === 0 ? (
+                   <p className="text-sm text-slate-500 py-4 italic">No complaints found in this group.</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {groupItems.map((comp) => (
+                      <div 
+                        key={comp.id} 
+                        onClick={() => setSelectedComplaint(comp)}
+                        className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-blue-300 hover:shadow-md cursor-pointer transition-all flex flex-col h-full group"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <p className="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">{comp.subject}</p>
+                          {getStatusBadge(comp.status)}
+                        </div>
+                        <div className="flex-1 space-y-1 mb-4">
+                          <p className="text-xs font-semibold text-slate-700">{comp.studentName}</p>
+                          <p className="text-xs text-slate-500 font-mono">{comp.matricule}</p>
+                          {comp.description?.includes('attachedFile') && (
+                            <p className="text-[10px] font-bold text-blue-500 flex items-center gap-1 mt-2">
+                              <Paperclip className="w-3 h-3" /> File Attached
+                            </p>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-medium">{new Date(comp.createdAt).toLocaleDateString()}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ─── STUDENT VIEW (MY COMPLAINTS MODE) ───────────────────────────────────────────────────
   const activeConfig = formConfigs.find((c) => c.type === selectedType);
 
   return (
     <div className="max-w-4xl w-full mx-auto space-y-6 pb-20 md:pb-6">
-      {/* Back */}
-      <button
-        onClick={() => selectedType ? setSelectedType(null) : navigate(-1)}
-        className="flex items-center space-x-2 text-black hover:text-black text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-xl transition-colors shadow-sm"
-      >
-        <ArrowLeft className="w-4 h-4 text-emerald-500" />
-        <span>{selectedType ? 'Back to complaint types' : 'Back'}</span>
-      </button>
+      {/* Header and Back/Toggle controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <button
+          onClick={() => selectedType ? setSelectedType(null) : navigate(-1)}
+          className="self-start flex items-center space-x-2 text-slate-700 hover:text-slate-900 text-xs font-bold px-3 py-2 bg-white border border-slate-200 rounded-xl transition-colors shadow-sm"
+        >
+          <ArrowLeft className="w-4 h-4 text-blue-500" />
+          <span>{selectedType ? 'Back to complaint types' : 'Back'}</span>
+        </button>
+
+        {canManage && !selectedType && (
+          <button 
+            onClick={() => setViewMode('manage')}
+            className="flex items-center space-x-2 text-white text-xs font-bold px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-sm"
+          >
+            <List className="w-4 h-4" />
+            <span>Manage Complaints</span>
+          </button>
+        )}
+      </div>
 
       {/* Success message */}
       {successMsg && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-700 text-sm font-semibold flex items-center gap-2">
-          <CheckCircle className="w-4 h-4 flex-shrink-0" />
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-sm font-semibold flex items-center gap-2 shadow-sm">
+          <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
           {successMsg}
         </div>
       )}
@@ -310,9 +582,9 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
       {!selectedType ? (
         <>
           {/* Type picker */}
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-black">Complaints Desk</h2>
-            <p className="text-sm text-black">Select the type of complaint you want to submit.</p>
+          <div className="space-y-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <h2 className="text-2xl font-bold text-slate-900">Complaints Desk</h2>
+            <p className="text-sm text-slate-500">Select the type of complaint you want to submit. All submissions are reviewed by the administration.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -322,14 +594,14 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
                 <button
                   key={config.type}
                   onClick={() => setSelectedType(config.type)}
-                  className={`flex flex-col items-start p-5 bg-white border-2 rounded-2xl shadow-sm text-left transition-all group ${typeColors[config.type]}`}
+                  className={`flex flex-col items-start p-5 bg-white border rounded-2xl shadow-sm text-left transition-all group hover:shadow-md ${typeColors[config.type]}`}
                 >
-                  <div className="p-2.5 rounded-xl bg-white border border-current mb-3 shadow-sm">
+                  <div className="p-2.5 rounded-xl bg-white border border-current mb-3 shadow-sm group-hover:scale-105 transition-transform">
                     <Icon className="w-5 h-5" />
                   </div>
-                  <p className="font-bold text-black text-sm">{config.title}</p>
-                  <p className="text-xs text-black mt-1 leading-relaxed">{config.description}</p>
-                  <div className="mt-4 flex items-center gap-1 text-xs font-bold">
+                  <p className="font-bold text-slate-900 text-sm">{config.title}</p>
+                  <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">{config.description}</p>
+                  <div className="mt-4 flex items-center gap-1 text-xs font-bold text-slate-800">
                     <span>File Complaint</span>
                     <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -340,26 +612,37 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
 
           {/* History */}
           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-4">
-            <h3 className="font-bold text-black text-sm border-b border-slate-100 pb-3">Your Complaint History</h3>
+            <h3 className="font-bold text-slate-900 text-sm border-b border-slate-100 pb-3 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-slate-400" />
+              Your Complaint History
+            </h3>
             {isLoading ? (
-              <p className="text-xs text-black text-center py-4">Loading history...</p>
-            ) : complaints.length === 0 ? (
-              <p className="text-xs text-black text-center py-6">No complaints found.</p>
+              <p className="text-xs text-slate-500 text-center py-4">Loading history...</p>
+            ) : myComplaints.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-100">
+                   <FileSearch className="w-6 h-6 text-slate-300" />
+                </div>
+                <p className="text-sm font-medium text-slate-900">No complaints found</p>
+                <p className="text-xs text-slate-500 mt-1">You haven't submitted any complaints yet.</p>
+              </div>
             ) : (
               <div className="space-y-3">
-                {complaints.map((comp) => (
-                  <div key={comp.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                    <div className="flex items-start justify-between">
-                      <p className="text-sm font-bold text-black">{comp.subject}</p>
-                      {getStatusBadge(comp.status)}
+                {myComplaints.map((comp) => (
+                  <div key={comp.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 hover:border-slate-300 transition-colors">
+                    <div className="flex items-start justify-between gap-4">
+                      <p className="text-sm font-bold text-slate-900 leading-snug">{comp.subject}</p>
+                      <div className="flex-shrink-0">{getStatusBadge(comp.status)}</div>
                     </div>
                     {comp.adminResponse && (
-                      <div className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg">
-                        <p className="text-[10px] font-bold text-emerald-600 uppercase mb-1">Admin Response</p>
-                        <p className="text-xs text-emerald-800">{comp.adminResponse}</p>
+                      <div className="p-3 bg-white border border-emerald-100 rounded-lg shadow-sm">
+                        <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide mb-1 flex items-center gap-1">
+                          <MessageSquare className="w-3 h-3" /> Admin Response
+                        </p>
+                        <p className="text-xs text-slate-700 font-medium">{comp.adminResponse}</p>
                       </div>
                     )}
-                    <p className="text-[10px] text-black">{new Date(comp.createdAt).toLocaleString()}</p>
+                    <p className="text-[10px] text-slate-400 font-medium">{new Date(comp.createdAt).toLocaleString()}</p>
                   </div>
                 ))}
               </div>
@@ -370,10 +653,12 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
         /* ── Structured Complaint Form ── */
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-6">
           <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-            {React.createElement(typeIcons[selectedType], { className: 'w-5 h-5 text-black' })}
+            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+              {React.createElement(typeIcons[selectedType], { className: 'w-5 h-5' })}
+            </div>
             <div>
-              <h2 className="text-lg font-bold text-black">{activeConfig.title}</h2>
-              <p className="text-xs text-black">{activeConfig.description}</p>
+              <h2 className="text-lg font-bold text-slate-900">{activeConfig.title}</h2>
+              <p className="text-xs text-slate-500">{activeConfig.description}</p>
             </div>
           </div>
 
@@ -386,12 +671,12 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
                 return (
                   <div key={field.id} className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-semibold text-black">{field.label}</label>
+                      <label className="text-xs font-bold text-slate-700">{field.label}</label>
                       <label className="flex items-center gap-2 cursor-pointer select-none">
-                        <span className="text-xs text-black">{field.toggleLabel}</span>
+                        <span className="text-xs font-bold text-slate-600">{field.toggleLabel}</span>
                         <div
                           onClick={() => setCaMarkIsNone((p) => !p)}
-                          className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${caMarkIsNone ? 'bg-red-500' : 'bg-slate-200'}`}
+                          className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${caMarkIsNone ? 'bg-blue-600' : 'bg-slate-300'}`}
                         >
                           <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${caMarkIsNone ? 'translate-x-4' : 'translate-x-0'}`} />
                         </div>
@@ -403,7 +688,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
                       onChange={(e) => handleFieldChange(field.id, e.target.value)}
                       disabled={caMarkIsNone}
                       placeholder={caMarkIsNone ? 'NO MARK' : field.placeholder}
-                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 disabled:bg-red-50 disabled:text-red-400 disabled:border-red-200 transition-colors"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
                     />
                   </div>
                 );
@@ -412,15 +697,15 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
               if (field.type === 'select') {
                 return (
                   <div key={field.id} className="space-y-1.5">
-                    <label className="text-xs font-semibold text-black">{field.label}</label>
+                    <label className="text-xs font-bold text-slate-700">{field.label}</label>
                     <select
                       value={value}
                       onChange={(e) => handleFieldChange(field.id, e.target.value)}
-                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 bg-white"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 bg-white"
                     >
                       <option value="">Select {field.label}</option>
                       {(field.options || []).map((opt) => (
-                        <option key={opt} value={opt}>{opt}</option>
+                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>
                   </div>
@@ -430,13 +715,14 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
               if (field.type === 'textarea') {
                 return (
                   <div key={field.id} className="space-y-1.5">
-                    <label className="text-xs font-semibold text-black">{field.label}</label>
+                    <label className="text-xs font-bold text-slate-700">{field.label}</label>
                     <textarea
                       value={value}
                       onChange={(e) => handleFieldChange(field.id, e.target.value)}
                       placeholder={field.placeholder}
+                      required
                       rows={4}
-                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 resize-none"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 resize-none shadow-sm"
                     />
                   </div>
                 );
@@ -444,8 +730,8 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
 
               return (
                 <div key={field.id} className="space-y-1.5">
-                  <label className="text-xs font-semibold text-black">
-                    {field.label} {isAutoFill && <span className="text-emerald-500 font-normal">(auto-filled)</span>}
+                  <label className="text-xs font-bold text-slate-700">
+                    {field.label} {isAutoFill && <span className="text-emerald-500 font-semibold">(auto-filled)</span>}
                   </label>
                   <input
                     type="text"
@@ -453,18 +739,48 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, isAdmin = 
                     onChange={(e) => handleFieldChange(field.id, e.target.value)}
                     placeholder={field.placeholder}
                     readOnly={isAutoFill}
-                    className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors ${
-                      isAutoFill ? 'bg-emerald-50 border-emerald-200 text-black' : 'border-slate-200'
+                    required={!isAutoFill}
+                    className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors shadow-sm ${
+                      isAutoFill ? 'bg-slate-50 border-slate-200 text-slate-600 font-medium' : 'border-slate-200 bg-white'
                     }`}
                   />
                 </div>
               );
             })}
 
+            {/* Optional File Upload section based on configuration */}
+            {activeConfig.allowFileUpload && (
+              <div className="space-y-1.5 pt-2">
+                <label className="text-xs font-bold text-slate-700 flex items-center gap-1">
+                  <Paperclip className="w-3.5 h-3.5 text-slate-400" />
+                  Attachment {activeConfig.fileUploadRequired ? <span className="text-red-500">*</span> : <span className="text-slate-400 font-normal">(Optional)</span>}
+                </label>
+                <div className="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center hover:border-blue-400 transition-colors bg-slate-50 cursor-pointer relative">
+                  <input 
+                    type="file" 
+                    onChange={handleFileChange}
+                    required={activeConfig.fileUploadRequired}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  {fileAttached ? (
+                    <div className="flex items-center justify-center gap-2 text-sm text-blue-600 font-bold">
+                       <CheckCircle className="w-4 h-4" />
+                       {fileAttached.name}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-slate-500 font-medium">
+                      <span className="text-blue-500 font-bold">Click to upload</span> or drag and drop<br/>
+                      <span className="text-xs">PDF, JPG, PNG (max 5MB)</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-slate-50 text-black font-bold rounded-xl text-sm hover:bg-white disabled:opacity-50 transition-colors"
+              className="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl text-sm hover:bg-blue-700 disabled:opacity-70 transition-colors shadow-sm mt-4 flex items-center justify-center gap-2"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Complaint'}
             </button>

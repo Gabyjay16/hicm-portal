@@ -106,7 +106,7 @@ export default function App() {
           <Route path="forum" element={<ForumPage currentUser={user} />} />
           <Route path="alerts" element={<AlertsView />} />
           <Route path="notes" element={<NotesView user={user} />} />
-          <Route path="complaints" element={<ComplaintsDesk user={user} />} />
+          <Route path="complaints" element={<ComplaintsDesk user={user} adminMode="none" />} />
           <Route path="lost-and-found" element={<LostAndFound user={user} />} />
           <Route path="elections" element={<ElectionsView user={user} />} />
           <Route path="request-documents" element={<RequestDocuments user={user} />} />
@@ -123,7 +123,8 @@ export default function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="tokens" element={<TokenRequestsAdmin />} />
           <Route path="users" element={<UserManagement adminSettings={adminSettings} />} />
-          <Route path="complaint-fields" element={<ComplaintsDesk user={user} isAdmin={true} />} />
+          <Route path="complaints" element={<ComplaintsDesk user={user} adminMode="manage" />} />
+          <Route path="complaint-fields" element={<ComplaintsDesk user={user} adminMode="fields" />} />
           <Route path="content" element={<AdminAnnouncementsManager />} />
           <Route path="settings" element={
             <AdminSettings 
