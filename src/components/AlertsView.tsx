@@ -44,6 +44,33 @@ const SAMPLE_ALERTS: AlertItem[] = [
 export const AlertsView: React.FC = () => {
   const [alerts, setAlerts] = useState<AlertItem[]>(SAMPLE_ALERTS);
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const lastCountRef = React.useRef(SAMPLE_ALERTS.filter(a => a.priority === 'high' && !a.isRead).length);
+
+  // Play sound when new urgent/high priority alert arrives
+  React.useEffect(() => {
+    const urgentUnread = alerts.filter(a => (a.priority === 'high' || a.category === 'emergency') && !a.isRead).length;
+    const announcementNotifications = localStorage.getItem('announcement_notifications') !== 'false';
+    const soundEnabled = localStorage.getItem('notification_sound') !== 'false';
+    
+    if (urgentUnread > lastCountRef.current && announcementNotifications && soundEnabled) {
+      try {
+        const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        [660, 880, 1100].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.15);
+          gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + i * 0.15 + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.3);
+          osc.start(ctx.currentTime + i * 0.15);
+          osc.stop(ctx.currentTime + i * 0.15 + 0.3);
+        });
+      } catch {}
+    }
+    lastCountRef.current = urgentUnread;
+  }, [alerts]);
 
   const toggleReadStatus = (id: string) => {
     setAlerts((prev) =>

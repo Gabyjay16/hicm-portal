@@ -21,7 +21,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
     if (user.role === 'admin') return '/admin';
     return '/student';
   };
-  
+
   const basePath = getBasePath();
 
   const tabs = [
@@ -32,16 +32,18 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-slate-50 border-t border-navy-800 flex justify-around items-center py-2 md:hidden shadow-lg">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 flex justify-around items-center py-2 md:hidden shadow-lg"
+      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)' }}
+    >
       {tabs.map((tab) => {
         const Icon = tab.icon;
-        const isActive = currentPath === tab.path;
+        const isActive = currentPath.startsWith(tab.path);
         return (
           <Link
             key={tab.id}
             to={tab.path}
-            className={`relative flex flex-col items-center justify-center w-full py-1 px-2 transition-all ${
-              isActive ? 'text-emerald-500 font-semibold' : 'text-black hover:text-black'
+            className={`relative flex flex-col items-center justify-center flex-1 py-1 px-1 transition-all min-w-0 ${
+              isActive ? 'text-blue-600 font-semibold' : 'text-slate-500'
             }`}
           >
             <div className="relative">
@@ -52,9 +54,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 </span>
               ) : null}
             </div>
-            <span className="text-[11px] mt-1 tracking-tight">{tab.label}</span>
+            <span className="text-[10px] mt-0.5 tracking-tight font-medium truncate">{tab.label}</span>
             {isActive && (
-              <span className="absolute bottom-0 w-8 h-0.5 bg-emerald-500 rounded-full"></span>
+              <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-blue-600 rounded-full" />
             )}
           </Link>
         );

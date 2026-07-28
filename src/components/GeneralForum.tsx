@@ -42,9 +42,7 @@ const formatTimestamp = (isoString: string): string => {
   if (diffMins < 60) return `${diffMins}m ago`;
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) {
-    return date.toLocaleDateString('en-US', { weekday: 'long' });
-  }
+  if (diffDays < 7) return date.toLocaleDateString('en-US', { weekday: 'long' });
   if (diffWeeks === 1) return '1 week ago';
   if (diffWeeks < 4) return `${diffWeeks} weeks ago`;
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -56,14 +54,29 @@ interface LocalMessage extends ForumMessage {
   createdAt: string;
 }
 
+// LocalStorage key based on forum type
+const getStorageKey = (forumType: string, departmentName?: string) => {
+  if (forumType === 'department' && departmentName) {
+    return `forum_messages_dept_${departmentName.replace(/\s+/g, '_')}`;
+  }
+  return 'forum_messages_general';
+};
+
 export const GeneralForum: React.FC<GeneralForumProps> = ({
   currentUser,
   forumType = 'general',
   departmentName,
   customUsername,
 }) => {
-  const [messages, setMessages] = useState<LocalMessage[]>([]);
-  const [initialScrollDone, setInitialScrollDone] = useState(false);
+  const storageKey = getStorageKey(forumType, departmentName);
+  const [messages, setMessages] = useState<LocalMessage[]>(() => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [inputText, setInputText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -72,42 +85,74 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
   const [pendingImage, setPendingImage] = useState<string | null>(null);
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [notificationsEnabled] = useState(() => {
+    return localStorage.getItem('forum_notifications') !== 'false';
+  });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const prevMessageCountRef = useRef<number>(messages.length);
 
   const isStaffBlocked = currentUser?.role === 'staff' && !currentUser?.isForumApproved;
 
   const forumTitle = forumType === 'department' && departmentName
-    ? `${departmentName} Department Forum`
+    ? `${departmentName} Forum`
     : 'HICM General Forum';
 
+  // Persist messages to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(messages));
+    } catch {}
+  }, [messages, storageKey]);
+
+  // Fetch messages from API and merge with local
   const fetchMessages = async () => {
     try {
       const endpoint = forumType === 'department'
         ? `/api/forum?department=${encodeURIComponent(departmentName || '')}`
         : '/api/forum';
       const res = await fetch(endpoint);
+      if (!res.ok) return;
       const data = await res.json();
-      if (data.success && data.data) {
-        setMessages(data.data.map((m: any) => ({ ...m, createdAt: m.createdAt || new Date().toISOString() })));
+      if (data.success && Array.isArray(data.data)) {
+        const serverMsgs: LocalMessage[] = data.data.map((m: any) => ({
+          ...m,
+          createdAt: m.createdAt || new Date().toISOString(),
+        }));
+        setMessages(prev => {
+          // Merge: server messages are source of truth, but preserve local-only messages
+          const serverIds = new Set(serverMsgs.map(m => m.id));
+          const localOnly = prev.filter(m => m.id.startsWith('local-') && !serverIds.has(m.id));
+          const merged = [...serverMsgs, ...localOnly].sort(
+            (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
+          // Play sound if new messages arrived
+          if (merged.length > prevMessageCountRef.current && notificationsEnabled) {
+            const hasNewFromOther = merged.slice(prevMessageCountRef.current).some(
+              m => m.author !== (customUsername || currentUser?.name)
+            );
+            if (hasNewFromOther) playNotificationSound();
+          }
+          prevMessageCountRef.current = merged.length;
+          return merged;
+        });
       }
     } catch {
-      // silently fail
+      // silently fail — local state still shows
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    setIsLoading(true);
     fetchMessages();
     const interval = setInterval(fetchMessages, 5000);
     return () => clearInterval(interval);
   }, [forumType, departmentName]);
-
-  // Removed auto-scroll on mount/update as requested by user
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -160,7 +205,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
     if (!text && !pendingImage && !pendingAudio) return;
 
     const newMsg: LocalMessage = {
-      id: `msg-${Date.now()}`,
+      id: `local-${Date.now()}`,
       author: customUsername || currentUser.name,
       role: currentUser.role,
       text: text || undefined,
@@ -173,8 +218,8 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
         : undefined,
     };
 
-    // Notify the person being replied to
-    if (replyingTo && replyingTo.author !== currentUser.name) {
+    // Play sound for replies
+    if (replyingTo && replyingTo.author !== (customUsername || currentUser.name) && notificationsEnabled) {
       playNotificationSound();
     }
 
@@ -188,14 +233,29 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
     fetch('/api/forum', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text || '', authorId: currentUser.id, imageUrl: newMsg.imageUrl, audioUrl: newMsg.audioUrl }),
+      body: JSON.stringify({
+        text: text || '',
+        authorId: currentUser.id,
+        imageUrl: pendingImage || undefined,
+        audioUrl: pendingAudio || undefined,
+        department: forumType === 'department' ? departmentName : undefined,
+      }),
     })
+      .then(async (res) => {
+        if (res.ok) {
+          const data = await res.json();
+          // Replace local-id with server id if returned
+          if (data.id) {
+            setMessages(prev => prev.map(m => m.id === newMsg.id ? { ...m, id: data.id } : m));
+          }
+        }
+      })
       .catch(() => {})
       .finally(() => setIsSending(false));
   };
 
   return (
-    <div className="max-w-4xl w-full mx-auto space-y-4 pb-20 md:pb-6">
+    <div className="w-full mx-auto space-y-4 pb-20 md:pb-6">
       {isStaffBlocked && (
         <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-700 text-sm font-semibold flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 flex-shrink-0" />
@@ -203,14 +263,19 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
         </div>
       )}
 
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col" style={{ height: '70vh', minHeight: '500px' }}>
+      <div
+        className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col"
+        style={{ height: 'calc(100dvh - 180px)', minHeight: '400px', maxHeight: '80vh' }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 bg-white text-white flex-shrink-0">
+        <div className="flex items-center justify-between px-4 py-3 bg-blue-600 flex-shrink-0">
           <div>
-            <h2 className="text-sm font-bold">{forumTitle}</h2>
-            <p className="text-xs text-black">{messages.length} messages</p>
+            <h2 className="text-sm font-bold text-white">{forumTitle}</h2>
+            <p className="text-xs text-blue-100">{messages.filter(m => !m.deleted).length} messages</p>
           </div>
-          <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" title="Live" />
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" title="Live" />
+          </div>
         </div>
 
         {/* Error */}
@@ -221,14 +286,14 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
           </div>
         )}
 
-        {/* Feed */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
+        {/* Message Feed */}
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-slate-50">
           {isLoading ? (
-            <div className="h-full flex items-center justify-center gap-2 text-black">
+            <div className="h-full flex items-center justify-center gap-2 text-slate-500">
               <Loader className="w-5 h-5 animate-spin" /><span className="text-sm">Loading...</span>
             </div>
-          ) : messages.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-black text-sm">
+          ) : messages.filter(m => !m.deleted || m.deleted).length === 0 ? (
+            <div className="h-full flex items-center justify-center text-slate-500 text-sm">
               No messages yet. Start the discussion!
             </div>
           ) : (
@@ -240,7 +305,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
               if (msg.deleted) {
                 return (
                   <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                    <p className="text-xs text-black italic px-4 py-2 bg-slate-100 rounded-full border border-slate-200">
+                    <p className="text-xs text-slate-400 italic px-4 py-2 bg-slate-100 rounded-full border border-slate-200">
                       This message was deleted
                     </p>
                   </div>
@@ -249,44 +314,44 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
 
               return (
                 <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}>
-                  <div className={`max-w-[80%] md:max-w-lg space-y-1.5 ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
+                  <div className={`max-w-[85%] sm:max-w-md space-y-1.5 ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
                     {/* Reply context */}
                     {msg.replyTo && (
-                      <div className={`flex items-start gap-1 px-3 py-1.5 rounded-xl border text-xs text-black bg-slate-100 border-slate-200 max-w-full ${isMe ? 'self-end' : 'self-start'}`}>
-                        <CornerDownRight className="w-3 h-3 flex-shrink-0 mt-0.5 text-black" />
-                        <span className="font-bold text-black mr-1">{msg.replyTo.author}:</span>
+                      <div className={`flex items-start gap-1 px-3 py-1.5 rounded-xl border text-xs text-slate-600 bg-slate-100 border-slate-200 max-w-full ${isMe ? 'self-end' : 'self-start'}`}>
+                        <CornerDownRight className="w-3 h-3 flex-shrink-0 mt-0.5 text-slate-400" />
+                        <span className="font-bold text-slate-700 mr-1">{msg.replyTo.author}:</span>
                         <span className="truncate">{msg.replyTo.text || '(media)'}</span>
                       </div>
                     )}
 
-                    <div className={`rounded-2xl p-3 shadow-sm ${
+                    <div className={`rounded-2xl px-3 py-2.5 shadow-sm ${
                       isMe
-                        ? 'bg-emerald-500 text-white rounded-br-none'
+                        ? 'bg-blue-600 text-white rounded-br-none'
                         : isStaffMsg
-                        ? 'bg-amber-50 border border-amber-200 text-black rounded-bl-none'
-                        : 'bg-white border border-slate-200 text-black rounded-bl-none'
+                        ? 'bg-amber-50 border border-amber-200 text-slate-900 rounded-bl-none'
+                        : 'bg-white border border-slate-200 text-slate-900 rounded-bl-none'
                     }`}>
-                      <div className={`flex items-center justify-between gap-3 mb-1 text-[10px] ${isMe ? 'text-emerald-100' : 'text-black'}`}>
+                      <div className={`flex items-center justify-between gap-3 mb-1 text-[10px] ${isMe ? 'text-blue-100' : 'text-slate-500'}`}>
                         <span className="font-bold">{msg.author}</span>
                         <span>{formatTimestamp(msg.createdAt)}</span>
                       </div>
-                      {msg.text && <p className="text-sm leading-relaxed">{msg.text}</p>}
-                      {msg.imageUrl && <img src={msg.imageUrl} alt="Shared" className="w-full max-w-xs rounded-xl mt-1 object-cover" />}
-                      {msg.audioUrl && <audio controls src={msg.audioUrl} className="w-full h-8 mt-1" />}
+                      {msg.text && <p className="text-sm leading-relaxed break-words">{msg.text}</p>}
+                      {msg.imageUrl && <img src={msg.imageUrl} alt="Shared" className="w-full max-w-[200px] sm:max-w-xs rounded-xl mt-1 object-cover" />}
+                      {msg.audioUrl && <audio controls src={msg.audioUrl} className="w-full mt-1" style={{ maxWidth: '240px', height: '36px' }} />}
                     </div>
 
-                    {/* Actions */}
-                    <div className={`flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ${isMe ? 'justify-end' : 'justify-start'}`}>
+                    {/* Actions — visible on hover (or always on mobile) */}
+                    <div className={`flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity ${isMe ? 'justify-end' : 'justify-start'} touch:opacity-100`}>
                       <button
                         onClick={() => setReplyingTo(msg)}
-                        className="flex items-center gap-1 text-[10px] text-black hover:text-black px-2 py-0.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                        className="flex items-center gap-1 text-[10px] text-slate-600 hover:text-blue-600 px-2 py-1 rounded-full bg-white border border-slate-200 shadow-sm"
                       >
                         <Reply className="w-3 h-3" /> Reply
                       </button>
                       {isMe && (
                         <button
                           onClick={() => handleDelete(msg.id)}
-                          className="flex items-center gap-1 text-[10px] text-red-400 hover:text-red-600 px-2 py-0.5 rounded-full bg-white border border-red-100 shadow-sm"
+                          className="flex items-center gap-1 text-[10px] text-red-400 hover:text-red-600 px-2 py-1 rounded-full bg-white border border-red-100 shadow-sm"
                         >
                           <Trash2 className="w-3 h-3" /> Delete
                         </button>
@@ -302,12 +367,12 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
 
         {/* Reply strip */}
         {replyingTo && (
-          <div className="px-4 py-2 bg-emerald-50 border-t border-emerald-100 flex items-center justify-between text-xs text-emerald-700 flex-shrink-0">
-            <div className="flex items-center gap-2">
-              <CornerDownRight className="w-3.5 h-3.5" />
-              <span>Replying to <strong>{replyingTo.author}</strong>: {replyingTo.text?.slice(0, 50) || '(media)'}...</span>
+          <div className="px-4 py-2 bg-blue-50 border-t border-blue-100 flex items-center justify-between text-xs text-blue-700 flex-shrink-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <CornerDownRight className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="truncate">Replying to <strong>{replyingTo.author}</strong>: {replyingTo.text?.slice(0, 40) || '(media)'}...</span>
             </div>
-            <button onClick={() => setReplyingTo(null)}><X className="w-3.5 h-3.5" /></button>
+            <button onClick={() => setReplyingTo(null)} className="flex-shrink-0 ml-2"><X className="w-3.5 h-3.5" /></button>
           </div>
         )}
 
@@ -323,8 +388,8 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
               </div>
             )}
             {pendingAudio && (
-              <div className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-xl text-xs text-black">
-                <Mic className="w-3.5 h-3.5 text-emerald-500" /> Voice note ready
+              <div className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-xl text-xs text-slate-700">
+                <Mic className="w-3.5 h-3.5 text-blue-500" /> Voice note ready
                 <button onClick={() => setPendingAudio(null)}><X className="w-3 h-3 text-red-400" /></button>
               </div>
             )}
@@ -332,14 +397,23 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
         )}
 
         {/* Input Bar */}
-        <form onSubmit={handleSubmit} className="px-3 py-3 bg-white border-t border-slate-200 flex gap-2 items-center flex-shrink-0">
+        <form onSubmit={handleSubmit} className="px-2 sm:px-3 py-3 bg-white border-t border-slate-200 flex gap-2 items-center flex-shrink-0">
           <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageSelect} className="hidden" />
-          <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isStaffBlocked}
-            className="p-2.5 text-black hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors disabled:opacity-40" title="Attach photo">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isStaffBlocked}
+            className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors disabled:opacity-40 flex-shrink-0"
+            title="Attach photo"
+          >
             <ImageIcon className="w-4 h-4" />
           </button>
-          <button type="button" onClick={isRecording ? stopRecording : startRecording} disabled={isStaffBlocked}
-            className={`p-2.5 rounded-xl transition-colors disabled:opacity-40 ${isRecording ? 'text-red-500 bg-red-50 animate-pulse' : 'text-black hover:text-emerald-600 hover:bg-emerald-50'}`}>
+          <button
+            type="button"
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={isStaffBlocked}
+            className={`p-2.5 rounded-xl transition-colors disabled:opacity-40 flex-shrink-0 ${isRecording ? 'text-red-500 bg-red-50 animate-pulse' : 'text-slate-500 hover:text-blue-600 hover:bg-blue-50'}`}
+          >
             {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
           </button>
           <input
@@ -348,11 +422,13 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
             onChange={(e) => { setInputText(e.target.value); if (errorMessage) setErrorMessage(''); }}
             disabled={!currentUser || isSending || isStaffBlocked}
             placeholder={isStaffBlocked ? 'Forum access pending...' : `Message ${forumTitle}...`}
-            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 placeholder:text-black disabled:opacity-50"
+            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 placeholder:text-slate-400 disabled:opacity-50 min-w-0"
           />
-          <button type="submit"
+          <button
+            type="submit"
             disabled={(!inputText.trim() && !pendingImage && !pendingAudio) || !currentUser || isSending || isStaffBlocked}
-            className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 text-black font-bold rounded-xl text-sm transition-colors flex items-center gap-1.5">
+            className="p-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white font-bold rounded-xl text-sm transition-colors flex items-center gap-1.5 flex-shrink-0"
+          >
             {isSending ? <Loader className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </button>
         </form>
