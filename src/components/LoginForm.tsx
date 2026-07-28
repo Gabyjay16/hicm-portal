@@ -455,7 +455,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                       autoComplete="current-password"
                       value={loginSecret}
                       onChange={(e) => setLoginSecret(e.target.value)}
-                      placeholder="UBa26C0001 or password"
+                      placeholder="••••••••"
                       className={`${inputCls} pl-11 font-mono tracking-wider`}
                     />
                   </div>
