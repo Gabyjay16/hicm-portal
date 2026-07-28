@@ -81,15 +81,20 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center space-x-6 text-sm font-bold text-slate-900">
         <Link 
           to={getHomePath()} 
-          className="hidden md:flex items-center space-x-1.5 hover:text-blue-600 transition-colors text-slate-500"
+          className="hidden md:flex items-center space-x-1.5 hover:text-blue-600 transition-colors text-black"
         >
           <Home className="w-4 h-4 text-blue-500" />
           <span>Home</span>
         </Link>
         
         <Link 
-          to="/student/forum" 
-          className="hidden md:flex items-center space-x-1.5 hover:text-blue-600 transition-colors text-slate-500"
+          to={user?.role === 'admin' ? '/admin/forum' : user?.role === 'staff' ? '/staff/forum' : '/student/forum'} 
+          className="hidden md:flex items-center space-x-1.5 hover:text-blue-600 transition-colors text-black"
+          onClick={() => {
+            setTimeout(() => {
+              window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            }, 100);
+          }}
         >
           <MessageSquare className="w-4 h-4 text-blue-500" />
           <span>Forum</span>

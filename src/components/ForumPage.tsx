@@ -18,7 +18,7 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
     }
   }, [currentUser]);
 
-  const [adminDept, setAdminDept] = useState('Business Administration');
+  const [adminDept, setAdminDept] = useState('Money and Banking');
 
   const dept = currentUser?.role === 'admin' ? adminDept : (currentUser?.department || 'General');
   const isAdmin = currentUser?.role === 'admin';
@@ -54,7 +54,7 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
           <button
             onClick={() => setActiveTab('general')}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              activeTab === 'general' ? 'bg-white shadow text-black' : 'text-slate-600 hover:text-black'
+              activeTab === 'general' ? 'bg-white shadow text-black' : 'text-black hover:bg-slate-200'
             }`}
           >
             <Users className="w-4 h-4" /> General Forum
@@ -62,7 +62,7 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
           <button
             onClick={() => setActiveTab('department')}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              activeTab === 'department' ? 'bg-white shadow text-black' : 'text-slate-600 hover:text-black'
+              activeTab === 'department' ? 'bg-white shadow text-black' : 'text-black hover:bg-slate-200'
             }`}
           >
             <GraduationCap className="w-4 h-4" /> {isAdmin ? 'Dept Forums' : `${dept} Forum`}
@@ -75,12 +75,12 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
             onChange={(e) => setAdminDept(e.target.value)}
             className="px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-black focus:outline-none focus:border-blue-500 shadow-sm"
           >
-            <option value="Business Administration">Business Administration</option>
-            <option value="Human Resources">Human Resources</option>
+            <option value="Money and Banking">Money &amp; Banking</option>
+            <option value="Accounting and Finance">Accounting &amp; Finance</option>
+            <option value="Organizational Sciences">Org. Sciences</option>
+            <option value="Management">Management</option>
+            <option value="Insurance and Security">Insurance &amp; Security</option>
             <option value="Marketing">Marketing</option>
-            <option value="Accounting">Accounting</option>
-            <option value="Finance">Finance</option>
-            <option value="Counselling">Counselling</option>
           </select>
         )}
       </div>

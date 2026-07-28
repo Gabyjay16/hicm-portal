@@ -464,7 +464,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
             {user?.role !== 'admin' && (
               <button 
                 onClick={() => setViewMode('my_complaints')}
-                className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+                className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-black hover:bg-slate-50 transition-colors shadow-sm"
               >
                 My Complaints
               </button>
@@ -472,7 +472,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
             {user?.role === 'admin' && (
               <button 
                 onClick={() => navigate(-1)}
-                className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+                className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-black hover:bg-slate-50 transition-colors shadow-sm"
               >
                 Dashboard
               </button>
@@ -484,17 +484,17 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col md:flex-row">
             <div className="md:w-1/2 p-6 border-b md:border-b-0 md:border-r border-slate-100 space-y-6">
               <div>
-                <button onClick={() => setSelectedComplaint(null)} className="text-xs text-slate-500 flex items-center gap-1 hover:text-blue-600 mb-4 transition-colors">
+                <button onClick={() => setSelectedComplaint(null)} className="text-xs text-black font-bold flex items-center gap-1 hover:text-blue-600 mb-4 transition-colors">
                   <ArrowLeft className="w-4 h-4" /> Back to list
                 </button>
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-bold text-slate-900">{selectedComplaint.subject}</h3>
+                  <h3 className="text-xl font-bold text-black">{selectedComplaint.subject}</h3>
                   {getStatusBadge(selectedComplaint.status)}
                 </div>
-                <div className="flex items-center gap-3 text-sm text-slate-600 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                  <div className="flex items-center gap-1.5"><UserIcon className="w-4 h-4 text-slate-400" /> <span className="font-medium">{selectedComplaint.studentName}</span></div>
-                  <div className="w-1 h-1 bg-slate-300 rounded-full" />
-                  <span className="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200">{selectedComplaint.matricule}</span>
+                <div className="flex items-center gap-3 text-sm text-black mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-1.5"><UserIcon className="w-4 h-4 text-black" /> <span className="font-bold text-black">{selectedComplaint.studentName}</span></div>
+                  <div className="w-1 h-1 bg-black rounded-full" />
+                  <span className="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200 text-black">{selectedComplaint.matricule}</span>
                 </div>
               </div>
               
@@ -526,24 +526,24 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
             
             <div className="md:w-1/2 p-6 bg-slate-50 flex flex-col justify-between">
               <div className="space-y-4">
-                <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                <h4 className="text-sm font-bold text-black uppercase tracking-wide flex items-center gap-2">
                   <MessageSquare className="w-4 h-4" /> Administration
                 </h4>
                 
                 {/* Exam Code Section */}
                 <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-2">
-                  <label className="block text-xs font-bold text-slate-700 mb-2">Exam Code (Optional)</label>
+                  <label className="block text-xs font-bold text-black mb-2">Exam Code (Optional)</label>
                   <div className="flex gap-2">
                     <input
                       type="text"
                       placeholder="e.g. EC-1029"
                       value={examCodeInput}
                       onChange={(e) => setExamCodeInput(e.target.value)}
-                      className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                      className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-black"
                     />
                     <button 
                       onClick={() => handleSaveExamCode(selectedComplaint.id)}
-                      className="px-3 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-lg hover:bg-slate-200 transition-colors border border-slate-200"
+                      className="px-3 py-2 bg-slate-100 text-black font-bold text-xs rounded-lg hover:bg-slate-200 transition-colors border border-slate-200"
                     >
                       Save
                     </button>
@@ -589,9 +589,9 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
             {Object.entries(groupedComplaints).map(([groupName, groupItems]) => (
               <div key={groupName} className="space-y-3">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                  <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
-                    <Filter className="w-5 h-5 text-slate-400" />
-                    {groupName} <span className="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full">{groupItems.length}</span>
+                  <h3 className="font-bold text-black text-lg flex items-center gap-2">
+                    <Filter className="w-5 h-5 text-black" />
+                    {groupName} <span className="bg-slate-200 text-black text-xs font-bold px-2 py-0.5 rounded-full">{groupItems.length}</span>
                   </h3>
                   <button 
                     onClick={() => handleExportCSV(groupName)} 
@@ -601,31 +601,48 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
                   </button>
                 </div>
                 {groupItems.length === 0 ? (
-                   <p className="text-sm text-slate-500 py-4 italic">No complaints found in this group.</p>
+                   <p className="text-sm text-black py-4 italic font-medium">No complaints found in this group.</p>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {groupItems.map((comp) => (
-                      <div 
-                        key={comp.id} 
-                        onClick={() => setSelectedComplaint(comp)}
-                        className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-blue-300 hover:shadow-md cursor-pointer transition-all flex flex-col h-full group"
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <p className="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">{comp.subject}</p>
-                          {getStatusBadge(comp.status)}
-                        </div>
-                        <div className="flex-1 space-y-1 mb-4">
-                          <p className="text-xs font-semibold text-slate-700">{comp.studentName}</p>
-                          <p className="text-xs text-slate-500 font-mono">{comp.matricule}</p>
-                          {comp.description?.includes('attachedFile') && (
-                            <p className="text-[10px] font-bold text-blue-500 flex items-center gap-1 mt-2">
-                              <Paperclip className="w-3 h-3" /> File Attached
-                            </p>
-                          )}
-                        </div>
-                        <p className="text-[10px] text-slate-400 font-medium">{new Date(comp.createdAt).toLocaleDateString()}</p>
-                      </div>
-                    ))}
+                  <div className="overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-sm">
+                    <table className="w-full text-left text-sm text-black">
+                      <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase font-bold text-black">
+                        <tr>
+                          <th className="px-4 py-3">Student</th>
+                          <th className="px-4 py-3">Matricule</th>
+                          <th className="px-4 py-3">Subject</th>
+                          <th className="px-4 py-3">Status</th>
+                          <th className="px-4 py-3">Date & Time</th>
+                          <th className="px-4 py-3 text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {groupItems.map((comp) => (
+                          <tr 
+                            key={comp.id} 
+                            onClick={() => setSelectedComplaint(comp)}
+                            className="hover:bg-blue-50 cursor-pointer transition-colors"
+                          >
+                            <td className="px-4 py-3 font-bold text-black">{comp.studentName}</td>
+                            <td className="px-4 py-3 font-mono text-xs text-black">{comp.matricule}</td>
+                            <td className="px-4 py-3 font-medium text-black">
+                              <div className="flex items-center gap-2">
+                                <span>{comp.subject}</span>
+                                {comp.description?.includes('attachedFile') && (
+                                  <Paperclip className="w-3 h-3 text-blue-500" />
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">{getStatusBadge(comp.status)}</td>
+                            <td className="px-4 py-3 text-xs font-medium text-black">
+                              {new Date(comp.createdAt).toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <button className="text-xs font-bold text-blue-700 hover:underline">View</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 )}
               </div>
