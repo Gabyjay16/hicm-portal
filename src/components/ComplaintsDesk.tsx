@@ -224,8 +224,13 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
     setTimeout(() => setSuccessMsg(''), 3000);
   };
 
-  const handleExportCSV = () => {
-    const itemsToExport = Object.values(groupedComplaints).flat();
+  const handleExportCSV = (targetGroup?: string) => {
+    let itemsToExport = [];
+    if (targetGroup && groupedComplaints[targetGroup]) {
+      itemsToExport = groupedComplaints[targetGroup];
+    } else {
+      itemsToExport = Object.values(groupedComplaints).flat();
+    }
 
     const headers = ['ID', 'Student Name', 'Matricule', 'Subject', 'Status', 'Date', 'Exam Code', 'Course Name', 'Course Code', 'CA Mark', 'Description'];
     const rows = itemsToExport.map(c => {
@@ -453,8 +458,8 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
               <option value="courseCode">Group by Course Code</option>
               <option value="noMark">Filter: No CA Mark</option>
             </select>
-            <button onClick={handleExportCSV} className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-2">
-              <Download className="w-4 h-4" /> Export
+            <button onClick={() => handleExportCSV()} className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-2">
+              <Download className="w-4 h-4" /> Export All
             </button>
             {user?.role !== 'admin' && (
               <button 
@@ -583,10 +588,18 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
           <div className="space-y-8">
             {Object.entries(groupedComplaints).map(([groupName, groupItems]) => (
               <div key={groupName} className="space-y-3">
-                <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2 border-b border-slate-200 pb-2">
-                  <Filter className="w-5 h-5 text-slate-400" />
-                  {groupName} <span className="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full">{groupItems.length}</span>
-                </h3>
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                    <Filter className="w-5 h-5 text-slate-400" />
+                    {groupName} <span className="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full">{groupItems.length}</span>
+                  </h3>
+                  <button 
+                    onClick={() => handleExportCSV(groupName)} 
+                    className="px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5"
+                  >
+                    <Download className="w-3.5 h-3.5" /> Export Group
+                  </button>
+                </div>
                 {groupItems.length === 0 ? (
                    <p className="text-sm text-slate-500 py-4 italic">No complaints found in this group.</p>
                 ) : (
