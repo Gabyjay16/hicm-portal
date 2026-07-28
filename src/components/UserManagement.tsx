@@ -13,9 +13,9 @@ const MOCK_STUDENTS = [
 ];
 
 const MOCK_STAFF = [
-  { id: 'stf-001', name: 'Dr. Samuel Ngwa', staffCode: 'STF-123', department: 'Business Administration', role: 'Lecturer', status: 'Active', isForumApproved: false, joinDate: '2020-01-15', email: 's.ngwa@staff.hicm.edu', canManageComplaints: false },
-  { id: 'stf-002', name: 'Prof. Amina Bello', staffCode: 'STF-456', department: 'Human Resources', role: 'Professor', status: 'Active', isForumApproved: true, joinDate: '2018-08-20', email: 'a.bello@staff.hicm.edu', canManageComplaints: true },
-  { id: 'stf-003', name: 'Ms. Grace Okafor', staffCode: 'STF-789', department: 'Counselling', role: 'Counsellor', status: 'Active', isForumApproved: true, joinDate: '2021-03-10', email: 'g.okafor@staff.hicm.edu', canManageComplaints: false },
+  { id: 'stf-001', name: 'Dr. Samuel Ngwa', staffCode: 'STF-123', department: 'Business Administration', role: 'Lecturer', status: 'Active', isForumApproved: false, joinDate: '2020-01-15', email: 's.ngwa@staff.hicm.edu', canManageComplaints: false, canViewAllForums: false, canUpdateAnnouncements: false, canVerifyMatricules: false, canViewAllStudents: false },
+  { id: 'stf-002', name: 'Prof. Amina Bello', staffCode: 'STF-456', department: 'Human Resources', role: 'Professor', status: 'Active', isForumApproved: true, joinDate: '2018-08-20', email: 'a.bello@staff.hicm.edu', canManageComplaints: true, canViewAllForums: false, canUpdateAnnouncements: false, canVerifyMatricules: false, canViewAllStudents: false },
+  { id: 'stf-003', name: 'Ms. Grace Okafor', staffCode: 'STF-789', department: 'Counselling', role: 'Counsellor', status: 'Active', isForumApproved: true, joinDate: '2021-03-10', email: 'g.okafor@staff.hicm.edu', canManageComplaints: false, canViewAllForums: false, canUpdateAnnouncements: false, canVerifyMatricules: false, canViewAllStudents: false },
 ];
 
 type Tab = 'students' | 'staff';
@@ -251,6 +251,42 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
                             >
                               {staff.canManageComplaints ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-black" />}
                               Can Manage Complaints
+                            </button>
+                            <button
+                              onClick={() => {
+                                setStaffList(prev => prev.map(s => s.id === staff.id ? { ...s, canViewAllForums: !s.canViewAllForums } : s));
+                              }}
+                              className="flex items-center gap-2 text-sm text-black"
+                            >
+                              {staff.canViewAllForums ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-black" />}
+                              Full Forum Access
+                            </button>
+                            <button
+                              onClick={() => {
+                                setStaffList(prev => prev.map(s => s.id === staff.id ? { ...s, canUpdateAnnouncements: !s.canUpdateAnnouncements } : s));
+                              }}
+                              className="flex items-center gap-2 text-sm text-black"
+                            >
+                              {staff.canUpdateAnnouncements ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-black" />}
+                              Manage Announcements
+                            </button>
+                            <button
+                              onClick={() => {
+                                setStaffList(prev => prev.map(s => s.id === staff.id ? { ...s, canVerifyMatricules: !s.canVerifyMatricules } : s));
+                              }}
+                              className="flex items-center gap-2 text-sm text-black"
+                            >
+                              {staff.canVerifyMatricules ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-black" />}
+                              Verify Matricules
+                            </button>
+                            <button
+                              onClick={() => {
+                                setStaffList(prev => prev.map(s => s.id === staff.id ? { ...s, canViewAllStudents: !s.canViewAllStudents } : s));
+                              }}
+                              className="flex items-center gap-2 text-sm text-black"
+                            >
+                              {staff.canViewAllStudents ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-black" />}
+                              View All Students
                             </button>
                           </div>
                         </div>

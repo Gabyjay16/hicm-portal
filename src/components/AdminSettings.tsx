@@ -12,11 +12,15 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
   const [localSettings, setLocalSettings] = useState<AdminSettingsConfig>(settings);
   const [isSaved, setIsSaved] = useState(false);
   const [rawMatricules, setRawMatricules] = useState(settings.validMatricules.join('\n'));
+  const [adminPassword, setAdminPassword] = useState('');
 
   const handleSave = () => {
     const matricules = rawMatricules.split('\n').map(m => m.trim()).filter(m => m.length > 0);
     const newSettings = { ...localSettings, validMatricules: matricules };
     onUpdateSettings(newSettings);
+    if (adminPassword) {
+      localStorage.setItem('admin_password', adminPassword);
+    }
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 3000);
   };
@@ -177,7 +181,29 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
         )}
       </div>
 
-      <div className="flex justify-end">
+      {/* Change Password */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mt-6">
+        <div className="p-5 border-b border-slate-100 flex items-center gap-3">
+          <div className="p-2 bg-slate-50 rounded-lg text-slate-600"><Settings className="w-5 h-5 text-black" /></div>
+          <div>
+            <h2 className="text-sm font-bold text-black">Admin Password</h2>
+            <p className="text-xs text-black">Change the system admin password (default: admin123).</p>
+          </div>
+        </div>
+        <div className="p-6">
+          <label className="block text-xs font-medium text-black mb-1">New Password</label>
+          <input
+            type="password"
+            value={adminPassword}
+            onChange={e => setAdminPassword(e.target.value)}
+            placeholder="Enter new admin password"
+            className="w-full md:w-1/2 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 font-bold"
+          />
+          <p className="text-xs text-black mt-2">Leave blank to keep the current password. You will use this password to log in as Admin.</p>
+        </div>
+      </div>
+
+      <div className="flex justify-end mt-6">
         <button
           onClick={handleSave}
           className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-xl flex items-center gap-2 transition-colors shadow-lg"

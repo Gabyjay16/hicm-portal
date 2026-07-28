@@ -16,6 +16,8 @@ export interface User {
   joinDate?: string;
   canUpdateAnnouncements?: boolean;
   canViewAllForums?: boolean;
+  canVerifyMatricules?: boolean;
+  canViewAllStudents?: boolean;
   customUsername?: string;
   showAvatarInForum?: boolean;
   canManageComplaints?: boolean;

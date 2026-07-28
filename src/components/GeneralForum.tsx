@@ -63,6 +63,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
   customUsername,
 }) => {
   const [messages, setMessages] = useState<LocalMessage[]>([]);
+  const [initialScrollDone, setInitialScrollDone] = useState(false);
   const [inputText, setInputText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -107,8 +108,12 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
   }, [forumType, departmentName]);
 
   useEffect(() => {
+    if (currentUser?.role === 'admin' && !initialScrollDone && messages.length > 0) {
+      setInitialScrollDone(true);
+      return;
+    }
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, currentUser?.role, initialScrollDone]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

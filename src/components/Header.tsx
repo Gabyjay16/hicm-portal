@@ -90,11 +90,6 @@ export const Header: React.FC<HeaderProps> = ({
         <Link 
           to={user?.role === 'admin' ? '/admin/forum' : user?.role === 'staff' ? '/staff/forum' : '/student/forum'} 
           className="hidden md:flex items-center space-x-1.5 hover:text-blue-600 transition-colors text-black"
-          onClick={() => {
-            setTimeout(() => {
-              window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            }, 100);
-          }}
         >
           <MessageSquare className="w-4 h-4 text-blue-500" />
           <span>Forum</span>
