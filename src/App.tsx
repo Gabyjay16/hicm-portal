@@ -21,11 +21,13 @@ import { ComplaintsDesk } from './components/ComplaintsDesk';
 import { LostAndFound } from './components/LostAndFound';
 import { ElectionsView } from './components/ElectionsView';
 import { TokenRequestsAdmin } from './components/TokenRequestsAdmin';
-import { RequestDocuments } from './components/RequestDocuments';
+import { RequestsHub } from './components/RequestsHub';
 import { UserManagement } from './components/UserManagement';
 import { PlagiarismCodeLookup } from './components/PlagiarismCodeLookup';
 import { AdminSettings } from './components/AdminSettings';
 import { AdminAnnouncementsManager } from './components/AdminAnnouncementsManager';
+import { AdminElections } from './components/AdminElections';
+import { StudentSettings } from './components/StudentSettings';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -109,13 +111,15 @@ export default function App() {
           <Route path="complaints" element={<ComplaintsDesk user={user} adminMode="none" />} />
           <Route path="lost-and-found" element={<LostAndFound user={user} />} />
           <Route path="elections" element={<ElectionsView user={user} />} />
-          <Route path="request-documents" element={<RequestDocuments user={user} />} />
+          <Route path="requests" element={<RequestsHub user={user} />} />
+          <Route path="settings" element={<StudentSettings user={user} />} />
         </Route>
 
         {/* Staff Routes */}
         <Route path="/staff" element={<StaffLayout user={user} onLogout={handleLogout} onUpdateUser={handleUpdateUser} />}>
-          <Route path="dashboard" element={<StaffDashboard />} />
+          <Route path="dashboard" element={<StaffDashboard user={user} />} />
           <Route path="plagiarism-lookup" element={<PlagiarismCodeLookup />} />
+          <Route path="elections" element={<AdminElections />} />
         </Route>
 
         {/* Admin Routes */}
@@ -127,6 +131,7 @@ export default function App() {
           <Route path="complaint-fields" element={<ComplaintsDesk user={user} adminMode="fields" />} />
           <Route path="forum" element={<ForumPage currentUser={user} />} />
           <Route path="content" element={<AdminAnnouncementsManager />} />
+          <Route path="elections" element={<AdminElections />} />
           <Route path="settings" element={
             <AdminSettings 
               settings={adminSettings} 

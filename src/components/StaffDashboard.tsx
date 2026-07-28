@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Clock, ArrowRight, Activity, HeartHandshake, Bell } from 'lucide-react';
+import { User } from '../types';
 import { useNavigate } from 'react-router-dom';
 
 // Simulated incoming counselling notifications
@@ -8,7 +9,11 @@ const MOCK_COUNSELLING_REQUESTS = [
   { id: 'csess-002', displayName: 'Paul Nkemdirim', mode: 'in_person', requestedAt: '2026-07-27T19:15:00Z' },
 ];
 
-export const StaffDashboard: React.FC = () => {
+interface StaffDashboardProps {
+  user: User | null;
+}
+
+export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user }) => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({ notesCount: 0, evaluationsCount: 0 });
   const [isLoading, setIsLoading] = useState(true);
@@ -166,6 +171,25 @@ export const StaffDashboard: React.FC = () => {
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
+
+        {user?.canManageElections && (
+          <div className="bg-white border border-emerald-200 rounded-2xl p-5 shadow-sm group hover:border-emerald-400 transition-all">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-500 border border-emerald-100">
+                <FileText className="w-5 h-5" />
+              </div>
+              <h3 className="text-base font-bold text-black">Elections & Voting</h3>
+            </div>
+            <p className="text-sm text-black mb-5">Review student ballot applications and monitor election results.</p>
+            <button
+              onClick={() => navigate('/staff/elections')}
+              className="w-full flex items-center justify-center space-x-2 py-2.5 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors text-sm font-bold"
+            >
+              <span>Manage Elections</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

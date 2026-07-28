@@ -14,23 +14,36 @@ export const ElectionsView: React.FC<ElectionsViewProps> = ({ user }) => {
   const [message, setMessage] = useState('');
   const [isVoting, setIsVoting] = useState(false);
 
-  const fetchElections = async () => {
-    if (!user) return;
-    try {
-      const res = await fetch(`/api/elections?studentId=${user.id}`);
-      const data = await res.json();
-      if (data.success) {
-        setElections(data.data);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchElections();
+    // Mocking elections data
+    setTimeout(() => {
+      setElections([
+        {
+          id: 'election-1',
+          title: 'HICMSA General Elections 2026',
+          description: 'Vote for your next student government representatives.',
+          status: 'active',
+          hasVoted: false,
+          candidates: [
+            {
+              id: 'c1',
+              studentName: 'John Doe',
+              position: 'President',
+              manifesto: 'I will fight for better internet on campus and extended library hours.',
+              avatarUrl: 'https://i.pravatar.cc/150?img=11',
+            },
+            {
+              id: 'c2',
+              studentName: 'Sarah Connor',
+              position: 'President',
+              manifesto: 'Focusing on student welfare and more networking events.',
+              avatarUrl: 'https://i.pravatar.cc/150?img=5',
+            }
+          ]
+        }
+      ]);
+      setIsLoading(false);
+    }, 800);
   }, [user]);
 
   const handleVote = async (electionId: string, candidateId: string) => {
@@ -38,28 +51,11 @@ export const ElectionsView: React.FC<ElectionsViewProps> = ({ user }) => {
     setIsVoting(true);
     setMessage('');
     
-    try {
-      const res = await fetch('/api/elections', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          electionId,
-          candidateId,
-          voterId: user.id
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setMessage('Your vote has been cast successfully.');
-        fetchElections();
-      } else {
-        setMessage(data.error || 'Failed to cast vote.');
-      }
-    } catch (err) {
-      setMessage('Network error occurred.');
-    } finally {
+    setTimeout(() => {
+      setMessage('Your vote has been cast successfully.');
+      setElections(prev => prev.map(e => e.id === electionId ? { ...e, hasVoted: true } : e));
       setIsVoting(false);
-    }
+    }, 1000);
   };
 
   return (
@@ -129,13 +125,21 @@ export const ElectionsView: React.FC<ElectionsViewProps> = ({ user }) => {
                           : 'bg-white border-slate-200 hover:border-purple-500/40 transition-colors'
                       }`}>
                         <div>
-                          <div className="flex items-center space-x-2">
-                            <Users className="w-4 h-4 text-purple-400" />
-                            <h4 className="text-sm font-bold text-black">{candidate.studentName}</h4>
+                          <div className="flex items-center space-x-3">
+                            {candidate.avatarUrl ? (
+                              <img src={candidate.avatarUrl} alt={candidate.studentName} className="w-10 h-10 rounded-full object-cover border border-slate-200" />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
+                                <Users className="w-5 h-5 text-purple-400" />
+                              </div>
+                            )}
+                            <div>
+                              <h4 className="text-sm font-bold text-black">{candidate.studentName}</h4>
+                              <p className="text-[10px] text-purple-400 font-bold uppercase tracking-wider mt-0.5">{candidate.position}</p>
+                            </div>
                           </div>
-                          <p className="text-[10px] text-purple-400 font-bold uppercase tracking-wider mt-1">{candidate.position}</p>
                           {candidate.manifesto && (
-                            <p className="text-xs text-black mt-2 line-clamp-3">{candidate.manifesto}</p>
+                            <p className="text-xs text-black mt-3 line-clamp-3 leading-relaxed">{candidate.manifesto}</p>
                           )}
                         </div>
                         

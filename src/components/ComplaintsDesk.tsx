@@ -32,7 +32,7 @@ const defaultFormConfigs: ComplaintFormConfig[] = [
       },
       { id: 'natureOthers', label: 'Others (Briefly State)', type: 'text', placeholder: 'If others, specify here...' },
       { id: 'academicYear', label: 'Academic Year', type: 'text', placeholder: 'e.g. 2025/2026' },
-      { id: 'semester', label: 'Semester', type: 'select', options: ['First Semester', 'Second Semester'] },
+      { id: 'semester', label: 'Semester', type: 'select', options: ['First Semester', 'Second Semester', 'Resit'] },
       { id: 'caMark', label: 'CA Mark', type: 'text', placeholder: 'e.g. 15' },
       { id: 'examMark', label: 'Exam/Resit Mark', type: 'text', placeholder: 'e.g. 0 (Zero)' },
       { id: 'courseCode', label: 'Course Code', type: 'text', placeholder: 'e.g. MGTC 3218' },
@@ -184,6 +184,13 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
       default: return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-600 border border-red-200">Pending</span>;
     }
   };
+
+    const handleDeleteComplaint = (id: string) => {
+      if (confirm('Are you sure you want to delete this complaint?')) {
+        setAllComplaints(prev => prev.filter(c => c.id !== id));
+        if (selectedComplaint?.id === id) setSelectedComplaint(null);
+      }
+    };
 
   const handleResolveComplaint = (id: string, status: string) => {
     setAllComplaints(prev => prev.map(c => 
@@ -615,7 +622,16 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
                               {new Date(comp.createdAt).toLocaleString()}
                             </td>
                             <td className="px-4 py-3 text-right">
-                              <button className="text-xs font-bold text-blue-700 hover:underline">View</button>
+                              <div className="flex items-center justify-end gap-3">
+                                <button onClick={(e) => { e.stopPropagation(); setSelectedComplaint(comp); }} className="text-xs font-bold text-blue-700 hover:underline">View</button>
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); handleDeleteComplaint(comp.id); }} 
+                                  className="text-red-500 hover:text-red-700 transition-colors"
+                                  title="Delete Complaint"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -718,7 +734,18 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
                   <div key={comp.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 hover:border-slate-300 transition-colors">
                     <div className="flex items-start justify-between gap-4">
                       <p className="text-sm font-bold text-slate-900 leading-snug">{comp.subject}</p>
-                      <div className="flex-shrink-0">{getStatusBadge(comp.status)}</div>
+                      <div className="flex-shrink-0 flex items-center gap-2">
+                        {getStatusBadge(comp.status)}
+                        {comp.status === 'pending' && (
+                          <button 
+                            onClick={() => handleDeleteComplaint(comp.id)}
+                            className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1 rounded transition-colors"
+                            title="Delete Complaint"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     {comp.adminResponse && (
                       <div className="p-3 bg-white border border-emerald-100 rounded-lg shadow-sm">

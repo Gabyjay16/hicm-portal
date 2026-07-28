@@ -18,7 +18,7 @@ interface AccordionNavProps {
 
 export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({
-    academics: true,
+    academics: false,
     services: false,
     campus: false,
   });
@@ -47,7 +47,7 @@ export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
       items: [
         { id: 'complaints', label: 'Complaints Desk', icon: HeartHandshake },
         { id: 'lost-and-found', label: 'Lost & Found', icon: MapPin },
-        { id: 'request-documents', label: 'Request Document', icon: Search },
+        { id: 'requests', label: 'Requests', icon: Search },
       ],
     },
     {

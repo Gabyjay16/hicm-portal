@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Users, GraduationCap, ChevronDown, ChevronUp, User as UserIcon, ShieldAlert, CheckSquare, Square } from 'lucide-react';
-import { AdminSettingsConfig } from '../types';
+import { AdminSettingsConfig, User } from '../types';
 
 // Mock data for demo
 const MOCK_STUDENTS = [
@@ -24,14 +24,14 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
   const [activeTab, setActiveTab] = useState<Tab>('students');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [students, setStudents] = useState(MOCK_STUDENTS);
-  const [staffList, setStaffList] = useState(MOCK_STAFF);
+  const [students, setStudents] = useState<User[]>(MOCK_STUDENTS as unknown as User[]);
+  const [staffList, setStaffList] = useState<User[]>(MOCK_STAFF as unknown as User[]);
 
   // Update students if matricules are enforced
   React.useEffect(() => {
     if (adminSettings?.matriculeVerificationEnabled && adminSettings.validMatricules.length > 0) {
       setStudents(prev => prev.map(s => {
-        if (!adminSettings.validMatricules.includes(s.matricNo)) {
+        if (s.matricNo && !adminSettings.validMatricules.includes(s.matricNo)) {
           return { ...s, status: 'Suspended (Invalid Matricule)' };
         } else if (s.status === 'Suspended (Invalid Matricule)') {
           return { ...s, status: 'Active' };
@@ -39,20 +39,20 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
         return s;
       }));
     }
-  }, [adminSettings]);
+  }, [adminSettings?.matriculeVerificationEnabled, adminSettings?.validMatricules]);
 
   const filteredStudents = students.filter(
     (s) =>
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.matricNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.department.toLowerCase().includes(searchQuery.toLowerCase())
+      (s.matricNo && s.matricNo.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (s.department && s.department.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const filteredStaff = staffList.filter(
     (s) =>
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.staffCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.department.toLowerCase().includes(searchQuery.toLowerCase())
+      (s.staffCode && s.staffCode.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (s.department && s.department.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const toggleExpand = (id: string) => {
@@ -128,11 +128,11 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold text-black truncate">{student.name}</p>
-                        <p className="text-xs text-black">{student.matricNo} · {student.department}</p>
+                        <p className="text-xs text-black">{student.matricNo || 'N/A'} · {student.department || 'N/A'}</p>
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
                         <span className="text-xs text-black hidden sm:block">{student.level}</span>
-                        {statusBadge(student.status)}
+                        {statusBadge(student.status || '')}
                         {isExpanded ? <ChevronUp className="w-4 h-4 text-black" /> : <ChevronDown className="w-4 h-4 text-black" />}
                       </div>
                     </button>
@@ -185,6 +185,15 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
                               {student.canManageComplaints ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-black" />}
                               Can Manage Complaints
                             </button>
+                            <button
+                              onClick={() => {
+                                setStudents(prev => prev.map(s => s.id === student.id ? { ...s, hasVotingPermit: !s.hasVotingPermit } : s));
+                              }}
+                              className="flex items-center gap-2 text-sm text-black"
+                            >
+                              {student.hasVotingPermit ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-black" />}
+                              Voting Permit
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -218,7 +227,7 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold hidden sm:block ${
                           staff.isForumApproved ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
                         }`}>{staff.isForumApproved ? 'Forum Approved' : 'Pending Forum'}</span>
-                        {statusBadge(staff.status)}
+                        {statusBadge(staff.status || '')}
                         {isExpanded ? <ChevronUp className="w-4 h-4 text-black" /> : <ChevronDown className="w-4 h-4 text-black" />}
                       </div>
                     </button>
@@ -287,6 +296,15 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
                             >
                               {staff.canViewAllStudents ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-black" />}
                               View All Students
+                            </button>
+                            <button
+                              onClick={() => {
+                                setStaffList(prev => prev.map(s => s.id === staff.id ? { ...s, canManageElections: !s.canManageElections } : s));
+                              }}
+                              className="flex items-center gap-2 text-sm text-black"
+                            >
+                              {staff.canManageElections ? <CheckSquare className="w-5 h-5 text-emerald-500" /> : <Square className="w-5 h-5 text-black" />}
+                              Manage Elections
                             </button>
                           </div>
                         </div>

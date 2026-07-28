@@ -21,6 +21,8 @@ export interface User {
   customUsername?: string;
   showAvatarInForum?: boolean;
   canManageComplaints?: boolean;
+  canManageElections?: boolean;
+  hasVotingPermit?: boolean;
 }
 
 export interface AdminSettingsConfig {
