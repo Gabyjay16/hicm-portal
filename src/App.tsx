@@ -120,6 +120,10 @@ export default function App() {
           <Route path="dashboard" element={<StaffDashboard user={user} />} />
           <Route path="plagiarism-lookup" element={<PlagiarismCodeLookup />} />
           <Route path="elections" element={<AdminElections />} />
+          <Route path="forum" element={<ForumPage currentUser={user} />} />
+          <Route path="alerts" element={<AlertsView />} />
+          <Route path="notes" element={<NotesView user={user} />} />
+          <Route path="complaints" element={<ComplaintsDesk user={user} adminMode="none" />} />
         </Route>
 
         {/* Admin Routes */}

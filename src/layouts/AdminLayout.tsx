@@ -1,7 +1,8 @@
 import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Header } from '../components/Header';
-import { User, NavTab, SubView } from '../types';
+import { BottomNav } from '../components/BottomNav';
+import { User } from '../types';
 
 interface AdminLayoutProps {
   user: User | null;
@@ -28,11 +29,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ user, onLogout, onUpda
         unreadAlertCount={0}
       />
       <div className="flex-1 flex w-full">
-        {/* Admin Sidebar can go here */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl mx-auto w-full pb-24 md:pb-8">
           <Outlet />
         </main>
       </div>
+      <BottomNav user={user} />
     </div>
   );
 };
