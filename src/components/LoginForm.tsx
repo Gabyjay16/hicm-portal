@@ -147,7 +147,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
     let role: 'student' | 'staff' | 'admin' = 'student';
     let isStaff = false;
 
-    if (cleanLoginName.includes('admin') || cleanSecret === 'admin123') {
+    const storedAdminPass = localStorage.getItem('admin_password') || 'admin123';
+    if (cleanLoginName.includes('admin') || cleanSecret === storedAdminPass) {
       role = 'admin';
       isStaff = true;
     } else if (
