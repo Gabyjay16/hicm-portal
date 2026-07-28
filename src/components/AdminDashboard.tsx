@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Users, FileText, Activity, ArrowRight, ShieldAlert, BookOpen,
-  CheckCircle, XCircle, Clock, Search, ChevronDown, ChevronUp, Settings
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Users, FileText, Activity, ArrowRight, ShieldAlert, BookOpen, CheckCircle, XCircle, Clock, Search, ChevronDown, ChevronUp, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // Simulated staff pending forum approval list
 const MOCK_PENDING_STAFF = [
@@ -12,7 +9,6 @@ const MOCK_PENDING_STAFF = [
 ];
 
 export const AdminDashboard: React.FC = () => {
-  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalStudents: 0,
     totalStaff: 0,
@@ -174,8 +170,8 @@ export const AdminDashboard: React.FC = () => {
         </h2>
 
         <div className="space-y-3">
-          <button
-            onClick={() => navigate('/admin/users')}
+          <Link
+            to="/admin/users"
             className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-colors group"
           >
             <div className="flex items-center space-x-4">
@@ -186,10 +182,10 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-black group-hover:text-blue-500 transition-colors" />
-          </button>
+          </Link>
 
-          <button
-            onClick={() => navigate('/admin/complaints')}
+          <Link
+            to="/admin/complaints"
             className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-red-400 hover:bg-red-50 transition-colors group"
           >
             <div className="flex items-center space-x-4">
@@ -200,10 +196,10 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-black group-hover:text-red-500 transition-colors" />
-          </button>
+          </Link>
 
-          <button
-            onClick={() => navigate('/admin/complaint-fields')}
+          <Link
+            to="/admin/complaint-fields"
             className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-purple-400 hover:bg-purple-50 transition-colors group"
           >
             <div className="flex items-center space-x-4">
@@ -214,10 +210,10 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-black group-hover:text-purple-500 transition-colors" />
-          </button>
+          </Link>
 
-          <button
-            onClick={() => navigate('/admin/content')}
+          <Link
+            to="/admin/content"
             className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-emerald-400 hover:bg-emerald-50 transition-colors group"
           >
             <div className="flex items-center space-x-4">
@@ -228,10 +224,10 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-black group-hover:text-emerald-500 transition-colors" />
-          </button>
+          </Link>
 
-          <button
-            onClick={() => navigate('/admin/tokens')}
+          <Link
+            to="/admin/tokens"
             className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-amber-400 hover:bg-amber-50 transition-colors group"
           >
             <div className="flex items-center space-x-4">
@@ -242,10 +238,10 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-black group-hover:text-amber-500 transition-colors" />
-          </button>
+          </Link>
 
-          <button
-            onClick={() => navigate('/admin/settings')}
+          <Link
+            to="/admin/settings"
             className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-slate-400 hover:bg-slate-100 transition-colors group"
           >
             <div className="flex items-center space-x-4">
@@ -256,7 +252,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-black group-hover:text-black transition-colors" />
-          </button>
+          </Link>
         </div>
       </div>
     </div>
