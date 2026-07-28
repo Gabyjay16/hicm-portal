@@ -40,8 +40,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ user }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Navigation Accordions */}
-        <div className="lg:col-span-2 space-y-4">
+        {/* Mobile Navigation Accordions (Hidden on Desktop) */}
+        <div className="lg:col-span-2 space-y-4 block md:hidden">
           <AccordionNav onSelectItem={(_, itemId) => navigate(`/student/${itemId}`)} />
         </div>
 

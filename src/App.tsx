@@ -30,7 +30,14 @@ import { AdminElections } from './components/AdminElections';
 import { StudentSettings } from './components/StudentSettings';
 
 export default function App() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const saved = localStorage.getItem('auth_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const [plagiarismTokens, setPlagiarismTokens] = useState<number>(5);
   
@@ -69,14 +76,20 @@ export default function App() {
 
   const handleLogin = (newUser: User) => {
     setUser(newUser);
+    localStorage.setItem('auth_user', JSON.stringify(newUser));
   };
 
   const handleLogout = () => {
     setUser(null);
+    localStorage.removeItem('auth_user');
   };
 
   const handleUpdateUser = (updated: Partial<User>) => {
-    setUser((prev) => (prev ? { ...prev, ...updated } : null));
+    setUser((prev) => {
+      const newUser = prev ? { ...prev, ...updated } : null;
+      if (newUser) localStorage.setItem('auth_user', JSON.stringify(newUser));
+      return newUser;
+    });
   };
 
   return (

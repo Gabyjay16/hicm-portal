@@ -138,6 +138,11 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
       if (!res.ok) return;
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
+        // Fix: If server returns empty but we have local messages, keep local messages
+        // This prevents MSW resets from wiping out local storage persistence
+        if (data.data.length === 0 && prevIdsRef.current.size > 0) {
+          return;
+        }
         const serverMsgs: LocalMessage[] = data.data.map((m: any) => ({
           id: m.id || `srv-${Date.now()}-${Math.random()}`,
           author: m.author || 'Unknown',
