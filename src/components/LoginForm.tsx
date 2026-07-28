@@ -173,7 +173,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
       status: 'Active & Verified',
     };
 
-    onLogin(authenticatedUser);
+    // Give browser password managers a split second to detect the submit event
+    setTimeout(() => {
+      onLogin(authenticatedUser);
+    }, 100);
   };
 
   const handleStudentRegisterSubmit = (e: React.FormEvent) => {
@@ -207,7 +210,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
       level: level,
       status: 'Active Student - Verified',
     };
-    onLogin(newStudent);
+    
+    setTimeout(() => {
+      onLogin(newStudent);
+    }, 100);
   };
 
   const handleStaffRegisterSubmit = (e: React.FormEvent) => {
@@ -232,7 +238,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
       department: department,
       status: `${position} - Verified`,
     };
-    onLogin(newStaff);
+    
+    setTimeout(() => {
+      onLogin(newStaff);
+    }, 100);
   };
 
   /* ─── Shared input style (light theme) ─── */
