@@ -2,6 +2,22 @@ export async function onRequest(context: any) {
   const { env } = context;
 
   try {
+    if (!env.DB) {
+      // Mock data if no D1 binding exists yet
+      return new Response(JSON.stringify({
+        success: true,
+        data: {
+          totalStudents: 1420,
+          totalStaff: 85,
+          activeComplaints: 23,
+          activeEvaluations: 4
+        }
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const studentsQuery = env.DB.prepare(`SELECT COUNT(*) as count FROM Users WHERE role = 'student'`);
     const staffQuery = env.DB.prepare(`SELECT COUNT(*) as count FROM Users WHERE role = 'staff'`);
     const complaintsQuery = env.DB.prepare(`SELECT COUNT(*) as count FROM Complaints WHERE status != 'resolved' AND status != 'closed'`);
