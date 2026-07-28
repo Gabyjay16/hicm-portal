@@ -19,6 +19,7 @@ interface AccordionCategory {
   id: string;
   title: string;
   icon: React.ElementType;
+  color: string;
   items: { id: string; label: string; icon: React.ElementType }[];
 }
 
@@ -27,18 +28,14 @@ interface AccordionNavProps {
 }
 
 export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
-  // All closed by default
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({
-    academics: false,
+    academics: true,
     services: false,
     campus: false,
   });
 
   const toggleCategory = (id: string) => {
-    setOpenCategories((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    setOpenCategories((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const categories: AccordionCategory[] = [
@@ -46,6 +43,7 @@ export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
       id: 'academics',
       title: 'Academics',
       icon: BookOpen,
+      color: 'indigo',
       items: [
         { id: 'evaluation', label: 'Evaluation', icon: Award },
         { id: 'notes', label: 'Lecture Notes', icon: FileText },
@@ -56,6 +54,7 @@ export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
       id: 'services',
       title: 'Student Services',
       icon: Shield,
+      color: 'emerald',
       items: [
         { id: 'complaints', label: 'Complaints Desk', icon: HeartHandshake },
         { id: 'lost-and-found', label: 'Lost & Found', icon: MapPin },
@@ -66,6 +65,7 @@ export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
       id: 'campus',
       title: 'Campus Life',
       icon: Layers,
+      color: 'violet',
       items: [
         { id: 'forum', label: 'General Forum', icon: Users },
         { id: 'elections', label: 'Student Elections', icon: Activity },
@@ -73,54 +73,83 @@ export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
     },
   ];
 
+  const colorMap: Record<string, { header: string; icon: string; item: string; itemHover: string; badge: string }> = {
+    indigo: {
+      header: 'border-indigo-500/30 bg-indigo-500/10',
+      icon: 'bg-indigo-500/20 text-indigo-300',
+      item: 'border-white/08 bg-white/04',
+      itemHover: 'hover:bg-indigo-500/15 hover:border-indigo-500/30 hover:text-white',
+      badge: 'text-indigo-300',
+    },
+    emerald: {
+      header: 'border-emerald-500/30 bg-emerald-500/10',
+      icon: 'bg-emerald-500/20 text-emerald-300',
+      item: 'border-white/08 bg-white/04',
+      itemHover: 'hover:bg-emerald-500/15 hover:border-emerald-500/30 hover:text-white',
+      badge: 'text-emerald-300',
+    },
+    violet: {
+      header: 'border-violet-500/30 bg-violet-500/10',
+      icon: 'bg-violet-500/20 text-violet-300',
+      item: 'border-white/08 bg-white/04',
+      itemHover: 'hover:bg-violet-500/15 hover:border-violet-500/30 hover:text-white',
+      badge: 'text-violet-300',
+    },
+  };
+
   const handleItemClick = (categoryTitle: string, item: { id: string; label: string }) => {
-    if (onSelectItem) {
-      onSelectItem(categoryTitle, item.id);
-    }
+    if (onSelectItem) onSelectItem(categoryTitle, item.id);
   };
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-3">
       {categories.map((category) => {
         const CategoryIcon = category.icon;
         const isOpen = !!openCategories[category.id];
+        const colors = colorMap[category.color];
 
         return (
           <div
             key={category.id}
-            className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm transition-all"
+            className={`rounded-2xl border overflow-hidden transition-all duration-300 ${
+              isOpen ? colors.header : 'border-white/08 bg-white/03'
+            }`}
           >
-            {/* Category Header */}
+            {/* Header */}
             <button
               onClick={() => toggleCategory(category.id)}
-              className="w-full flex items-center justify-between p-4 text-left font-semibold text-black hover:bg-slate-50 transition-colors"
+              className="w-full flex items-center justify-between p-4 text-left transition-colors hover:bg-white/05"
             >
               <div className="flex items-center space-x-3">
-                <div className={`p-2 rounded-xl transition-colors ${isOpen ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-black'}`}>
+                <div className={`p-2 rounded-xl transition-colors ${isOpen ? colors.icon : 'bg-white/08 text-slate-400'}`}>
                   <CategoryIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[15px] font-bold text-black">{category.title}</span>
-                  <p className="text-xs text-black font-medium">{category.items.length} Sub-menus</p>
+                  <span className="text-[15px] font-bold text-white">{category.title}</span>
+                  <p className="text-xs text-slate-500 font-medium">{category.items.length} modules</p>
                 </div>
               </div>
-              <div className={`transition-transform duration-200 ${isOpen ? 'text-emerald-500' : 'text-black'}`}>
-                {isOpen ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+              <div className={`transition-all duration-200 ${isOpen ? colors.badge : 'text-slate-500'}`}>
+                {isOpen
+                  ? <ChevronDown className="w-4 h-4" />
+                  : <ChevronRight className="w-4 h-4" />}
               </div>
             </button>
 
-            {/* Accordion Items Body */}
+            {/* Body */}
             {isOpen && (
-              <div className="px-4 pb-4 pt-1 border-t border-slate-100 bg-slate-50 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="px-4 pb-4 pt-1 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {category.items.map((item) => {
                   const ItemIcon = item.icon;
                   return (
                     <button
                       key={item.id}
                       onClick={() => handleItemClick(category.title, item)}
-                      className="flex items-center space-x-3 p-3 rounded-xl bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 text-left transition-all text-black hover:text-emerald-700 group shadow-sm"
+                      className={`flex items-center space-x-3 p-3 rounded-xl border text-left transition-all duration-200 group text-slate-300 ${colors.item} ${colors.itemHover}`}
                     >
-                      <ItemIcon className="w-5 h-5 text-emerald-500 group-hover:scale-110 transition-transform flex-shrink-0" />
+                      <div className={`p-1.5 rounded-lg ${colors.icon} flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                        <ItemIcon className="w-4 h-4" />
+                      </div>
                       <span className="text-sm font-semibold truncate">{item.label}</span>
                     </button>
                   );
