@@ -4,13 +4,14 @@ import { AdminSettingsConfig, User } from '../types';
 
 // Mock data for demo
 const MOCK_STUDENTS = [
-  { id: 'std-2026-089', name: 'Jane Doe', matricNo: 'HICM-2024-089', department: 'Business Administration', level: 'Level 300', status: 'Active', joinDate: '2024-09-01', email: 'j.doe@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false, canManageComplaints: false },
-  { id: 'std-2026-090', name: 'Paul Nkemdirim', matricNo: 'HICM-2024-090', department: 'Human Resources', level: 'Level 200', status: 'Active', joinDate: '2024-09-01', email: 'p.nkemdirim@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false, canManageComplaints: false },
-  { id: 'std-2026-091', name: 'Fatima Bah', matricNo: 'HICM-2024-091', department: 'Business Administration', level: 'Level 400', status: 'Active', joinDate: '2024-09-02', email: 'f.bah@student.hicm.edu', canUpdateAnnouncements: true, canViewAllForums: true, canManageComplaints: true },
-  { id: 'std-2026-092', name: 'Chukwuemeka Eze', matricNo: 'HICM-2024-092', department: 'Marketing', level: 'Level 100', status: 'Active', joinDate: '2025-09-01', email: 'c.eze@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false, canManageComplaints: false },
-  { id: 'std-2026-093', name: 'Abena Mensah', matricNo: 'HICM-2024-093', department: 'Accounting', level: 'Level 500', status: 'Suspended', joinDate: '2023-09-01', email: 'a.mensah@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false, canManageComplaints: false },
-  { id: 'std-2026-094', name: 'Kwame Asante', matricNo: 'HICM-2024-094', department: 'Finance', level: 'Level 600', status: 'Active', joinDate: '2022-09-01', email: 'k.asante@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false, canManageComplaints: false },
+  { id: 'std-2026-089', name: 'Jane Doe', matricNo: 'HICM-2024-089', department: 'Business Administration', level: 'Level 300', status: 'Active', joinDate: '2024-09-01', email: 'j.doe@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false, canManageComplaints: false, hasVotingPermit: false },
+  { id: 'std-2026-090', name: 'Paul Nkemdirim', matricNo: 'HICM-2024-090', department: 'Human Resources', level: 'Level 200', status: 'Active', joinDate: '2024-09-01', email: 'p.nkemdirim@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false, canManageComplaints: false, hasVotingPermit: false },
+  { id: 'std-2026-091', name: 'Fatima Bah', matricNo: 'HICM-2024-091', department: 'Business Administration', level: 'Level 400', status: 'Active', joinDate: '2024-09-02', email: 'f.bah@student.hicm.edu', canUpdateAnnouncements: true, canViewAllForums: true, canManageComplaints: true, hasVotingPermit: true },
+  { id: 'std-2026-092', name: 'Chukwuemeka Eze', matricNo: 'HICM-2024-092', department: 'Marketing', level: 'Level 100', status: 'Active', joinDate: '2025-09-01', email: 'c.eze@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false, canManageComplaints: false, hasVotingPermit: false },
+  { id: 'std-2026-093', name: 'Abena Mensah', matricNo: 'HICM-2024-093', department: 'Accounting', level: 'Level 500', status: 'Suspended', joinDate: '2023-09-01', email: 'a.mensah@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false, canManageComplaints: false, hasVotingPermit: false },
+  { id: 'std-2026-094', name: 'Kwame Asante', matricNo: 'HICM-2024-094', department: 'Finance', level: 'Level 600', status: 'Active', joinDate: '2022-09-01', email: 'k.asante@student.hicm.edu', canUpdateAnnouncements: false, canViewAllForums: false, canManageComplaints: false, hasVotingPermit: false },
 ];
+
 
 const MOCK_STAFF = [
   { id: 'stf-001', name: 'Dr. Samuel Ngwa', staffCode: 'STF-123', department: 'Business Administration', role: 'Lecturer', status: 'Active', isForumApproved: false, joinDate: '2020-01-15', email: 's.ngwa@staff.hicm.edu', canManageComplaints: false, canViewAllForums: false, canUpdateAnnouncements: false, canVerifyMatricules: false, canViewAllStudents: false },

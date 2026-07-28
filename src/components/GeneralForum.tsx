@@ -29,37 +29,68 @@ const playNotificationSound = () => {
   } catch {}
 };
 
-const formatTimestamp = (isoString: string): string => {
-  const date = new Date(isoString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-  const diffWeeks = Math.floor(diffDays / 7);
-
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return date.toLocaleDateString('en-US', { weekday: 'long' });
-  if (diffWeeks === 1) return '1 week ago';
-  if (diffWeeks < 4) return `${diffWeeks} weeks ago`;
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+const formatTimestamp = (iso: string): string => {
+  try {
+    const date = new Date(iso);
+    if (isNaN(date.getTime())) return 'Just now';
+    const diffMs = Date.now() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return date.toLocaleDateString('en-US', { weekday: 'short' });
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  } catch {
+    return 'Just now';
+  }
 };
 
-interface LocalMessage extends ForumMessage {
+interface LocalMessage {
+  id: string;
+  author: string;
+  role?: string;
+  text?: string;
+  imageUrl?: string;
+  audioUrl?: string;
+  timestamp?: string;
+  createdAt: string; // always ISO
   replyTo?: { id: string; author: string; text?: string };
   deleted?: boolean;
-  createdAt: string;
+  isLocal?: boolean; // true = only stored locally, not yet confirmed by server
 }
 
-// LocalStorage key based on forum type
 const getStorageKey = (forumType: string, departmentName?: string) => {
   if (forumType === 'department' && departmentName) {
-    return `forum_messages_dept_${departmentName.replace(/\s+/g, '_')}`;
+    return `forum_msgs_dept_${departmentName.replace(/[^a-zA-Z0-9]/g, '_')}`;
   }
-  return 'forum_messages_general';
+  return 'forum_msgs_general';
+};
+
+const saveMessages = (key: string, msgs: LocalMessage[]) => {
+  try {
+    // Only save last 200 messages to avoid quota issues
+    const toSave = msgs.slice(-200);
+    localStorage.setItem(key, JSON.stringify(toSave));
+  } catch {}
+};
+
+const loadMessages = (key: string): LocalMessage[] => {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    // Ensure all messages have createdAt
+    return parsed.map((m: any) => ({
+      ...m,
+      createdAt: m.createdAt || new Date().toISOString(),
+    }));
+  } catch {
+    return [];
+  }
 };
 
 export const GeneralForum: React.FC<GeneralForumProps> = ({
@@ -69,46 +100,35 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
   customUsername,
 }) => {
   const storageKey = getStorageKey(forumType, departmentName);
-  const [messages, setMessages] = useState<LocalMessage[]>(() => {
-    try {
-      const saved = localStorage.getItem(storageKey);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  
+  // Initialize from localStorage immediately
+  const [messages, setMessages] = useState<LocalMessage[]>(() => loadMessages(storageKey));
   const [inputText, setInputText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(messages.length === 0);
   const [isSending, setIsSending] = useState(false);
   const [replyingTo, setReplyingTo] = useState<LocalMessage | null>(null);
   const [pendingImage, setPendingImage] = useState<string | null>(null);
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [notificationsEnabled] = useState(() => {
-    return localStorage.getItem('forum_notifications') !== 'false';
-  });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const prevMessageCountRef = useRef<number>(messages.length);
+  const prevIdsRef = useRef<Set<string>>(new Set(messages.map(m => m.id)));
 
   const isStaffBlocked = currentUser?.role === 'staff' && !currentUser?.isForumApproved;
-
   const forumTitle = forumType === 'department' && departmentName
     ? `${departmentName} Forum`
     : 'HICM General Forum';
 
-  // Persist messages to localStorage whenever they change
+  // Persist to localStorage whenever messages change
   useEffect(() => {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(messages));
-    } catch {}
+    saveMessages(storageKey, messages);
   }, [messages, storageKey]);
 
-  // Fetch messages from API and merge with local
+  // Fetch from API and merge with local (server is source of truth)
   const fetchMessages = async () => {
     try {
       const endpoint = forumType === 'department'
@@ -119,36 +139,49 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         const serverMsgs: LocalMessage[] = data.data.map((m: any) => ({
-          ...m,
+          id: m.id || `srv-${Date.now()}-${Math.random()}`,
+          author: m.author || 'Unknown',
+          role: m.role,
+          text: m.text,
+          imageUrl: m.imageUrl,
+          audioUrl: m.audioUrl,
           createdAt: m.createdAt || new Date().toISOString(),
+          timestamp: m.timestamp,
+          replyTo: m.replyTo,
+          deleted: m.deleted || false,
+          isLocal: false,
         }));
+
         setMessages(prev => {
-          // Merge: server messages are source of truth, but preserve local-only messages
           const serverIds = new Set(serverMsgs.map(m => m.id));
-          const localOnly = prev.filter(m => m.id.startsWith('local-') && !serverIds.has(m.id));
+          // Keep local-only messages not yet confirmed by server
+          const localOnly = prev.filter(m => m.isLocal && !serverIds.has(m.id));
           const merged = [...serverMsgs, ...localOnly].sort(
             (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
           );
-          // Play sound if new messages arrived
-          if (merged.length > prevMessageCountRef.current && notificationsEnabled) {
-            const hasNewFromOther = merged.slice(prevMessageCountRef.current).some(
-              m => m.author !== (customUsername || currentUser?.name)
-            );
-            if (hasNewFromOther) playNotificationSound();
+          
+          // Check for new messages from others and play sound
+          const newIds = merged.filter(m => !prevIdsRef.current.has(m.id));
+          const hasNewFromOther = newIds.some(
+            m => m.author !== (customUsername || currentUser?.name)
+          );
+          if (hasNewFromOther) {
+            const forumNotifs = localStorage.getItem('forum_notifications') !== 'false';
+            const soundEnabled = localStorage.getItem('notification_sound') !== 'false';
+            if (forumNotifs && soundEnabled) playNotificationSound();
           }
-          prevMessageCountRef.current = merged.length;
+          newIds.forEach(m => prevIdsRef.current.add(m.id));
           return merged;
         });
       }
     } catch {
-      // silently fail — local state still shows
+      // silent — local state still shows
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    setIsLoading(true);
     fetchMessages();
     const interval = setInterval(fetchMessages, 5000);
     return () => clearInterval(interval);
@@ -158,7 +191,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => setPendingImage(ev.target?.result as string);
+    reader.onload = ev => setPendingImage(ev.target?.result as string);
     reader.readAsDataURL(file);
     e.target.value = '';
   };
@@ -168,15 +201,15 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       audioChunksRef.current = [];
-      recorder.ondataavailable = (e) => {
+      recorder.ondataavailable = e => {
         if (e.data.size > 0) audioChunksRef.current.push(e.data);
       };
       recorder.onstop = () => {
         const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         const reader = new FileReader();
-        reader.onload = (ev) => setPendingAudio(ev.target?.result as string);
+        reader.onload = ev => setPendingAudio(ev.target?.result as string);
         reader.readAsDataURL(blob);
-        stream.getTracks().forEach((t) => t.stop());
+        stream.getTracks().forEach(t => t.stop());
       };
       recorder.start();
       mediaRecorderRef.current = recorder;
@@ -192,8 +225,11 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
   };
 
   const handleDelete = (msgId: string) => {
-    setMessages((prev) =>
-      prev.map((m) => m.id === msgId ? { ...m, deleted: true, text: undefined, imageUrl: undefined, audioUrl: undefined } : m)
+    setMessages(prev =>
+      prev.map(m => m.id === msgId
+        ? { ...m, deleted: true, text: undefined, imageUrl: undefined, audioUrl: undefined }
+        : m
+      )
     );
   };
 
@@ -204,31 +240,31 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
     const text = inputText.trim();
     if (!text && !pendingImage && !pendingAudio) return;
 
+    const now = new Date().toISOString();
+    const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const newMsg: LocalMessage = {
-      id: `local-${Date.now()}`,
+      id: localId,
       author: customUsername || currentUser.name,
       role: currentUser.role,
       text: text || undefined,
       imageUrl: pendingImage || undefined,
       audioUrl: pendingAudio || undefined,
-      timestamp: formatTimestamp(new Date().toISOString()),
-      createdAt: new Date().toISOString(),
+      timestamp: 'Just now',
+      createdAt: now,
       replyTo: replyingTo
         ? { id: replyingTo.id, author: replyingTo.author, text: replyingTo.text }
         : undefined,
+      isLocal: true,
     };
 
-    // Play sound for replies
-    if (replyingTo && replyingTo.author !== (customUsername || currentUser.name) && notificationsEnabled) {
-      playNotificationSound();
-    }
-
-    setMessages((prev) => [...prev, newMsg]);
+    prevIdsRef.current.add(localId);
+    setMessages(prev => [...prev, newMsg]);
     setInputText('');
     setPendingImage(null);
     setPendingAudio(null);
     setReplyingTo(null);
 
+    // Post to server in background
     setIsSending(true);
     fetch('/api/forum', {
       method: 'POST',
@@ -236,17 +272,23 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
       body: JSON.stringify({
         text: text || '',
         authorId: currentUser.id,
+        author: customUsername || currentUser.name,
+        role: currentUser.role,
         imageUrl: pendingImage || undefined,
         audioUrl: pendingAudio || undefined,
         department: forumType === 'department' ? departmentName : undefined,
+        createdAt: now,
       }),
     })
-      .then(async (res) => {
+      .then(async res => {
         if (res.ok) {
           const data = await res.json();
-          // Replace local-id with server id if returned
           if (data.id) {
-            setMessages(prev => prev.map(m => m.id === newMsg.id ? { ...m, id: data.id } : m));
+            // Replace local id with server id
+            setMessages(prev => prev.map(m =>
+              m.id === localId ? { ...m, id: data.id, isLocal: false } : m
+            ));
+            prevIdsRef.current.add(data.id);
           }
         }
       })
@@ -265,17 +307,17 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
 
       <div
         className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col"
-        style={{ height: 'calc(100dvh - 180px)', minHeight: '400px', maxHeight: '80vh' }}
+        style={{ height: 'calc(100dvh - 180px)', minHeight: '400px', maxHeight: '85vh' }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-blue-600 flex-shrink-0">
           <div>
             <h2 className="text-sm font-bold text-white">{forumTitle}</h2>
-            <p className="text-xs text-blue-100">{messages.filter(m => !m.deleted).length} messages</p>
+            <p className="text-xs text-blue-100">
+              {messages.filter(m => !m.deleted).length} messages
+            </p>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" title="Live" />
-          </div>
+          <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" title="Live" />
         </div>
 
         {/* Error */}
@@ -288,16 +330,16 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
 
         {/* Message Feed */}
         <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-slate-50">
-          {isLoading ? (
+          {isLoading && messages.length === 0 ? (
             <div className="h-full flex items-center justify-center gap-2 text-slate-500">
               <Loader className="w-5 h-5 animate-spin" /><span className="text-sm">Loading...</span>
             </div>
-          ) : messages.filter(m => !m.deleted || m.deleted).length === 0 ? (
+          ) : messages.length === 0 ? (
             <div className="h-full flex items-center justify-center text-slate-500 text-sm">
               No messages yet. Start the discussion!
             </div>
           ) : (
-            messages.map((msg) => {
+            messages.map(msg => {
               const currentName = customUsername || currentUser?.name;
               const isMe = currentName === msg.author || currentUser?.name === msg.author;
               const isStaffMsg = msg.role === 'staff' || msg.role === 'admin';
@@ -315,7 +357,6 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
               return (
                 <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}>
                   <div className={`max-w-[85%] sm:max-w-md space-y-1.5 ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
-                    {/* Reply context */}
                     {msg.replyTo && (
                       <div className={`flex items-start gap-1 px-3 py-1.5 rounded-xl border text-xs text-slate-600 bg-slate-100 border-slate-200 max-w-full ${isMe ? 'self-end' : 'self-start'}`}>
                         <CornerDownRight className="w-3 h-3 flex-shrink-0 mt-0.5 text-slate-400" />
@@ -323,7 +364,6 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
                         <span className="truncate">{msg.replyTo.text || '(media)'}</span>
                       </div>
                     )}
-
                     <div className={`rounded-2xl px-3 py-2.5 shadow-sm ${
                       isMe
                         ? 'bg-blue-600 text-white rounded-br-none'
@@ -336,12 +376,18 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
                         <span>{formatTimestamp(msg.createdAt)}</span>
                       </div>
                       {msg.text && <p className="text-sm leading-relaxed break-words">{msg.text}</p>}
-                      {msg.imageUrl && <img src={msg.imageUrl} alt="Shared" className="w-full max-w-[200px] sm:max-w-xs rounded-xl mt-1 object-cover" />}
-                      {msg.audioUrl && <audio controls src={msg.audioUrl} className="w-full mt-1" style={{ maxWidth: '240px', height: '36px' }} />}
+                      {msg.imageUrl && (
+                        <img src={msg.imageUrl} alt="Shared" className="w-full max-w-[200px] sm:max-w-xs rounded-xl mt-1 object-cover" />
+                      )}
+                      {msg.audioUrl && (
+                        <audio controls src={msg.audioUrl} className="w-full mt-1" style={{ maxWidth: '240px', height: '36px' }} />
+                      )}
+                      {msg.isLocal && (
+                        <span className="text-[9px] text-blue-200 block text-right mt-0.5">Sending...</span>
+                      )}
                     </div>
-
-                    {/* Actions — visible on hover (or always on mobile) */}
-                    <div className={`flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity ${isMe ? 'justify-end' : 'justify-start'} touch:opacity-100`}>
+                    {/* Action buttons — always visible on touch */}
+                    <div className={`flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ${isMe ? 'justify-end' : 'justify-start'}`}>
                       <button
                         onClick={() => setReplyingTo(msg)}
                         className="flex items-center gap-1 text-[10px] text-slate-600 hover:text-blue-600 px-2 py-1 rounded-full bg-white border border-slate-200 shadow-sm"
@@ -404,7 +450,6 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
             onClick={() => fileInputRef.current?.click()}
             disabled={isStaffBlocked}
             className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors disabled:opacity-40 flex-shrink-0"
-            title="Attach photo"
           >
             <ImageIcon className="w-4 h-4" />
           </button>
@@ -419,7 +464,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
           <input
             type="text"
             value={inputText}
-            onChange={(e) => { setInputText(e.target.value); if (errorMessage) setErrorMessage(''); }}
+            onChange={e => { setInputText(e.target.value); if (errorMessage) setErrorMessage(''); }}
             disabled={!currentUser || isSending || isStaffBlocked}
             placeholder={isStaffBlocked ? 'Forum access pending...' : `Message ${forumTitle}...`}
             className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 placeholder:text-slate-400 disabled:opacity-50 min-w-0"
