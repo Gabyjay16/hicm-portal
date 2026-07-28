@@ -112,12 +112,12 @@ export interface NoteItem {
   tags: string[];
 }
 
-export type ComplaintType = 'wrong_marks' | 'wrong_course_code' | 'remark_script';
+export type ComplaintType = 'academic_complaint';
 
 export interface ComplaintField {
   id: string;
   label: string;
-  type: 'text' | 'number' | 'select' | 'textarea' | 'toggle' | 'file';
+  type: 'text' | 'number' | 'select' | 'textarea' | 'toggle' | 'file' | 'checkbox-group';
   placeholder?: string;
   options?: string[];
   autoFill?: 'name' | 'matricule' | 'phone';

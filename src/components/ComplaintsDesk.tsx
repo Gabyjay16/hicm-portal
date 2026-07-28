@@ -14,69 +14,47 @@ interface ComplaintsDeskProps {
 // Default field configurations for each complaint type
 const defaultFormConfigs: ComplaintFormConfig[] = [
   {
-    type: 'wrong_marks',
-    title: 'Wrong / No Marks',
-    description: 'Report a missing or incorrect mark entry for a course.',
+    type: 'academic_complaint',
+    title: 'Academic Complaint Form',
+    description: 'Submit an academic complaint including transcript issues, missing marks, wrong course codes, and more.',
     allowFileUpload: true,
     fileUploadRequired: false,
     fields: [
-      { id: 'fullName', label: 'Full Name', type: 'text', autoFill: 'name', placeholder: 'Auto-filled' },
-      { id: 'matricule', label: 'Matricule', type: 'text', autoFill: 'matricule', placeholder: 'Auto-filled' },
-      { id: 'phone', label: 'Phone Number', type: 'text', autoFill: 'phone', placeholder: 'Auto-filled' },
-      { id: 'courseName', label: 'Course Name', type: 'text', placeholder: 'e.g. Principles of Management' },
-      { id: 'courseCode', label: 'Course Code', type: 'text', placeholder: 'e.g. MGT 301' },
-      { id: 'camark', label: 'CA Mark', type: 'toggle', toggleLabel: 'NO MARK', placeholder: 'Enter your CA mark' },
+      { id: 'fullName', label: "Student's Name", type: 'text', autoFill: 'name', placeholder: 'Auto-filled' },
+      { id: 'matricule', label: 'Reg Number', type: 'text', autoFill: 'matricule', placeholder: 'Auto-filled' },
+      { id: 'department', label: 'Department/Option', type: 'text', placeholder: 'e.g. Management and Entre' },
+      { id: 'phone', label: 'Tel', type: 'text', autoFill: 'phone', placeholder: 'Auto-filled' },
+      { 
+        id: 'natureOfComplaint', 
+        label: 'Nature of Complaint', 
+        type: 'checkbox-group', 
+        options: ['Transcript Issue', 'Certificate Issue', 'Marks Not Found Online', 'Wrong Mark', 'Drop Registered Course', 'Wrong Information', 'Spelling Error', 'Others']
+      },
+      { id: 'natureOthers', label: 'Others (Briefly State)', type: 'text', placeholder: 'If others, specify here...' },
+      { id: 'academicYear', label: 'Academic Year', type: 'text', placeholder: 'e.g. 2025/2026' },
       { id: 'semester', label: 'Semester', type: 'select', options: ['First Semester', 'Second Semester'] },
-      { id: 'year', label: 'Academic Year', type: 'text', placeholder: 'e.g. 2024/2025' },
+      { id: 'caMark', label: 'CA Mark', type: 'text', placeholder: 'e.g. 15' },
+      { id: 'examMark', label: 'Exam/Resit Mark', type: 'text', placeholder: 'e.g. 0 (Zero)' },
+      { id: 'courseCode', label: 'Course Code', type: 'text', placeholder: 'e.g. MGTC 3218' },
+      { id: 'courseTitle', label: 'Course Title', type: 'text', placeholder: 'e.g. Price and Pricing policy' },
+      { id: 'problem', label: 'Explanation of Complaint (Problem)', type: 'textarea', placeholder: 'Describe the problem in detail...' }
     ],
-  },
-  {
-    type: 'wrong_course_code',
-    title: 'Wrong Course Code',
-    description: 'Report an incorrect course code assignment in your record.',
-    allowFileUpload: false,
-    fields: [
-      { id: 'fullName', label: 'Full Name', type: 'text', autoFill: 'name', placeholder: 'Auto-filled' },
-      { id: 'matricule', label: 'Matricule', type: 'text', autoFill: 'matricule', placeholder: 'Auto-filled' },
-      { id: 'wrongCode', label: 'Incorrect Course Code', type: 'text', placeholder: 'e.g. MGT 201' },
-      { id: 'correctCode', label: 'Correct Course Code', type: 'text', placeholder: 'e.g. MGT 301' },
-      { id: 'description', label: 'Additional Details', type: 'textarea', placeholder: 'Describe the discrepancy...' },
-    ],
-  },
-  {
-    type: 'remark_script',
-    title: 'Request Remark Script',
-    description: 'Request an official review and re-marking of your exam script.',
-    allowFileUpload: true,
-    fields: [
-      { id: 'fullName', label: 'Full Name', type: 'text', autoFill: 'name', placeholder: 'Auto-filled' },
-      { id: 'matricule', label: 'Matricule', type: 'text', autoFill: 'matricule', placeholder: 'Auto-filled' },
-      { id: 'phone', label: 'Phone Number', type: 'text', autoFill: 'phone', placeholder: 'Auto-filled' },
-      { id: 'courseName', label: 'Course Name', type: 'text', placeholder: 'e.g. Business Law' },
-      { id: 'courseCode', label: 'Course Code', type: 'text', placeholder: 'e.g. LAW 201' },
-      { id: 'justification', label: 'Justification', type: 'textarea', placeholder: 'Why do you believe your script needs re-marking?' },
-    ],
-  },
+  }
 ];
 
-const typeIcons: Record<ComplaintType, React.ElementType> = {
-  wrong_marks: BarChart2,
-  wrong_course_code: BookOpen,
-  remark_script: FileSearch,
+const typeIcons: Record<string, React.ElementType> = {
+  academic_complaint: FileSearch,
 };
 
-const typeColors: Record<ComplaintType, string> = {
-  wrong_marks: 'text-red-500 bg-red-50 border-red-200 hover:border-red-400',
-  wrong_course_code: 'text-amber-600 bg-amber-50 border-amber-200 hover:border-amber-400',
-  remark_script: 'text-blue-600 bg-blue-50 border-blue-200 hover:border-blue-400',
+const typeColors: Record<string, string> = {
+  academic_complaint: 'text-blue-600 bg-blue-50 border-blue-200 hover:border-blue-400',
 };
 
 // Mock ALL complaints for management view
 const MOCK_ALL_COMPLAINTS = [
-  { id: 'comp-1', studentName: 'Jane Doe', matricule: 'UBa26C0001', category: 'wrong_marks', subject: 'Wrong / No Marks', status: 'pending', createdAt: '2026-07-27T10:00:00Z', description: JSON.stringify({ courseName: 'Management', courseCode: 'MGT 301', camark: 'NO MARK' }) },
-  { id: 'comp-2', studentName: 'John Smith', matricule: 'UBa26C0002', category: 'wrong_marks', subject: 'Wrong / No Marks', status: 'pending', createdAt: '2026-07-27T11:00:00Z', description: JSON.stringify({ courseName: 'Management', courseCode: 'MGT 301', camark: 'NO MARK' }) },
-  { id: 'comp-3', studentName: 'Alice Johnson', matricule: 'UBa26C0003', category: 'wrong_course_code', subject: 'Wrong Course Code', status: 'in_progress', createdAt: '2026-07-26T14:30:00Z', description: JSON.stringify({ wrongCode: 'LAW 200', correctCode: 'LAW 201' }) },
-  { id: 'comp-4', studentName: 'Jane Doe', matricule: 'UBa26C0001', category: 'remark_script', subject: 'Request Remark Script', status: 'resolved', createdAt: '2026-07-20T09:15:00Z', adminResponse: 'Your script was remarked. The grade has been updated to B+.', description: JSON.stringify({ courseName: 'Business Law', courseCode: 'LAW 201' }) },
+  { id: 'comp-1', studentName: 'Jane Doe', matricule: 'UBa26C0001', category: 'academic_complaint', subject: 'Academic Complaint Form', status: 'pending', createdAt: '2026-07-27T10:00:00Z', description: JSON.stringify({ courseTitle: 'Management', courseCode: 'MGT 301', natureOfComplaint: ['Marks Not Found Online'], problem: 'No CA Mark found.' }) },
+  { id: 'comp-2', studentName: 'John Smith', matricule: 'UBa26C0002', category: 'academic_complaint', subject: 'Academic Complaint Form', status: 'pending', createdAt: '2026-07-27T11:00:00Z', description: JSON.stringify({ courseTitle: 'Accounting', courseCode: 'ACC 201', natureOfComplaint: ['Wrong Mark'], problem: 'I scored higher on the script.' }) },
+  { id: 'comp-3', studentName: 'Alice Johnson', matricule: 'UBa26C0003', category: 'academic_complaint', subject: 'Academic Complaint Form', status: 'in_progress', createdAt: '2026-07-26T14:30:00Z', description: JSON.stringify({ courseTitle: 'Law', courseCode: 'LAW 200', natureOfComplaint: ['Drop Registered Course'], problem: 'I wish to drop this course.' }) },
 ];
 
 export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode = 'none' }) => {
@@ -157,7 +135,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
     fetchComplaints();
   }, [user]);
 
-  const handleFieldChange = (fieldId: string, value: string) => {
+  const handleFieldChange = (fieldId: string, value: any) => {
     setFormValues((prev) => ({ ...prev, [fieldId]: value }));
   };
 
@@ -245,9 +223,9 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
         c.status,
         new Date(c.createdAt).toLocaleDateString(),
         c.examCode || '',
-        desc.courseName || '',
+        desc.courseTitle || desc.courseName || '',
         desc.courseCode || desc.wrongCode || desc.correctCode || '',
-        desc.camark || '',
+        desc.caMark || desc.camark || '',
         JSON.stringify(desc).replace(/"/g, '""')
       ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
     });
@@ -272,12 +250,12 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
       let key = 'Other';
       try {
         const desc = JSON.parse(c.description || '{}');
-        if (groupBy === 'courseName' && desc.courseName) key = desc.courseName;
+        if (groupBy === 'courseName' && desc.courseTitle) key = desc.courseTitle;
         if (groupBy === 'courseCode' && desc.courseCode) key = desc.courseCode;
-        if (groupBy === 'noMark' && desc.camark === 'NO MARK') key = 'No CA Mark';
+        if (groupBy === 'noMark' && desc.natureOfComplaint && desc.natureOfComplaint.includes('Marks Not Found Online')) key = 'Marks Not Found Online';
       } catch (e) {}
       
-      if (groupBy === 'noMark' && key !== 'No CA Mark') return; // Filter to only No Mark
+      if (groupBy === 'noMark' && key !== 'Marks Not Found Online') return; // Filter to only No Mark
       
       if (!groups[key]) groups[key] = [];
       groups[key].push(c);
@@ -516,7 +494,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
                     return (
                       <div key={key} className="border-b border-slate-100 pb-2">
                         <p className="text-xs font-semibold text-slate-500 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
-                        <p className="text-sm font-medium text-slate-900 mt-0.5">{String(value)}</p>
+                        <p className="text-sm font-medium text-slate-900 mt-0.5">{Array.isArray(value) ? value.join(', ') : String(value)}</p>
                       </div>
                     )
                   })}
@@ -836,6 +814,34 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
                 );
               }
 
+              if (field.type === 'checkbox-group') {
+                const currentSelections: string[] = Array.isArray(value) ? value : [];
+                return (
+                  <div key={field.id} className="space-y-2">
+                    <label className="text-xs font-bold text-slate-700">{field.label}</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {(field.options || []).map(opt => (
+                        <label key={opt} className="flex items-center gap-2 cursor-pointer p-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                          <input 
+                            type="checkbox" 
+                            checked={currentSelections.includes(opt)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                handleFieldChange(field.id, [...currentSelections, opt]);
+                              } else {
+                                handleFieldChange(field.id, currentSelections.filter(v => v !== opt));
+                              }
+                            }}
+                            className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                          />
+                          <span className="text-sm font-medium text-slate-700">{opt}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
               return (
                 <div key={field.id} className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700">
@@ -866,6 +872,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
                 <div className="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center hover:border-blue-400 transition-colors bg-slate-50 cursor-pointer relative">
                   <input 
                     type="file" 
+                    accept="application/pdf"
                     onChange={handleFileChange}
                     required={activeConfig.fileUploadRequired}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -878,7 +885,7 @@ export const ComplaintsDesk: React.FC<ComplaintsDeskProps> = ({ user, adminMode 
                   ) : (
                     <div className="text-sm text-slate-500 font-medium">
                       <span className="text-blue-500 font-bold">Click to upload</span> or drag and drop<br/>
-                      <span className="text-xs">PDF, JPG, PNG (max 5MB)</span>
+                      <span className="text-xs">PDF Only (max 5MB)</span>
                     </div>
                   )}
                 </div>

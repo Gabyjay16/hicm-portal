@@ -107,13 +107,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
     return () => clearInterval(interval);
   }, [forumType, departmentName]);
 
-  useEffect(() => {
-    if (currentUser?.role === 'admin' && !initialScrollDone && messages.length > 0) {
-      setInitialScrollDone(true);
-      return;
-    }
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, currentUser?.role, initialScrollDone]);
+  // Removed auto-scroll on mount/update as requested by user
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
