@@ -25,6 +25,7 @@ import { RequestDocuments } from './components/RequestDocuments';
 import { UserManagement } from './components/UserManagement';
 import { PlagiarismCodeLookup } from './components/PlagiarismCodeLookup';
 import { AdminSettings } from './components/AdminSettings';
+import { AdminAnnouncementsManager } from './components/AdminAnnouncementsManager';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -123,6 +124,7 @@ export default function App() {
           <Route path="tokens" element={<TokenRequestsAdmin />} />
           <Route path="users" element={<UserManagement adminSettings={adminSettings} />} />
           <Route path="complaint-fields" element={<ComplaintsDesk user={user} isAdmin={true} />} />
+          <Route path="content" element={<AdminAnnouncementsManager />} />
           <Route path="settings" element={
             <AdminSettings 
               settings={adminSettings} 

@@ -68,47 +68,47 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 px-6 sm:px-8 py-4 flex items-center justify-between border-b border-white/08 text-white" style={{ background: 'rgba(10, 15, 30, 0.95)' }}>
+    <header className="sticky top-0 z-40 bg-white px-6 sm:px-8 py-4 flex items-center justify-between border-b border-slate-200 shadow-sm text-slate-900">
       {/* Title Area */}
       <div className="hidden sm:block">
-        <h1 className="text-xl font-black tracking-tight text-white flex items-center gap-2">
+        <h1 className="text-lg font-black tracking-tight text-slate-900 flex items-center gap-2">
           HICM Hub
         </h1>
         <p className="text-[12px] text-slate-400 font-medium">Student Academic &amp; Services Portal</p>
       </div>
 
       {/* Navigation Links & Profile */}
-      <div className="flex items-center space-x-6 text-sm font-bold text-white">
+      <div className="flex items-center space-x-6 text-sm font-bold text-slate-900">
         <Link 
           to={getHomePath()} 
-          className="hidden md:flex items-center space-x-1.5 hover:text-indigo-300 transition-colors text-slate-400 pb-0.5"
+          className="hidden md:flex items-center space-x-1.5 hover:text-blue-600 transition-colors text-slate-500"
         >
-          <Home className="w-4 h-4 text-indigo-400" />
+          <Home className="w-4 h-4 text-blue-500" />
           <span>Home</span>
         </Link>
         
         <Link 
           to="/student/forum" 
-          className="hidden md:flex items-center space-x-1.5 hover:text-indigo-300 transition-colors text-slate-400"
+          className="hidden md:flex items-center space-x-1.5 hover:text-blue-600 transition-colors text-slate-500"
         >
-          <MessageSquare className="w-4 h-4 text-indigo-400" />
+          <MessageSquare className="w-4 h-4 text-blue-500" />
           <span>Forum</span>
         </Link>
 
         <div className="relative">
           <div 
-            className="flex items-center space-x-2.5 cursor-pointer hover:text-indigo-300 transition-colors group p-1 rounded-xl hover:bg-white/08"
+            className="flex items-center space-x-2.5 cursor-pointer hover:text-blue-600 transition-colors group p-1 rounded-xl hover:bg-blue-50"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            <div className="w-9 h-9 rounded-full bg-indigo-500/20 overflow-hidden border-2 border-indigo-500/50 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <div className="w-9 h-9 rounded-full bg-blue-50 overflow-hidden border-2 border-blue-200 flex items-center justify-center shadow-sm">
                {user?.avatarUrl ? (
                   <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <UserIcon className="w-5 h-5 text-indigo-300" />
+                  <UserIcon className="w-5 h-5 text-blue-600" />
                 )}
             </div>
-            <span className="hidden lg:block font-bold text-slate-300 group-hover:text-white">Profile</span>
-            <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
+            <span className="hidden lg:block font-bold text-slate-700 group-hover:text-blue-600">Profile</span>
+            <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
           </div>
 
           {isDropdownOpen && (

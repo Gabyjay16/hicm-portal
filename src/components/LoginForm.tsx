@@ -235,42 +235,40 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
     onLogin(newStaff);
   };
 
-  /* ─── Shared input style ─── */
-  const inputCls = "w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 transition-all text-sm";
-  const labelCls = "block text-slate-300 text-xs font-semibold mb-1.5 uppercase tracking-wider";
-  const selectCls = "w-full bg-slate-900/60 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-indigo-400 transition-all";
+  /* ─── Shared input style (light theme) ─── */
+  const inputCls = "w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all text-sm";
+  const labelCls = "block text-slate-600 text-xs font-semibold mb-1.5 uppercase tracking-wider";
+  const selectCls = "w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-blue-400 transition-all";
 
   return (
-    /* ─── Full page cinematic background ─── */
+    /* ─── Full page background (white with blue hints) ─── */
     <div className="min-h-screen w-full bg-ambient-glass flex items-center justify-center p-4 relative overflow-hidden">
 
-      {/* Decorative orbs */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-emerald-600/08 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 w-[600px] h-[300px] bg-violet-600/05 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      {/* Subtle decorative orbs */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-400/06 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-indigo-400/05 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
       {/* Card */}
       <div className="relative z-10 w-full max-w-lg animate-fade-in-up">
-        <div className="rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-black/60"
-          style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)' }}>
+        <div className="rounded-3xl overflow-hidden bg-white shadow-xl shadow-slate-200/80 border border-slate-200">
 
           {/* ── Header Banner ── */}
           <div className="relative px-8 pt-10 pb-8 text-center overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.20) 0%, rgba(16,185,129,0.10) 100%)' }}>
-            <div className="absolute inset-0 opacity-20"
-              style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} />
+            style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%)' }}>
+            <div className="absolute inset-0 opacity-30"
+              style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #bfdbfe 1px, transparent 0)', backgroundSize: '24px 24px' }} />
             <div className="relative z-10">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-xl"
-                style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-lg shadow-blue-200"
+                style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}>
                 <GraduationCap className="w-8 h-8 text-white" />
               </div>
-              <h1 className="text-2xl font-black text-white tracking-tight">
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight">
                 {mode === 'landing' && 'HICM Hub'}
                 {mode === 'login_form' && 'Sign In'}
                 {mode === 'student_register' && 'Student Registration'}
                 {mode === 'staff_register' && 'Staff Registration'}
               </h1>
-              <p className="text-slate-400 text-sm mt-1.5 font-medium">
+              <p className="text-slate-500 text-sm mt-1.5 font-medium">
                 {mode === 'landing' && 'Higher Institute of Human Resource Management'}
                 {mode === 'login_form' && 'Enter your credentials to access the portal'}
                 {mode === 'student_register' && 'Create your student account'}
@@ -284,13 +282,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
 
             {/* Error / Success alerts */}
             {errorMessage && (
-              <div className="flex items-center gap-3 p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+              <div className="flex items-center gap-3 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <span>{errorMessage}</span>
               </div>
             )}
             {successMessage && (
-              <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm">
+              <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm">
                 <ShieldCheck className="w-4 h-4 flex-shrink-0" />
                 <span>{successMessage}</span>
               </div>
@@ -304,53 +302,36 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                 <button
                   type="button"
                   onClick={() => { setMode('login_form'); setErrorMessage(''); setSuccessMessage(''); }}
-                  className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl font-bold text-white text-sm transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50"
-                  style={{ background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' }}
+                  className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl font-bold text-white text-sm transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-300/50 hover:shadow-blue-400/60"
+                  style={{ background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' }}
                 >
                   <LogIn className="w-5 h-5" />
                   <span>Log In to Portal</span>
                   <ArrowRight className="w-4 h-4 opacity-70" />
                 </button>
 
-                {/* Quick Stats Row */}
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { label: 'Students', value: '2,400+', color: 'text-indigo-400' },
-                    { label: 'Departments', value: '6', color: 'text-emerald-400' },
-                    { label: 'Active Now', value: '134', color: 'text-violet-400' },
-                  ].map((stat) => (
-                    <div key={stat.label} className="text-center p-3 rounded-xl border border-white/06"
-                      style={{ background: 'rgba(255,255,255,0.03)' }}>
-                      <p className={`text-lg font-black ${stat.color}`}>{stat.value}</p>
-                      <p className="text-slate-500 text-[11px] font-medium">{stat.label}</p>
-                    </div>
-                  ))}
-                </div>
-
                 {/* Announcements Section */}
-                <div className="rounded-2xl border border-white/10 overflow-hidden"
-                  style={{ background: 'rgba(255,255,255,0.03)' }}>
+                <div className="rounded-2xl border border-slate-200 overflow-hidden bg-white shadow-sm">
 
                   {/* Announcement Header */}
-                  <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/08"
-                    style={{ background: 'rgba(255,255,255,0.04)' }}>
+                  <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-slate-50">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center">
-                        <Bell className="w-4 h-4 text-amber-400" />
+                      <div className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center">
+                        <Bell className="w-4 h-4 text-blue-600" />
                       </div>
                       <div>
-                        <p className="text-white font-bold text-sm">Campus Announcements</p>
-                        <p className="text-slate-500 text-[10px]">Official Notices</p>
+                        <p className="text-slate-900 font-bold text-sm">Campus Announcements</p>
+                        <p className="text-slate-400 text-[10px]">Official Notices</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <button type="button" onClick={handleScrollUp}
-                        className="p-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                        className="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all"
                         title="Scroll Up">
                         <ChevronUp className="w-3.5 h-3.5" />
                       </button>
                       <button type="button" onClick={handleScrollDown}
-                        className="p-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                        className="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all"
                         title="Scroll Down">
                         <ChevronDown className="w-3.5 h-3.5" />
                       </button>
@@ -358,39 +339,39 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                   </div>
 
                   {/* Scrollable List */}
-                  <div ref={scrollRef} className="max-h-[320px] overflow-y-auto divide-y divide-white/06">
+                  <div ref={scrollRef} className="max-h-[320px] overflow-y-auto divide-y divide-slate-100">
                     {announcements.map((ann, idx) => {
-                      const colors = [
-                        { dot: 'bg-indigo-400', badge: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' },
-                        { dot: 'bg-emerald-400', badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' },
-                        { dot: 'bg-violet-400',  badge: 'bg-violet-500/20 text-violet-300 border-violet-500/30' },
-                        { dot: 'bg-amber-400',   badge: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
+                      const badgeColors = [
+                        'bg-blue-100 text-blue-700 border-blue-200',
+                        'bg-emerald-100 text-emerald-700 border-emerald-200',
+                        'bg-violet-100 text-violet-700 border-violet-200',
+                        'bg-amber-100 text-amber-700 border-amber-200',
                       ];
-                      const c = colors[idx % colors.length];
+                      const dotColors = ['bg-blue-500', 'bg-emerald-500', 'bg-violet-500', 'bg-amber-500'];
                       return (
                         <div key={ann.id}
-                          className="px-5 py-4 hover:bg-white/04 transition-colors group">
+                          className="px-5 py-4 hover:bg-blue-50/50 transition-colors group">
                           <div className="flex items-start gap-3">
-                            <div className={`w-2 h-2 rounded-full ${c.dot} mt-1.5 flex-shrink-0`} />
+                            <div className={`w-2 h-2 rounded-full ${dotColors[idx % dotColors.length]} mt-1.5 flex-shrink-0`} />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-2 mb-1.5">
-                                <h3 className="text-sm font-semibold text-white leading-snug">{ann.title}</h3>
-                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0 uppercase tracking-wide ${c.badge}`}>
+                                <h3 className="text-sm font-semibold text-slate-900 leading-snug">{ann.title}</h3>
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0 uppercase tracking-wide ${badgeColors[idx % badgeColors.length]}`}>
                                   {ann.category || 'Notice'}
                                 </span>
                               </div>
-                              <p className="text-xs text-slate-400 leading-relaxed">{ann.content}</p>
+                              <p className="text-xs text-slate-500 leading-relaxed">{ann.content}</p>
                               {ann.imageUrl && (
-                                <div className="mt-3 rounded-xl overflow-hidden border border-white/10">
+                                <div className="mt-3 rounded-xl overflow-hidden border border-slate-200">
                                   <img src={ann.imageUrl} alt={ann.title} className="w-full max-h-40 object-cover" />
                                 </div>
                               )}
                               {ann.videoUrl && (
-                                <div className="mt-3 rounded-xl overflow-hidden border border-white/10 bg-black/50">
+                                <div className="mt-3 rounded-xl overflow-hidden border border-slate-200 bg-slate-900">
                                   <video controls src={ann.videoUrl} className="w-full max-h-40 object-contain" />
                                 </div>
                               )}
-                              <p className="text-[10px] text-slate-600 mt-2 font-medium">{ann.date}</p>
+                              <p className="text-[10px] text-slate-400 mt-2 font-medium">{ann.date}</p>
                             </div>
                           </div>
                         </div>
@@ -400,16 +381,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                 </div>
 
                 {/* Footer links */}
-                <div className="flex items-center justify-between pt-2 border-t border-white/08">
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
                   <button type="button"
                     onClick={() => { setMode('student_register'); setErrorMessage(''); setSuccessMessage(''); }}
-                    className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-indigo-300 transition-colors font-medium">
+                    className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-blue-600 transition-colors font-medium">
                     <UserPlus className="w-3.5 h-3.5" />
                     <span>Register as Student</span>
                   </button>
                   <button type="button"
                     onClick={() => { setMode('login_form'); setErrorMessage(''); setSuccessMessage(''); }}
-                    className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-emerald-300 transition-colors font-medium">
+                    className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-blue-600 transition-colors font-medium">
                     <LogIn className="w-3.5 h-3.5" />
                     <span>Sign In</span>
                   </button>
@@ -464,18 +445,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-bold text-white text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/30"
-                  style={{ background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' }}
+                  className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-bold text-white text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-blue-300/50"
+                  style={{ background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' }}
                 >
                   <UserCheck className="w-4 h-4" />
                   <span>{isLoading ? 'Authenticating…' : 'Sign In to Portal'}</span>
                 </button>
 
-                <div className="text-center pt-2 border-t border-white/08">
+                <div className="text-center pt-2 border-t border-slate-100">
                   <button type="button"
                     onClick={() => { setMode('student_register'); setErrorMessage(''); setSuccessMessage(''); }}
-                    className="text-xs text-slate-500 hover:text-indigo-300 transition-colors">
-                    Don't have an account? <span className="font-semibold text-indigo-400">Register here →</span>
+                    className="text-xs text-slate-500 hover:text-blue-600 transition-colors">
+                    Don't have an account? <span className="font-semibold text-blue-600">Register here →</span>
                   </button>
                 </div>
               </form>
@@ -550,17 +531,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
                 </div>
 
                 <button type="submit" disabled={isLoading}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-white text-sm transition-all duration-200 hover:scale-[1.02] disabled:opacity-60 shadow-lg shadow-emerald-500/20"
-                  style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-white text-sm transition-all duration-200 hover:scale-[1.02] disabled:opacity-60 shadow-lg shadow-emerald-200"
+                  style={{ background: 'linear-gradient(135deg, #059669 0%, #047857 100%)' }}>
                   <UserCheck2 className="w-4 h-4" />
                   <span>{isLoading ? 'Registering…' : 'Register Student Account'}</span>
                 </button>
 
-                <div className="text-center pt-2 border-t border-white/08">
+                <div className="text-center pt-2 border-t border-slate-100">
                   <button type="button"
                     onClick={() => { setMode('login_form'); setErrorMessage(''); setSuccessMessage(''); }}
-                    className="text-xs text-slate-500 hover:text-indigo-300 transition-colors">
-                    Already registered? <span className="font-semibold text-indigo-400">Sign In →</span>
+                    className="text-xs text-slate-500 hover:text-blue-600 transition-colors">
+                    Already registered? <span className="font-semibold text-blue-600">Sign In →</span>
                   </button>
                 </div>
               </form>
@@ -640,9 +621,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
           </div>
 
           {/* ── Footer ── */}
-          <div className="px-8 py-4 border-t border-white/08 text-center"
-            style={{ background: 'rgba(0,0,0,0.20)' }}>
-            <p className="text-slate-600 text-[11px]">
+          <div className="px-8 py-4 border-t border-slate-100 text-center bg-slate-50">
+            <p className="text-slate-400 text-[11px]">
               © 2026 HICM · Higher Institute of Human Resource Management
             </p>
           </div>

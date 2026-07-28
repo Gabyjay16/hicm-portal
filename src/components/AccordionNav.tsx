@@ -1,25 +1,14 @@
 import React, { useState } from 'react';
 import {
-  ChevronDown,
-  ChevronRight,
-  BookOpen,
-  Award,
-  FileCheck,
-  Users,
-  Activity,
-  Shield,
-  Layers,
-  FileText,
-  HeartHandshake,
-  Search,
-  MapPin,
+  ChevronDown, ChevronRight, BookOpen, Award, FileCheck,
+  Users, Activity, Shield, Layers, FileText, HeartHandshake, Search, MapPin,
 } from 'lucide-react';
 
 interface AccordionCategory {
   id: string;
   title: string;
   icon: React.ElementType;
-  color: string;
+  color: 'blue' | 'emerald' | 'violet';
   items: { id: string; label: string; icon: React.ElementType }[];
 }
 
@@ -43,7 +32,7 @@ export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
       id: 'academics',
       title: 'Academics',
       icon: BookOpen,
-      color: 'indigo',
+      color: 'blue',
       items: [
         { id: 'evaluation', label: 'Evaluation', icon: Award },
         { id: 'notes', label: 'Lecture Notes', icon: FileText },
@@ -73,27 +62,33 @@ export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
     },
   ];
 
-  const colorMap: Record<string, { header: string; icon: string; item: string; itemHover: string; badge: string }> = {
-    indigo: {
-      header: 'border-indigo-500/30 bg-indigo-500/10',
-      icon: 'bg-indigo-500/20 text-indigo-300',
-      item: 'border-white/08 bg-white/04',
-      itemHover: 'hover:bg-indigo-500/15 hover:border-indigo-500/30 hover:text-white',
-      badge: 'text-indigo-300',
+  const colorMap = {
+    blue: {
+      headerOpen: 'bg-blue-50 border-blue-200',
+      headerClosed: 'bg-white border-slate-200',
+      icon: 'bg-blue-100 text-blue-600',
+      iconClosed: 'bg-slate-100 text-slate-500',
+      chevron: 'text-blue-500',
+      itemHover: 'hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700',
+      itemIcon: 'bg-blue-100 text-blue-600',
     },
     emerald: {
-      header: 'border-emerald-500/30 bg-emerald-500/10',
-      icon: 'bg-emerald-500/20 text-emerald-300',
-      item: 'border-white/08 bg-white/04',
-      itemHover: 'hover:bg-emerald-500/15 hover:border-emerald-500/30 hover:text-white',
-      badge: 'text-emerald-300',
+      headerOpen: 'bg-emerald-50 border-emerald-200',
+      headerClosed: 'bg-white border-slate-200',
+      icon: 'bg-emerald-100 text-emerald-600',
+      iconClosed: 'bg-slate-100 text-slate-500',
+      chevron: 'text-emerald-500',
+      itemHover: 'hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700',
+      itemIcon: 'bg-emerald-100 text-emerald-600',
     },
     violet: {
-      header: 'border-violet-500/30 bg-violet-500/10',
-      icon: 'bg-violet-500/20 text-violet-300',
-      item: 'border-white/08 bg-white/04',
-      itemHover: 'hover:bg-violet-500/15 hover:border-violet-500/30 hover:text-white',
-      badge: 'text-violet-300',
+      headerOpen: 'bg-violet-50 border-violet-200',
+      headerClosed: 'bg-white border-slate-200',
+      icon: 'bg-violet-100 text-violet-600',
+      iconClosed: 'bg-slate-100 text-slate-500',
+      chevron: 'text-violet-500',
+      itemHover: 'hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700',
+      itemIcon: 'bg-violet-100 text-violet-600',
     },
   };
 
@@ -109,45 +104,42 @@ export const AccordionNav: React.FC<AccordionNavProps> = ({ onSelectItem }) => {
         const colors = colorMap[category.color];
 
         return (
-          <div
-            key={category.id}
-            className={`rounded-2xl border overflow-hidden transition-all duration-300 ${
-              isOpen ? colors.header : 'border-white/08 bg-white/03'
-            }`}
-          >
-            {/* Header */}
+          <div key={category.id}
+            className={`rounded-2xl border overflow-hidden transition-all duration-200 shadow-sm ${
+              isOpen ? colors.headerOpen : colors.headerClosed
+            }`}>
+
+            {/* Header button */}
             <button
               onClick={() => toggleCategory(category.id)}
-              className="w-full flex items-center justify-between p-4 text-left transition-colors hover:bg-white/05"
+              className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50 transition-colors"
             >
               <div className="flex items-center space-x-3">
-                <div className={`p-2 rounded-xl transition-colors ${isOpen ? colors.icon : 'bg-white/08 text-slate-400'}`}>
+                <div className={`p-2 rounded-xl transition-colors ${isOpen ? colors.icon : colors.iconClosed}`}>
                   <CategoryIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[15px] font-bold text-white">{category.title}</span>
-                  <p className="text-xs text-slate-500 font-medium">{category.items.length} modules</p>
+                  <span className="text-[15px] font-bold text-slate-900">{category.title}</span>
+                  <p className="text-xs text-slate-400 font-medium">{category.items.length} modules</p>
                 </div>
               </div>
-              <div className={`transition-all duration-200 ${isOpen ? colors.badge : 'text-slate-500'}`}>
-                {isOpen
-                  ? <ChevronDown className="w-4 h-4" />
-                  : <ChevronRight className="w-4 h-4" />}
+              <div className={`transition-all duration-200 ${isOpen ? colors.chevron : 'text-slate-400'}`}>
+                {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
               </div>
             </button>
 
-            {/* Body */}
+            {/* Items */}
             {isOpen && (
-              <div className="px-4 pb-4 pt-1 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="px-4 pb-4 pt-1 border-t border-slate-100 bg-white grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {category.items.map((item) => {
                   const ItemIcon = item.icon;
                   return (
                     <button
                       key={item.id}
                       onClick={() => handleItemClick(category.title, item)}
-                      className={`flex items-center space-x-3 p-3 rounded-xl border text-left transition-all duration-200 group text-slate-300 ${colors.item} ${colors.itemHover}`}
+                      className={`flex items-center space-x-3 p-3 rounded-xl border border-slate-200 bg-slate-50 text-left transition-all duration-150 group text-slate-700 ${colors.itemHover}`}
                     >
-                      <div className={`p-1.5 rounded-lg ${colors.icon} flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                      <div className={`p-1.5 rounded-lg flex-shrink-0 ${colors.itemIcon} group-hover:scale-105 transition-transform`}>
                         <ItemIcon className="w-4 h-4" />
                       </div>
                       <span className="text-sm font-semibold truncate">{item.label}</span>
