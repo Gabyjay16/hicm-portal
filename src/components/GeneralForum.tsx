@@ -308,7 +308,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
   };
 
   return (
-    <div className="w-full mx-auto space-y-4 pb-20 md:pb-6">
+    <div className="w-full mx-auto space-y-4">
       {isStaffBlocked && (
         <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-700 text-sm font-semibold flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 flex-shrink-0" />
@@ -318,7 +318,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
 
       <div
         className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col"
-        style={{ height: 'calc(100dvh - 180px)', minHeight: '400px', maxHeight: '85vh' }}
+        style={{ height: 'calc(100dvh - 220px)', minHeight: '400px', maxHeight: '80vh' }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-blue-600 flex-shrink-0">
@@ -340,7 +340,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
         )}
 
         {/* Message Feed */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-slate-50">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-slate-50" style={{ overflowAnchor: 'none' }}>
           {isLoading && messages.length === 0 ? (
             <div className="h-full flex items-center justify-center gap-2 text-slate-500">
               <Loader className="w-5 h-5 animate-spin" /><span className="text-sm">Loading...</span>
@@ -454,23 +454,23 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
         )}
 
         {/* Input Bar */}
-        <form onSubmit={handleSubmit} className="px-2 sm:px-3 py-3 bg-white border-t border-slate-200 flex gap-2 items-center flex-shrink-0">
+        <form onSubmit={handleSubmit} className="px-1.5 sm:px-3 py-3 bg-white border-t border-slate-200 flex gap-2 items-center flex-shrink-0 w-full overflow-hidden">
           <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageSelect} className="hidden" />
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isStaffBlocked}
-            className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors disabled:opacity-40 flex-shrink-0"
+            className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors disabled:opacity-40 flex-shrink-0"
           >
-            <ImageIcon className="w-4 h-4" />
+            <ImageIcon className="w-5 h-5" />
           </button>
           <button
             type="button"
             onClick={isRecording ? stopRecording : startRecording}
             disabled={isStaffBlocked}
-            className={`p-2.5 rounded-xl transition-colors disabled:opacity-40 flex-shrink-0 ${isRecording ? 'text-red-500 bg-red-50 animate-pulse' : 'text-slate-500 hover:text-blue-600 hover:bg-blue-50'}`}
+            className={`p-2 rounded-xl transition-colors disabled:opacity-40 flex-shrink-0 ${isRecording ? 'text-red-500 bg-red-50 animate-pulse' : 'text-slate-500 hover:text-blue-600 hover:bg-blue-50'}`}
           >
-            {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
           </button>
           <input
             type="text"
@@ -478,7 +478,7 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
             onChange={e => { setInputText(e.target.value); if (errorMessage) setErrorMessage(''); }}
             disabled={!currentUser || isSending || isStaffBlocked}
             placeholder={isStaffBlocked ? 'Forum access pending...' : `Message ${forumTitle}...`}
-            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 placeholder:text-slate-400 disabled:opacity-50 min-w-0"
+            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-base focus:outline-none focus:border-blue-500 placeholder:text-slate-400 disabled:opacity-50 min-w-0"
           />
           <button
             type="submit"

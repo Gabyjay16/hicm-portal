@@ -34,7 +34,7 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
               type="text"
               value={customUsername}
               onChange={(e) => setCustomUsername(e.target.value)}
-              className="px-2 py-1 border rounded text-sm text-black"
+              className="px-2 py-1 border rounded text-base text-black"
             />
           ) : (
             <span className="font-bold text-black">{customUsername}</span>
@@ -73,7 +73,7 @@ export const ForumPage: React.FC<ForumPageProps> = ({ currentUser }) => {
           <select 
             value={adminDept}
             onChange={(e) => setAdminDept(e.target.value)}
-            className="px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-black focus:outline-none focus:border-blue-500 shadow-sm"
+            className="px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-base text-black focus:outline-none focus:border-blue-500 shadow-sm"
           >
             <option value="Money and Banking">Money &amp; Banking</option>
             <option value="Accounting and Finance">Accounting &amp; Finance</option>
