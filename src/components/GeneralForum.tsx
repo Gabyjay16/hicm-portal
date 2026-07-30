@@ -4,6 +4,7 @@ import {
   Send, Image as ImageIcon, Mic, MicOff, X,
   AlertTriangle, Loader, Reply, Trash2, CornerDownRight
 } from 'lucide-react';
+import { checkForForbiddenLinks } from '../utils/urlValidator';
 
 interface GeneralForumProps {
   currentUser: User | null;
@@ -244,6 +245,11 @@ export const GeneralForum: React.FC<GeneralForumProps> = ({
     if (!currentUser || isStaffBlocked) return;
     const text = inputText.trim();
     if (!text && !pendingImage && !pendingAudio) return;
+
+    if (checkForForbiddenLinks(text)) {
+      setErrorMessage('Web links are not allowed in this forum.');
+      return;
+    }
 
     const now = new Date().toISOString();
     const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;

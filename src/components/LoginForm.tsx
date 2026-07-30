@@ -108,7 +108,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
   };
 
   const isStaffVerificationCode = (input: string): boolean => {
-    const clean = input.trim().toUpperCase();
+    const clean = input.trim();
     return clean === 'STF-123' || clean === 'ADM-123' || clean.startsWith('STF-') || clean.startsWith('ADM-');
   };
 
@@ -123,7 +123,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCancel, adminSe
     }
 
     if (isStaffVerificationCode(loginName)) {
-      const code = loginName.trim().toUpperCase();
+      const code = loginName.trim();
       setMode('staff_register');
       if (code === 'ADM-123' || code.includes('ADM')) {
         setPosition('System Administrator');

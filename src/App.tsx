@@ -50,7 +50,8 @@ export default function App() {
       secondaryNumber: '',
       secondaryName: '',
       amount: '3,500',
-    }
+    },
+    aiProvider: 'auto',
   });
 
   const handleEnforceMatricules = () => {
@@ -114,9 +115,15 @@ export default function App() {
           <Route path="dashboard" element={
             <StudentDashboard user={user} plagiarismTokens={plagiarismTokens} />
           } />
-          <Route path="evaluation" element={<TimedEvaluation user={user} />} />
+          <Route path="evaluation" element={<TimedEvaluation user={user} adminSettings={adminSettings} />} />
           <Route path="plagiarism" element={
-            <PlagiarismTest user={user} adminSettings={adminSettings} />
+            <PlagiarismTest 
+              user={user} 
+              adminSettings={adminSettings}
+              plagiarismTokens={plagiarismTokens}
+              onAddTokens={handleAddTokens}
+              onUseToken={handleUsePlagiarismToken}
+            />
           } />
           <Route path="forum" element={<ForumPage currentUser={user} />} />
           <Route path="alerts" element={<AlertsView />} />

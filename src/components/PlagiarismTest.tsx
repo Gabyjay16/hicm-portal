@@ -10,6 +10,9 @@ import { useNavigate } from 'react-router-dom';
 interface PlagiarismTestProps {
   user: User | null;
   adminSettings: AdminSettingsConfig;
+  plagiarismTokens: number;
+  onAddTokens: (amount: number) => void;
+  onUseToken: () => boolean;
 }
 
 // Generate a unique 8-char alphanumeric code
@@ -46,9 +49,9 @@ const PlagiarismGauge: React.FC<{ label: string; pct: number; color: string }> =
   </div>
 );
 
-export const PlagiarismTest: React.FC<PlagiarismTestProps> = ({ user, adminSettings }) => {
+export const PlagiarismTest: React.FC<PlagiarismTestProps> = ({ user, adminSettings, plagiarismTokens, onAddTokens, onUseToken }) => {
   const navigate = useNavigate();
-  const [stage, setStage] = useState<Stage>('payment_gate');
+  const [stage, setStage] = useState<Stage>(plagiarismTokens > 0 ? 'upload' : 'payment_gate');
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [paymentSubmitted, setPaymentSubmitted] = useState(false);
@@ -84,6 +87,7 @@ export const PlagiarismTest: React.FC<PlagiarismTestProps> = ({ user, adminSetti
     // In production: upload screenshot to backend for admin approval
     // For now simulate pending -> approved after a delay
     setTimeout(() => {
+      onAddTokens(5);
       setStage('upload');
     }, 2000);
   };
@@ -111,6 +115,11 @@ export const PlagiarismTest: React.FC<PlagiarismTestProps> = ({ user, adminSetti
 
   const startAnalysis = async () => {
     if (!selectedFile || !user) return;
+    if (!onUseToken()) {
+      setErrorMessage('Insufficient tokens. Please purchase a token pack to continue.');
+      setStage('payment_gate');
+      return;
+    }
     setErrorMessage('');
     setIsAnalyzing(true);
     setProgress(0);
@@ -141,6 +150,7 @@ export const PlagiarismTest: React.FC<PlagiarismTestProps> = ({ user, adminSetti
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          provider: adminSettings.aiProvider || 'auto',
           messages: [
             {
               role: 'system',

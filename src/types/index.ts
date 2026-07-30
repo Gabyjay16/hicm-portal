@@ -23,6 +23,7 @@ export interface User {
   canManageComplaints?: boolean;
   canManageElections?: boolean;
   hasVotingPermit?: boolean;
+  plagiarismTokens?: number;
 }
 
 export interface AdminSettingsConfig {
@@ -35,6 +36,7 @@ export interface AdminSettingsConfig {
     secondaryName?: string;
     amount?: string;
   };
+  aiProvider?: 'openrouter' | 'gemini' | 'auto';
 }
 
 export type NavTab = 'home' | 'forum' | 'alerts' | 'notes';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, ShieldAlert, CreditCard, Save, Upload, CheckCircle2, AlertTriangle, FileText } from 'lucide-react';
+import { Settings, ShieldAlert, CreditCard, Save, Upload, CheckCircle2, AlertTriangle, FileText, Cpu } from 'lucide-react';
 import { AdminSettingsConfig } from '../types';
 
 interface AdminSettingsProps {
@@ -111,6 +111,54 @@ export const AdminSettings: React.FC<AdminSettingsProps> = ({ settings, onUpdate
                 className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
               />
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* AI API Provider */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="p-5 border-b border-slate-100 flex items-center gap-3">
+          <div className="p-2 bg-purple-50 rounded-lg text-purple-600"><Cpu className="w-5 h-5" /></div>
+          <div>
+            <h2 className="text-sm font-bold text-black">AI API Provider</h2>
+            <p className="text-xs text-black">Select which AI provider to use for generation and checks.</p>
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="flex gap-4 items-center text-sm font-medium text-black">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input 
+                type="radio" 
+                name="aiProvider" 
+                value="openrouter"
+                checked={localSettings.aiProvider === 'openrouter'}
+                onChange={() => setLocalSettings(s => ({ ...s, aiProvider: 'openrouter' }))}
+                className="w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+              />
+              OpenRouter
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input 
+                type="radio" 
+                name="aiProvider" 
+                value="gemini"
+                checked={localSettings.aiProvider === 'gemini'}
+                onChange={() => setLocalSettings(s => ({ ...s, aiProvider: 'gemini' }))}
+                className="w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+              />
+              Gemini
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input 
+                type="radio" 
+                name="aiProvider" 
+                value="auto"
+                checked={localSettings.aiProvider === 'auto'}
+                onChange={() => setLocalSettings(s => ({ ...s, aiProvider: 'auto' }))}
+                className="w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+              />
+              Auto (Fallback)
+            </label>
           </div>
         </div>
       </div>

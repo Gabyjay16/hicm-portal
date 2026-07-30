@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { QuizQuestion, User } from '../types';
+import { QuizQuestion, User, AdminSettingsConfig } from '../types';
 import { Clock, AlertTriangle, CheckCircle2, XCircle, ArrowLeft, RefreshCw, Award, HelpCircle, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface TimedEvaluationProps {
   user: User | null;
+  adminSettings?: AdminSettingsConfig;
 }
 
-export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
+export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user, adminSettings }) => {
   const navigate = useNavigate();
   // Timer state: 10 minutes = 600 seconds
   const [timeLeft, setTimeLeft] = useState<number>(600);
@@ -46,6 +47,7 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          provider: adminSettings?.aiProvider || 'auto',
           messages: [
             {
               role: 'system',
@@ -58,7 +60,8 @@ export const TimedEvaluation: React.FC<TimedEvaluationProps> = ({ user }) => {
     "correctAnswer": 0,
     "explanation": "<explanation string>"
   }
-]`
+]
+No preamble, no postamble. Must be parsable by JSON.parse().`
             },
             {
               role: 'user',
