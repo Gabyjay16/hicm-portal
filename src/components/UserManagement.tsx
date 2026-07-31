@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Users, GraduationCap, ChevronDown, ChevronUp, User as UserIcon, ShieldAlert, CheckSquare, Square } from 'lucide-react';
+import { Search, Users, GraduationCap, ChevronDown, ChevronUp, User as UserIcon, ShieldAlert, CheckSquare, Square, Key, Copy, Check } from 'lucide-react';
 import { AdminSettingsConfig, User } from '../types';
 
 // Mock data for demo
@@ -27,6 +27,20 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [students, setStudents] = useState<User[]>(MOCK_STUDENTS as unknown as User[]);
   const [staffList, setStaffList] = useState<User[]>(MOCK_STAFF as unknown as User[]);
+  const [generatedStaffCode, setGeneratedStaffCode] = useState<string | null>(null);
+  const [copiedStaffCode, setCopiedStaffCode] = useState(false);
+
+  const handleGenerateStaffCode = () => {
+    const code = `STF-${Math.floor(100000 + Math.random() * 900000)}`;
+    setGeneratedStaffCode(code);
+    setCopiedStaffCode(false);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedStaffCode(true);
+    setTimeout(() => setCopiedStaffCode(false), 2000);
+  };
 
   // Update students if matricules are enforced
   React.useEffect(() => {
@@ -206,9 +220,75 @@ export const UserManagement: React.FC<{ adminSettings?: AdminSettingsConfig }> =
           )
         ) : (
           filteredStaff.length === 0 ? (
-            <p className="p-6 text-xs text-black text-center">No staff found.</p>
+            <div className="divide-y divide-slate-100">
+              {/* Generate Staff Code Section */}
+              <div className="p-4 md:p-6 bg-slate-50 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-bold text-black flex items-center gap-2">
+                    <Key className="w-4 h-4 text-emerald-600" />
+                    Generate Staff Registration Code
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1">Create a one-time code for new staff to register.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  {generatedStaffCode ? (
+                    <div className="flex items-center gap-2 bg-white border border-emerald-200 pl-3 pr-1 py-1 rounded-lg">
+                      <span className="text-sm font-mono font-bold tracking-wider text-emerald-700">{generatedStaffCode}</span>
+                      <button 
+                        onClick={() => copyToClipboard(generatedStaffCode)}
+                        className="p-1.5 hover:bg-emerald-50 rounded-md transition-colors"
+                        title="Copy code"
+                      >
+                        {copiedStaffCode ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-slate-400 hover:text-emerald-600" />}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleGenerateStaffCode}
+                      className="flex items-center gap-2 px-4 py-2 bg-black text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition-colors whitespace-nowrap"
+                    >
+                      <Key className="w-3 h-3" />
+                      Generate Code
+                    </button>
+                  )}
+                </div>
+              </div>
+              <p className="p-6 text-xs text-black text-center">No staff found.</p>
+            </div>
           ) : (
             <div className="divide-y divide-slate-100">
+              {/* Generate Staff Code Section */}
+              <div className="p-4 md:p-6 bg-slate-50 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-bold text-black flex items-center gap-2">
+                    <Key className="w-4 h-4 text-emerald-600" />
+                    Generate Staff Registration Code
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1">Create a one-time code for new staff to register.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  {generatedStaffCode ? (
+                    <div className="flex items-center gap-2 bg-white border border-emerald-200 pl-3 pr-1 py-1 rounded-lg">
+                      <span className="text-sm font-mono font-bold tracking-wider text-emerald-700">{generatedStaffCode}</span>
+                      <button 
+                        onClick={() => copyToClipboard(generatedStaffCode)}
+                        className="p-1.5 hover:bg-emerald-50 rounded-md transition-colors"
+                        title="Copy code"
+                      >
+                        {copiedStaffCode ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-slate-400 hover:text-emerald-600" />}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleGenerateStaffCode}
+                      className="flex items-center gap-2 px-4 py-2 bg-black text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition-colors whitespace-nowrap"
+                    >
+                      <Key className="w-3 h-3" />
+                      Generate Code
+                    </button>
+                  )}
+                </div>
+              </div>
               {filteredStaff.map((staff) => {
                 const isExpanded = expandedId === staff.id;
                 return (

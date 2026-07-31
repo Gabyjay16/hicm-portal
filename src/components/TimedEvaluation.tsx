@@ -172,42 +172,50 @@ No preamble, no postamble. Must be parsable by JSON.parse().`
   }
   
   if (questions.length === 0) {
-    return <div className="text-center text-black py-10 text-xs">No active evaluation found.</div>;
+    return (
+      <div className="max-w-3xl w-full mx-auto space-y-6 pb-16 md:pb-6">
+        {/* AI MCQ Generator Banner */}
+        <div className="glass-panel p-4 rounded-2xl border border-blue-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl backdrop-blur-xl">
+          <div className="flex items-center gap-2.5 text-xs text-black">
+            <Sparkles className="w-5 h-5 text-yellow-400 animate-pulse flex-shrink-0" />
+            <div>
+              <span className="font-bold text-black block text-sm">OpenRouter AI MCQ Generator</span>
+              <span className="text-[11px] text-black">Generate fresh evaluation questions on any subject</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <input
+              type="text"
+              value={aiTopic}
+              onChange={(e) => setAiTopic(e.target.value)}
+              placeholder="e.g. Corporate Finance"
+              className="bg-black/60 border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-400 w-full sm:w-48"
+            />
+            <button
+              type="button"
+              onClick={handleGenerateAIMCQs}
+              disabled={isGeneratingAI}
+              className="px-3.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs rounded-xl shadow-lg transition-all flex items-center gap-1.5 flex-shrink-0 cursor-pointer disabled:opacity-50"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
+              <span>{isGeneratingAI ? 'Generating...' : 'Generate MCQs'}</span>
+            </button>
+          </div>
+        </div>
+        
+        <div className="text-center text-black py-10 text-xs bg-white rounded-xl shadow-sm border border-slate-200">
+          No active evaluation found. Generate an AI Quiz above!
+        </div>
+      </div>
+    );
   }
 
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6 pb-16 md:pb-6">
-      {/* AI MCQ Generator Banner */}
-      <div className="glass-panel p-4 rounded-2xl border border-blue-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl backdrop-blur-xl">
-        <div className="flex items-center gap-2.5 text-xs text-black">
-          <Sparkles className="w-5 h-5 text-yellow-400 animate-pulse flex-shrink-0" />
-          <div>
-            <span className="font-bold text-black block text-sm">OpenRouter AI MCQ Generator</span>
-            <span className="text-[11px] text-black">Generate fresh evaluation questions on any subject</span>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <input
-            type="text"
-            value={aiTopic}
-            onChange={(e) => setAiTopic(e.target.value)}
-            placeholder="e.g. Corporate Finance"
-            className="bg-black/60 border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-400 w-full sm:w-48"
-          />
-          <button
-            type="button"
-            onClick={handleGenerateAIMCQs}
-            disabled={isGeneratingAI}
-            className="px-3.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs rounded-xl shadow-lg transition-all flex items-center gap-1.5 flex-shrink-0 cursor-pointer disabled:opacity-50"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
-            <span>{isGeneratingAI ? 'Generating...' : 'Generate MCQs'}</span>
-          </button>
-        </div>
-      </div>
 
       {/* Top Controls & Navigation */}
       <div className="flex items-center justify-between">
